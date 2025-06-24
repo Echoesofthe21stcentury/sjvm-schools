@@ -2,76 +2,78 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Welcome to Sapta Soul | SJVM Schools</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <title>SJVM Schools - Welcome</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
   <style>
-    * {
-      margin: 0; padding: 0;
-      box-sizing: border-box;
-      font-family: 'Poppins', sans-serif;
-    }
     body {
-      background: linear-gradient(to right, #e0f7fa, #ffffff);
-      color: #004080;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      text-align: center;
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f0f8ff;
+      color: #333;
+    }
+    header {
+      background-color: #004080;
+      color: white;
       padding: 20px;
+      text-align: center;
     }
-    h1 {
-      font-size: 3rem;
-      margin-bottom: 10px;
-      color: #003366;
+    nav {
+      background: #003366;
+      padding: 10px;
+      text-align: center;
     }
-    h2 {
-      font-weight: 400;
-      font-size: 1.5rem;
-      margin-bottom: 40px;
-      color: #006699;
-    }
-    .btn-group {
-      display: flex;
-      gap: 20px;
-      flex-wrap: wrap;
-    }
-    a {
+    nav a {
+      color: white;
       text-decoration: none;
+      margin: 0 15px;
+      font-weight: bold;
+    }
+    nav a:hover {
+      text-decoration: underline;
+    }
+    .content {
+      padding: 30px;
+      text-align: center;
+    }
+    .cta {
+      margin-top: 20px;
+    }
+    .cta a {
+      display: inline-block;
+      padding: 10px 20px;
       background: #004080;
       color: white;
-      padding: 12px 24px;
+      text-decoration: none;
       border-radius: 8px;
-      font-weight: 600;
-      transition: 0.3s;
     }
-    a:hover {
+    .cta a:hover {
       background: #002f5f;
-    }
-    footer {
-      position: absolute;
-      bottom: 10px;
-      font-size: 0.9rem;
-      color: #666;
     }
   </style>
 </head>
 <body>
 
-  <h1>🌟 Sapta Soul</h1>
-  <h2>Uniting 7 Souls for a Better Tomorrow</h2>
+  <header>
+    <h1>Welcome to SJVM Schools</h1>
+    <p>Bandikodigenahalli & Atturu Layout</p>
+  </header>
 
-  <div class="btn-group">
-    <a href="userlogin.html">🔐 Login</a>
-    <a href="register.html">📝 Register</a>
-    <a href="admissions.html">🎓 Admissions</a>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="admission.html">Admission</a>
+    <a href="register.html">Register</a>
+    <a href="userlogin.html">Login</a>
+  </nav>
+
+  <div class="content">
+    <h2>Empowering Students for a Brighter Future</h2>
+    <p>SJVM is committed to academic excellence, holistic development, and strong values.</p>
+
+    <div class="cta">
+      <a href="admission.html">Apply for Admission</a>
+    </div>
   </div>
-
-  <footer>
-    &copy; 2025 SJVM Schools & Sapta Soul. All Rights Reserved.
-  </footer>
 
 </body>
 </html>
-
