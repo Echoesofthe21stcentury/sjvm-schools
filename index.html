@@ -2,78 +2,65 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>SJVM Schools - Welcome</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
-  <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-      margin: 0;
-      padding: 0;
-      background: #f0f8ff;
-      color: #333;
-    }
-    header {
-      background-color: #004080;
-      color: white;
-      padding: 20px;
-      text-align: center;
-    }
-    nav {
-      background: #003366;
-      padding: 10px;
-      text-align: center;
-    }
-    nav a {
-      color: white;
-      text-decoration: none;
-      margin: 0 15px;
-      font-weight: bold;
-    }
-    nav a:hover {
-      text-decoration: underline;
-    }
-    .content {
-      padding: 30px;
-      text-align: center;
-    }
-    .cta {
-      margin-top: 20px;
-    }
-    .cta a {
-      display: inline-block;
-      padding: 10px 20px;
-      background: #004080;
-      color: white;
-      text-decoration: none;
-      border-radius: 8px;
-    }
-    .cta a:hover {
-      background: #002f5f;
-    }
-  </style>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>SJVM Schools – Where Education Meets Excellence</title>
+  <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-
+  <!-- Header / Nav -->
   <header>
-    <h1>Welcome to SJVM Schools</h1>
-    <p>Bandikodigenahalli & Atturu Layout</p>
+    <div class="container">
+      <h1>SJVM Schools</h1>
+      <nav>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="branches.html">Branches</a></li>
+          <li><a href="gallery.html">Gallery</a></li>
+          <li><a href="admission.html">Admission</a></li>
+          <li><a href="request.html">Request Login</a></li>
+          <li><a href="login.html">Login</a></li>
+        </ul>
+      </nav>
+    </div>
   </header>
 
-  <nav>
-    <a href="index.html">Home</a>
-    <a href="admission.html">Admission</a>
-    <a href="register.html">Register</a>
-    <a href="userlogin.html">Login</a>
-  </nav>
-
-  <div class="content">
-    <h2>Empowering Students for a Brighter Future</h2>
-    <p>SJVM is committed to academic excellence, holistic development, and strong values.</p>
-
-    <div class="cta">
-      <a href="admission.html">Apply for Admission</a>
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <h2>Welcome to SJVM Schools</h2>
+      <p class="tagline">Where Education Meets Excellence</p>
+      <img src="images/school_front.jpg" alt="SJVM Schools Building">
     </div>
-  </div>
+  </section>
 
+  <!-- About / Introduction -->
+  <section class="intro container">
+    <h3>About Us</h3>
+    <p>At SJVM Schools, we nurture young minds with a blend of academic rigor and holistic development. Our campuses at Bandikodigenahalli and Atturu Layout offer world-class facilities and caring faculty.</p>
+  </section>
+
+  <!-- Quick Links -->
+  <section class="quick-links container">
+    <div class="card">
+      <h4>Our Branches</h4>
+      <p>Bandikodigenahalli & Atturu Layout</p>
+      <a href="branches.html">Learn More</a>
+    </div>
+    <div class="card">
+      <h4>Gallery</h4>
+      <p>Campus Events & Celebrations</p>
+      <a href="gallery.html">View Gallery</a>
+    </div>
+    <div class="card">
+      <h4>Admissions</h4>
+      <p>Open for 2025–26 Session</p>
+      <a href="admission.html">Apply Now</a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="container">
+    <p>© 2025 SJVM Schools. All Rights Reserved.</p>
+  </footer>
 </body>
 </html>
