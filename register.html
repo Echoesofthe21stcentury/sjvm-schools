@@ -39,7 +39,12 @@
       cursor: pointer;
     }
     button:hover { background-color: #002f5f; }
-    .note { color: #cc0000; font-size: 14px; margin-top: 10px; }
+    .note {
+      color: #cc0000;
+      font-size: 14px;
+      margin-top: 10px;
+      font-weight: 500;
+    }
   </style>
   <script>
     function toggleFields() {
@@ -54,16 +59,16 @@
   <form class="register-form" action="submit_registration.php" method="POST">
     <h2>Register (Student / Teacher)</h2>
 
-    <label>Full Name:</label>
+    <label for="name">Full Name:</label>
     <input type="text" name="name" required />
 
-    <label>Email ID:</label>
+    <label for="email">Email ID:</label>
     <input type="email" name="email" required />
 
-    <label>Mobile Number (+91XXXXXXXXXX):</label>
+    <label for="phone">Mobile Number (+91XXXXXXXXXX):</label>
     <input type="tel" name="phone" pattern="^\+91[0-9]{10}$" placeholder="+91XXXXXXXXXX" required />
 
-    <label>Role:</label>
+    <label for="role">Role:</label>
     <select name="role" id="role" onchange="toggleFields()" required>
       <option value="">-- Select Role --</option>
       <option value="student">Student</option>
@@ -73,10 +78,10 @@
     <!-- Student Fields -->
     <div id="student-fields" style="display:none;">
       <label>Class:</label>
-      <input type="text" name="class" placeholder="e.g., Class 6B" />
+      <input type="text" name="class" placeholder="e.g., Class 6A" />
 
       <label>Gender:</label>
-      <select name="gender" required>
+      <select name="gender">
         <option value="">-- Select Gender --</option>
         <option>Male</option>
         <option>Female</option>
@@ -84,32 +89,32 @@
       </select>
 
       <label>Student Aadhar Number:</label>
-      <input type="text" name="student_aadhar" pattern="[0-9]{12}" required />
+      <input type="text" name="student_aadhar" pattern="[0-9]{12}" maxlength="12" required />
 
-      <label>Father's Name:</label>
+      <label>Father's Name (as per Aadhar):</label>
       <input type="text" name="father_name" required />
       <label>Father's Aadhar Number:</label>
-      <input type="text" name="father_aadhar" pattern="[0-9]{12}" required />
+      <input type="text" name="father_aadhar" pattern="[0-9]{12}" maxlength="12" required />
 
-      <label>Mother's Name:</label>
+      <label>Mother's Name (as per Aadhar):</label>
       <input type="text" name="mother_name" required />
       <label>Mother's Aadhar Number:</label>
-      <input type="text" name="mother_aadhar" pattern="[0-9]{12}" required />
+      <input type="text" name="mother_aadhar" pattern="[0-9]{12}" maxlength="12" required />
 
-      <div class="note">🔒 Note: These details will be used to create your official school profile.</div>
+      <div class="note">🔒 Note: These details will be used as your official school profile if accepted.</div>
     </div>
 
     <!-- Teacher Fields -->
     <div id="teacher-fields" style="display:none;">
       <label>Class Teacher Of:</label>
-      <input type="text" name="classteacher_of" placeholder="e.g., Class 8A" />
+      <input type="text" name="classteacher_of" placeholder="e.g., Class 9B" />
 
       <label>Branch:</label>
       <input type="text" name="branch" placeholder="e.g., SJVM Atturu" />
     </div>
 
-    <label>Message / Extra Info (optional):</label>
-    <textarea name="message" rows="3"></textarea>
+    <label for="message">Message / Extra Info (optional):</label>
+    <textarea name="message" rows="3" placeholder="Any additional info..."></textarea>
 
     <button type="submit">Submit Registration</button>
   </form>
