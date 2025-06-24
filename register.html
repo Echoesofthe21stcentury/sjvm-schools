@@ -52,11 +52,16 @@
       document.getElementById('student-fields').style.display = role === 'student' ? 'block' : 'none';
       document.getElementById('teacher-fields').style.display = role === 'teacher' ? 'block' : 'none';
     }
+
+    function showSuccess() {
+      alert("✅ Registration submitted successfully!");
+      return true;
+    }
   </script>
 </head>
 <body>
 
-  <form class="register-form" action="submit_registration.php" method="POST">
+  <form class="register-form" action="submit_registration.php" method="POST" onsubmit="return showSuccess()">
     <h2>Register (Student / Teacher)</h2>
 
     <label for="name">Full Name:</label>
@@ -93,11 +98,13 @@
 
       <label>Father's Name (as per Aadhar):</label>
       <input type="text" name="father_name" required />
+
       <label>Father's Aadhar Number:</label>
       <input type="text" name="father_aadhar" pattern="[0-9]{12}" maxlength="12" required />
 
       <label>Mother's Name (as per Aadhar):</label>
       <input type="text" name="mother_name" required />
+
       <label>Mother's Aadhar Number:</label>
       <input type="text" name="mother_aadhar" pattern="[0-9]{12}" maxlength="12" required />
 
@@ -109,8 +116,8 @@
       <label>Class Teacher Of:</label>
       <input type="text" name="classteacher_of" placeholder="e.g., Class 9B" />
 
-      <label for="branch">Branch:</label>
-      <select name="branch" id="branch">
+      <label>Branch:</label>
+      <select name="branch">
         <option value="">-- Select Branch --</option>
         <option>SJVM Bandikodigenahalli</option>
         <option>SJVM Atturu</option>
