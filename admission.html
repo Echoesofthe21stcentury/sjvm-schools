@@ -1,134 +1,120 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SJVM Admission Form</title>
+  <title>Admission Form - SJVM Schools</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #eef6fb;
-      color: #333;
+      font-family: Arial;
+      background: #f0f8ff;
       padding: 20px;
     }
-    h2 {
-      color: #1d3557;
-    }
-    form {
-      background: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      max-width: 700px;
-      margin: auto;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    label {
+    label, select, input {
       display: block;
-      margin-top: 15px;
-      font-weight: bold;
-    }
-    select, input, textarea {
+      margin: 10px 0;
       width: 100%;
-      padding: 8px;
-      margin-top: 5px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
+      max-width: 400px;
     }
-    button {
-      background: #0077cc;
-      color: white;
-      padding: 10px 15px;
-      border: none;
-      border-radius: 5px;
-      margin-top: 20px;
-      cursor: pointer;
+    .container {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      max-width: 600px;
+      margin: auto;
     }
   </style>
 </head>
 <body>
+  <div class="container">
+    <h2>Admission Form</h2>
+    
+    <label for="state">Select State:</label>
+    <select id="state" onchange="updateDistricts()">
+      <option value="">-- Select State --</option>
+      <option value="Karnataka">Karnataka</option>
+      <option value="Tamil Nadu">Tamil Nadu</option>
+      <option value="Maharashtra">Maharashtra</option>
+      <option value="Kerala">Kerala</option>
+      <option value="Andhra Pradesh">Andhra Pradesh</option>
+      <option value="Telangana">Telangana</option>
+      <option value="Gujarat">Gujarat</option>
+      <option value="Rajasthan">Rajasthan</option>
+      <option value="Uttar Pradesh">Uttar Pradesh</option>
+      <option value="Madhya Pradesh">Madhya Pradesh</option>
+      <option value="Bihar">Bihar</option>
+      <option value="West Bengal">West Bengal</option>
+      <option value="Odisha">Odisha</option>
+      <option value="Jharkhand">Jharkhand</option>
+      <option value="Chhattisgarh">Chhattisgarh</option>
+      <option value="Assam">Assam</option>
+      <option value="Punjab">Punjab</option>
+      <option value="Haryana">Haryana</option>
+      <option value="Himachal Pradesh">Himachal Pradesh</option>
+      <option value="Uttarakhand">Uttarakhand</option>
+      <option value="Tripura">Tripura</option>
+      <option value="Mizoram">Mizoram</option>
+      <option value="Manipur">Manipur</option>
+      <option value="Nagaland">Nagaland</option>
+      <option value="Sikkim">Sikkim</option>
+      <option value="Meghalaya">Meghalaya</option>
+      <option value="Goa">Goa</option>
+      <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+      <option value="Delhi">Delhi</option>
+    </select>
 
-<h2>🎓 SJVM Admission Form</h2>
+    <label for="district">Select District:</label>
+    <select id="district">
+      <option value="">-- Select District --</option>
+    </select>
+  </div>
 
-<form>
-  <label for="studentName">Name of the Student:</label>
-  <input type="text" id="studentName" name="studentName" required />
+  <script>
+    const districtMap = {
+      "Karnataka": ["Bengaluru Urban", "Bengaluru Rural", "Tumkur", "Mysore", "Udupi", "Hubli", "Dharwad", "Belgaum", "Chikmagalur"],
+      "Tamil Nadu": ["Chennai", "Madurai", "Salem", "Coimbatore", "Tiruchirapalli", "Erode", "Vellore"],
+      "Maharashtra": ["Mumbai", "Pune", "Nagpur", "Nashik", "Aurangabad", "Solapur"],
+      "Kerala": ["Thiruvananthapuram", "Ernakulam", "Kozhikode", "Kollam", "Thrissur", "Palakkad"],
+      "Andhra Pradesh": ["Visakhapatnam", "Vijayawada", "Guntur", "Chittoor", "Nellore"],
+      "Telangana": ["Hyderabad", "Warangal", "Nizamabad", "Karimnagar", "Khammam"],
+      "Gujarat": ["Ahmedabad", "Surat", "Rajkot", "Vadodara", "Bhavnagar"],
+      "Rajasthan": ["Jaipur", "Jodhpur", "Udaipur", "Kota", "Ajmer"],
+      "Uttar Pradesh": ["Lucknow", "Kanpur", "Varanasi", "Agra", "Meerut"],
+      "Madhya Pradesh": ["Bhopal", "Indore", "Gwalior", "Jabalpur", "Ujjain"],
+      "Bihar": ["Patna", "Gaya", "Bhagalpur", "Muzaffarpur", "Darbhanga"],
+      "West Bengal": ["Kolkata", "Howrah", "Darjeeling", "Siliguri", "Bardhaman"],
+      "Odisha": ["Bhubaneswar", "Cuttack", "Rourkela", "Puri", "Balasore"],
+      "Jharkhand": ["Ranchi", "Dhanbad", "Jamshedpur", "Hazaribagh", "Bokaro"],
+      "Chhattisgarh": ["Raipur", "Bilaspur", "Durg", "Korba", "Jagdalpur"],
+      "Assam": ["Guwahati", "Silchar", "Dibrugarh", "Jorhat", "Tezpur"],
+      "Punjab": ["Amritsar", "Ludhiana", "Jalandhar", "Patiala", "Bathinda"],
+      "Haryana": ["Gurgaon", "Faridabad", "Panipat", "Rohtak", "Karnal"],
+      "Himachal Pradesh": ["Shimla", "Kullu", "Mandi", "Dharamshala", "Solan"],
+      "Uttarakhand": ["Dehradun", "Haridwar", "Nainital", "Rishikesh", "Almora"],
+      "Tripura": ["Agartala", "Dharmanagar", "Udaipur", "Kailasahar"],
+      "Mizoram": ["Aizawl", "Lunglei", "Champhai", "Kolasib"],
+      "Manipur": ["Imphal", "Thoubal", "Bishnupur", "Ukhrul"],
+      "Nagaland": ["Kohima", "Dimapur", "Mokokchung", "Wokha"],
+      "Sikkim": ["Gangtok", "Namchi", "Mangan", "Gyalshing"],
+      "Meghalaya": ["Shillong", "Tura", "Nongpoh", "Jowai"],
+      "Goa": ["North Goa", "South Goa"],
+      "Arunachal Pradesh": ["Itanagar", "Tawang", "Bomdila", "Pasighat"],
+      "Delhi": ["Central Delhi", "North Delhi", "South Delhi", "East Delhi", "West Delhi"]
+    };
 
-  <label for="classApply">Class Applying For:</label>
-  <select id="classApply" name="classApply" required>
-    <option value="">--Select--</option>
-    <option>PKG</option>
-    <option>LKG</option>
-    <option>UKG</option>
-    <option>Class 1</option>
-    <option>Class 2</option>
-    <option>Class 3</option>
-    <option>Class 4</option>
-    <option>Class 5</option>
-    <option>Class 6</option>
-    <option>Class 7</option>
-    <option>Class 8</option>
-    <option>Class 9</option>
-    <option>Class 10</option>
-  </select>
+    function updateDistricts() {
+      const state = document.getElementById("state").value;
+      const districtDropdown = document.getElementById("district");
+      districtDropdown.innerHTML = "<option value=''>-- Select District --</option>";
 
-  <label for="state">Native State:</label>
-  <select id="state" required>
-    <option value="">--Select State--</option>
-  </select>
-
-  <label for="district">District:</label>
-  <select id="district" required>
-    <option value="">--Select District--</option>
-  </select>
-
-  <label for="dob">Date of Birth:</label>
-  <input type="date" id="dob" name="dob" required />
-
-  <label for="aadhar">Aadhar Number:</label>
-  <input type="text" id="aadhar" name="aadhar" maxlength="12" pattern="\d{12}" required />
-
-  <label for="address">Permanent Address:</label>
-  <textarea id="address" rows="3" required></textarea>
-
-  <label for="mobile">Mobile Number:</label>
-  <input type="tel" id="mobile" name="mobile" pattern="\d{10}" maxlength="10" required />
-
-  <button type="submit">Submit Admission Request</button>
-</form>
-
-<script>
-  const stateDistrictMap = {
-    "Andhra Pradesh": ["Adilabad", "Anantapur", "Chittoor", "East Godavari", "Guntur", "Hyderabad", "Kadapa", "Karimnagar", "Khammam", "Krishna", "Kurnool", "Nellore", "Prakasam", "Srikakulam", "Visakhapatnam", "Vizianagaram", "West Godavari"],
-    "Arunachal Pradesh": ["Anjaw", "Changlang", "East Kameng", "East Siang", "Kurung Kumey", "Lohit", "Lower Dibang Valley", "Lower Subansiri", "Papum Pare", "Tawang", "Tirap", "Upper Dibang Valley", "Upper Siang", "Upper Subansiri", "West Kameng", "West Siang"],
-    "Assam": ["Baksa", "Barpeta", "Bongaigaon", "Cachar", "Chirang", "Darrang", "Dhemaji", "Dhubri", "Dibrugarh", "Goalpara", "Golaghat", "Hailakandi", "Jorhat", "Kamrup", "Karbi Anglong", "Karimganj", "Kokrajhar", "Lakhimpur", "Morigaon", "Nagaon", "Nalbari", "Sibsagar", "Sonitpur", "Tinsukia", "Udalguri"],
-    "Bihar": ["Araria", "Arwal", "Aurangabad", "Banka", "Begusarai", "Bhagalpur", "Bhojpur", "Buxar", "Darbhanga", "East Champaran", "Gaya", "Gopalganj", "Jamui", "Jehanabad", "Kaimur", "Katihar", "Khagaria", "Kishanganj", "Lakhisarai", "Madhepura", "Madhubani", "Munger", "Muzaffarpur", "Nalanda", "Nawada", "Patna", "Purnia", "Rohtas", "Saharsa", "Samastipur", "Saran", "Sheikhpura", "Sheohar", "Sitamarhi", "Siwan", "Supaul", "Vaishali", "West Champaran"],
-    "Karnataka": ["Bagalkot", "Ballari", "Belagavi", "Bengaluru Rural", "Bengaluru Urban", "Bidar", "Chamarajanagar", "Chikkaballapur", "Chikkamagaluru", "Chitradurga", "Dakshina Kannada", "Davanagere", "Dharwad", "Gadag", "Hassan", "Haveri", "Kalaburagi", "Kodagu", "Kolar", "Koppal", "Mandya", "Mysuru", "Raichur", "Ramanagara", "Shivamogga", "Tumakuru", "Udupi", "Uttara Kannada", "Vijayapura", "Yadgir"],
-    "West Bengal": ["Alipurduar", "Bankura", "Birbhum", "Cooch Behar", "Dakshin Dinajpur", "Darjeeling", "Hooghly", "Howrah", "Jalpaiguri", "Jhargram", "Kalimpong", "Kolkata", "Malda", "Murshidabad", "Nadia", "North 24 Parganas", "Paschim Bardhaman", "Paschim Medinipur", "Purba Bardhaman", "Purba Medinipur", "Purulia", "South 24 Parganas", "Uttar Dinajpur"]
-    // Add all other states here...
-  };
-
-  const stateSelect = document.getElementById("state");
-  const districtSelect = document.getElementById("district");
-
-  for (let state in stateDistrictMap) {
-    let opt = document.createElement("option");
-    opt.value = state;
-    opt.textContent = state;
-    stateSelect.appendChild(opt);
-  }
-
-  stateSelect.addEventListener("change", () => {
-    const selectedState = stateSelect.value;
-    const districts = stateDistrictMap[selectedState] || [];
-    districtSelect.innerHTML = '<option value="">--Select District--</option>';
-    districts.forEach(dist => {
-      const opt = document.createElement("option");
-      opt.value = dist;
-      opt.textContent = dist;
-      districtSelect.appendChild(opt);
-    });
-  });
-</script>
-
+      if (districtMap[state]) {
+        districtMap[state].forEach(function(district) {
+          const option = document.createElement("option");
+          option.text = district;
+          option.value = district;
+          districtDropdown.add(option);
+        });
+      }
+    }
+  </script>
 </body>
 </html>
