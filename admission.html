@@ -1,120 +1,131 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Admission Form - SJVM Schools</title>
+  <title>SJVM School Admission Form</title>
   <style>
     body {
-      font-family: Arial;
-      background: #f0f8ff;
-      padding: 20px;
+      font-family: Arial, sans-serif;
+      background-color: #f2f6fc;
+      padding: 30px;
     }
-    label, select, input {
-      display: block;
-      margin: 10px 0;
-      width: 100%;
-      max-width: 400px;
+    h2 {
+      color: #003366;
     }
-    .container {
-      background: white;
+    form {
+      max-width: 800px;
+      margin: auto;
+      background: #ffffff;
       padding: 20px;
       border-radius: 8px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      max-width: 600px;
-      margin: auto;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    button {
+      margin-top: 20px;
+      background-color: #0066cc;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #004c99;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2>Admission Form</h2>
+
+  <h2>SJVM School Admission Form</h2>
+  <form action="#" method="post" enctype="multipart/form-data">
     
-    <label for="state">Select State:</label>
-    <select id="state" onchange="updateDistricts()">
-      <option value="">-- Select State --</option>
-      <option value="Karnataka">Karnataka</option>
-      <option value="Tamil Nadu">Tamil Nadu</option>
-      <option value="Maharashtra">Maharashtra</option>
-      <option value="Kerala">Kerala</option>
-      <option value="Andhra Pradesh">Andhra Pradesh</option>
-      <option value="Telangana">Telangana</option>
-      <option value="Gujarat">Gujarat</option>
-      <option value="Rajasthan">Rajasthan</option>
-      <option value="Uttar Pradesh">Uttar Pradesh</option>
-      <option value="Madhya Pradesh">Madhya Pradesh</option>
-      <option value="Bihar">Bihar</option>
-      <option value="West Bengal">West Bengal</option>
-      <option value="Odisha">Odisha</option>
-      <option value="Jharkhand">Jharkhand</option>
-      <option value="Chhattisgarh">Chhattisgarh</option>
-      <option value="Assam">Assam</option>
-      <option value="Punjab">Punjab</option>
-      <option value="Haryana">Haryana</option>
-      <option value="Himachal Pradesh">Himachal Pradesh</option>
-      <option value="Uttarakhand">Uttarakhand</option>
-      <option value="Tripura">Tripura</option>
-      <option value="Mizoram">Mizoram</option>
-      <option value="Manipur">Manipur</option>
-      <option value="Nagaland">Nagaland</option>
-      <option value="Sikkim">Sikkim</option>
-      <option value="Meghalaya">Meghalaya</option>
-      <option value="Goa">Goa</option>
-      <option value="Arunachal Pradesh">Arunachal Pradesh</option>
-      <option value="Delhi">Delhi</option>
+    <label>Student Full Name</label>
+    <input type="text" name="student_name" required>
+
+    <label>Class Applying For</label>
+    <select name="class_applying" required>
+      <option value="">-- Select Class --</option>
+      <option>PKG</option><option>LKG</option><option>UKG</option>
+      <option>Class 1</option><option>Class 2</option><option>Class 3</option>
+      <option>Class 4</option><option>Class 5</option><option>Class 6</option>
+      <option>Class 7</option><option>Class 8</option><option>Class 9</option><option>Class 10</option>
     </select>
 
-    <label for="district">Select District:</label>
-    <select id="district">
-      <option value="">-- Select District --</option>
+    <label>Date of Birth</label>
+    <input type="date" name="dob" required>
+
+    <label>Aadhar Number</label>
+    <input type="text" name="aadhar_number" maxlength="12" minlength="12" required>
+
+    <label>Mobile Number</label>
+    <input type="text" name="mobile" maxlength="10" minlength="10" required>
+
+    <label>Gender</label>
+    <select name="gender" required>
+      <option value="">-- Select Gender --</option>
+      <option>Male</option>
+      <option>Female</option>
+      <option>Other</option>
     </select>
-  </div>
 
-  <script>
-    const districtMap = {
-      "Karnataka": ["Bengaluru Urban", "Bengaluru Rural", "Tumkur", "Mysore", "Udupi", "Hubli", "Dharwad", "Belgaum", "Chikmagalur"],
-      "Tamil Nadu": ["Chennai", "Madurai", "Salem", "Coimbatore", "Tiruchirapalli", "Erode", "Vellore"],
-      "Maharashtra": ["Mumbai", "Pune", "Nagpur", "Nashik", "Aurangabad", "Solapur"],
-      "Kerala": ["Thiruvananthapuram", "Ernakulam", "Kozhikode", "Kollam", "Thrissur", "Palakkad"],
-      "Andhra Pradesh": ["Visakhapatnam", "Vijayawada", "Guntur", "Chittoor", "Nellore"],
-      "Telangana": ["Hyderabad", "Warangal", "Nizamabad", "Karimnagar", "Khammam"],
-      "Gujarat": ["Ahmedabad", "Surat", "Rajkot", "Vadodara", "Bhavnagar"],
-      "Rajasthan": ["Jaipur", "Jodhpur", "Udaipur", "Kota", "Ajmer"],
-      "Uttar Pradesh": ["Lucknow", "Kanpur", "Varanasi", "Agra", "Meerut"],
-      "Madhya Pradesh": ["Bhopal", "Indore", "Gwalior", "Jabalpur", "Ujjain"],
-      "Bihar": ["Patna", "Gaya", "Bhagalpur", "Muzaffarpur", "Darbhanga"],
-      "West Bengal": ["Kolkata", "Howrah", "Darjeeling", "Siliguri", "Bardhaman"],
-      "Odisha": ["Bhubaneswar", "Cuttack", "Rourkela", "Puri", "Balasore"],
-      "Jharkhand": ["Ranchi", "Dhanbad", "Jamshedpur", "Hazaribagh", "Bokaro"],
-      "Chhattisgarh": ["Raipur", "Bilaspur", "Durg", "Korba", "Jagdalpur"],
-      "Assam": ["Guwahati", "Silchar", "Dibrugarh", "Jorhat", "Tezpur"],
-      "Punjab": ["Amritsar", "Ludhiana", "Jalandhar", "Patiala", "Bathinda"],
-      "Haryana": ["Gurgaon", "Faridabad", "Panipat", "Rohtak", "Karnal"],
-      "Himachal Pradesh": ["Shimla", "Kullu", "Mandi", "Dharamshala", "Solan"],
-      "Uttarakhand": ["Dehradun", "Haridwar", "Nainital", "Rishikesh", "Almora"],
-      "Tripura": ["Agartala", "Dharmanagar", "Udaipur", "Kailasahar"],
-      "Mizoram": ["Aizawl", "Lunglei", "Champhai", "Kolasib"],
-      "Manipur": ["Imphal", "Thoubal", "Bishnupur", "Ukhrul"],
-      "Nagaland": ["Kohima", "Dimapur", "Mokokchung", "Wokha"],
-      "Sikkim": ["Gangtok", "Namchi", "Mangan", "Gyalshing"],
-      "Meghalaya": ["Shillong", "Tura", "Nongpoh", "Jowai"],
-      "Goa": ["North Goa", "South Goa"],
-      "Arunachal Pradesh": ["Itanagar", "Tawang", "Bomdila", "Pasighat"],
-      "Delhi": ["Central Delhi", "North Delhi", "South Delhi", "East Delhi", "West Delhi"]
-    };
+    <label>State</label>
+    <input type="text" name="state" placeholder="Enter State" required>
 
-    function updateDistricts() {
-      const state = document.getElementById("state").value;
-      const districtDropdown = document.getElementById("district");
-      districtDropdown.innerHTML = "<option value=''>-- Select District --</option>";
+    <label>District</label>
+    <input type="text" name="district" placeholder="Enter District" required>
 
-      if (districtMap[state]) {
-        districtMap[state].forEach(function(district) {
-          const option = document.createElement("option");
-          option.text = district;
-          option.value = district;
-          districtDropdown.add(option);
-        });
-      }
-    }
-  </script>
+    <label>Permanent Address</label>
+    <textarea name="address" rows="4" required></textarea>
+
+    <label>Father's Name</label>
+    <input type="text" name="father_name" required>
+
+    <label>Father's Aadhar Number</label>
+    <input type="text" name="father_aadhar" maxlength="12" minlength="12">
+
+    <label>Mother's Name</label>
+    <input type="text" name="mother_name" required>
+
+    <label>Mother's Aadhar Number</label>
+    <input type="text" name="mother_aadhar" maxlength="12" minlength="12">
+
+    <label>Photo of Student (Live Capture or Upload)</label>
+    <input type="file" name="student_photo" accept="image/*" required>
+
+    <label>Aadhar Card Photo</label>
+    <input type="file" name="aadhar_photo" accept="image/*" required>
+
+    <label>Birth Certificate</label>
+    <input type="file" name="birth_certificate" accept="image/*" required>
+
+    <label>Email (optional)</label>
+    <input type="email" name="email">
+
+    <label>Previous School (if any)</label>
+    <input type="text" name="prev_school">
+
+    <label>How Did You Hear About Us?</label>
+    <select name="ref_source">
+      <option>Social Media</option>
+      <option>By Our Alumni</option>
+      <option>By Our Campaign</option>
+      <option>By Studying Students</option>
+      <option>Advertisement</option>
+    </select>
+
+    <button type="submit">Submit Admission Form</button>
+  </form>
+
 </body>
 </html>
