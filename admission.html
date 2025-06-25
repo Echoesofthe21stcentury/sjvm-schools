@@ -2,130 +2,41 @@
 <html>
 <head>
   <title>SJVM School Admission Form</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f2f6fc;
-      padding: 30px;
-    }
-    h2 {
-      color: #003366;
-    }
-    form {
-      max-width: 800px;
-      margin: auto;
-      background: #ffffff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    label {
-      display: block;
-      margin-top: 15px;
-      font-weight: bold;
-    }
-    input, select, textarea {
-      width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      border-radius: 4px;
-      border: 1px solid #ccc;
-    }
-    button {
-      margin-top: 20px;
-      background-color: #0066cc;
-      color: white;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #004c99;
-    }
-  </style>
 </head>
 <body>
-
-  <h2>SJVM School Admission Form</h2>
+  <h2>Admission Form - SJVM Schools</h2>
   <form action="submit_admission.php" method="post" enctype="multipart/form-data">
+    <label>Student Name:</label><br>
+    <input type="text" name="student_name" required><br><br>
 
-    <label>Student Full Name</label>
-    <input type="text" name="student_name" required>
+    <label>Class Applying For:</label><br>
+    <input type="text" name="class_applying" required><br><br>
 
-    <label>Class Applying For</label>
-    <select name="class_applying" required>
-      <option value="">-- Select Class --</option>
-      <option>PKG</option><option>LKG</option><option>UKG</option>
-      <option>Class 1</option><option>Class 2</option><option>Class 3</option>
-      <option>Class 4</option><option>Class 5</option><option>Class 6</option>
-      <option>Class 7</option><option>Class 8</option><option>Class 9</option><option>Class 10</option>
-    </select>
+    <label>Mobile Number:</label><br>
+    <input type="text" name="mobile" maxlength="10" required><br><br>
 
-    <label>Date of Birth</label>
-    <input type="date" name="dob" required>
+    <label>Date of Birth:</label><br>
+    <input type="date" name="dob" required><br><br>
 
-    <label>Aadhar Number</label>
-    <input type="text" name="aadhar_number" maxlength="12" minlength="12" required>
+    <label>Aadhar Number:</label><br>
+    <input type="text" name="aadhar" maxlength="12" required><br><br>
 
-    <label>Mobile Number</label>
-    <input type="text" name="mobile" maxlength="10" minlength="10" required>
+    <label>Email:</label><br>
+    <input type="email" name="email" required><br><br>
 
-    <label>Gender</label>
-    <select name="gender" required>
-      <option value="">-- Select Gender --</option>
-      <option>Male</option>
-      <option>Female</option>
-      <option>Other</option>
-    </select>
+    <label>Address:</label><br>
+    <textarea name="address" rows="4" cols="40" required></textarea><br><br>
 
-    <label>State</label>
-    <input type="text" name="state" placeholder="Enter State" required>
+    <label>Student Photo:</label><br>
+    <input type="file" name="photo" accept="image/*" required><br><br>
 
-    <label>District</label>
-    <input type="text" name="district" placeholder="Enter District" required>
+    <label>Aadhar Card (PDF/Image):</label><br>
+    <input type="file" name="aadhar_file" accept=".pdf,image/*" required><br><br>
 
-    <label>Permanent Address</label>
-    <textarea name="address" rows="4" required></textarea>
+    <label>Birth Certificate (PDF/Image):</label><br>
+    <input type="file" name="birth_certificate" accept=".pdf,image/*" required><br><br>
 
-    <label>Father's Name</label>
-    <input type="text" name="father_name" required>
-
-    <label>Father's Aadhar Number</label>
-    <input type="text" name="father_aadhar" maxlength="12" minlength="12">
-
-    <label>Mother's Name</label>
-    <input type="text" name="mother_name" required>
-
-    <label>Mother's Aadhar Number</label>
-    <input type="text" name="mother_aadhar" maxlength="12" minlength="12">
-
-    <label>Photo of Student (Live Capture or Upload)</label>
-    <input type="file" name="student_photo" accept="image/*" required>
-
-    <label>Aadhar Card Photo</label>
-    <input type="file" name="aadhar_photo" accept="image/*" required>
-
-    <label>Birth Certificate</label>
-    <input type="file" name="birth_certificate" accept="image/*" required>
-
-    <label>Email (optional)</label>
-    <input type="email" name="email">
-
-    <label>Previous School (if any)</label>
-    <input type="text" name="prev_school">
-
-    <label>How Did You Hear About Us?</label>
-    <select name="ref_source">
-      <option>Social Media</option>
-      <option>By Our Alumni</option>
-      <option>By Our Campaign</option>
-      <option>By Studying Students</option>
-      <option>Advertisement</option>
-    </select>
-
-    <button type="submit">Submit Admission Form</button>
+    <input type="submit" value="Submit Admission Form">
   </form>
-
 </body>
 </html>
