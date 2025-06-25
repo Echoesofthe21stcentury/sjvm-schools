@@ -2,117 +2,110 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Admission - SJVM Schools</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SJVM Schools – Gallery</title>
   <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: #f9f9ff;
-      margin: 0;
-      padding: 40px;
-    }
+    /* Reset & Base */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: #e6f0ff; color: #333; }
+    .container { width: 90%; max-width: 1200px; margin: auto; }
 
-    .form-box {
-      max-width: 600px;
-      margin: auto;
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-    }
+    /* Header & Nav */
+    header { background: #0047ab; color: #fff; padding: 1rem 0; }
+    .logo { display: inline-block; margin-left: 1rem; font-size: 1.6rem; }
+    .nav-list { list-style: none; float: right; margin-right: 1rem; }
+    .nav-list li { display: inline; margin-left: 1.5rem; }
+    .nav-list a { color: #fff; text-decoration: none; font-weight: bold; }
+    .nav-list a.active,
+    .nav-list a:hover { text-decoration: underline; }
 
-    h2 {
-      text-align: center;
-      color: #004080;
-    }
-
-    label {
-      display: block;
-      margin-top: 15px;
-      font-weight: bold;
-    }
-
-    input, select, textarea {
-      width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-    }
-
-    button {
-      background-color: #004080;
-      color: white;
-      padding: 12px;
-      margin-top: 20px;
-      border: none;
-      border-radius: 6px;
+    /* Branch filter */
+    .branch-filter { text-align: center; margin: 2rem 0; }
+    .branch-filter button {
+      background: #0047ab; color: #fff;
+      border: none; padding: 0.6rem 1.2rem;
+      margin: 0 0.5rem; border-radius: 4px;
       cursor: pointer;
-      width: 100%;
-      font-size: 16px;
+    }
+    .branch-filter button.active { background: #003380; }
+
+    /* Gallery grid */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit,minmax(200px,1fr));
+      gap: 1rem;
+    }
+    .gallery-item {
+      overflow: hidden; border-radius: 6px;
+      box-shadow: 0 0 8px rgba(0,102,204,0.2);
+    }
+    .gallery-item img {
+      width: 100%; height: 150px; object-fit: cover;
+      display: block;
     }
 
-    button:hover {
-      background-color: #002f5f;
-    }
-
-    .success {
-      text-align: center;
-      color: green;
-      margin-top: 15px;
-      font-weight: bold;
-    }
+    /* Footer */
+    footer { background: #0047ab; color: #fff; text-align: center; padding: 1rem 0; margin-top: 2rem; }
   </style>
+  <script>
+    function showBranch(branch) {
+      document.querySelectorAll('.gallery-item').forEach(item => {
+        item.style.display = item.dataset.branch === branch || branch === 'all' ? 'block' : 'none';
+      });
+      document.querySelectorAll('.branch-filter button').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.branch === branch);
+      });
+    }
+    window.onload = () => showBranch('all');
+  </script>
 </head>
 <body>
+  <!-- Header/Nav -->
+  <header>
+    <div class="container">
+      <h1 class="logo">SJVM Schools</h1>
+      <nav>
+        <ul class="nav-list">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="branches.html">Branches</a></li>
+          <li><a href="gallery.html" class="active">Gallery</a></li>
+          <li><a href="admission.html">Admission</a></li>
+          <li><a href="request.html">Request Login</a></li>
+          <li><a href="login.html">Login</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
 
-  <div class="form-box">
-    <h2>Apply for Admission</h2>
-    <form>
-      <label for="studentName">Student Name:</label>
-      <input type="text" id="studentName" required>
-
-      <label for="dob">Date of Birth:</label>
-      <input type="date" id="dob" required>
-
-      <label for="gender">Gender:</label>
-      <select id="gender" required>
-        <option value="">-- Select --</option>
-        <option>Male</option>
-        <option>Female</option>
-        <option>Other</option>
-      </select>
-
-      <label for="class">Class Applying For:</label>
-      <select id="class" required>
-        <option value="">-- Select --</option>
-        <option>PKG</option>
-        <option>LKG</option>
-        <option>UKG</option>
-        <option>Class 1</option>
-        <option>Class 2</option>
-        <option>Class 3</option>
-        <option>Class 4</option>
-        <option>Class 5</option>
-        <option>Class 6</option>
-        <option>Class 7</option>
-        <option>Class 8</option>
-        <option>Class 9</option>
-        <option>Class 10</option>
-      </select>
-
-      <label for="parentName">Parent/Guardian Name:</label>
-      <input type="text" id="parentName" required>
-
-      <label for="phone">Contact Number:</label>
-      <input type="tel" id="phone" maxlength="10" required>
-
-      <label for="message">Additional Notes:</label>
-      <textarea id="message" rows="4"></textarea>
-
-      <button type="submit">Submit Application</button>
-    </form>
+  <!-- Branch Filter -->
+  <div class="branch-filter container">
+    <button data-branch="all" onclick="showBranch('all')">All Branches</button>
+    <button data-branch="bandikodigenahalli" onclick="showBranch('bandikodigenahalli')">Bandikodigenahalli</button>
+    <button data-branch="atturu" onclick="showBranch('atturu')">Atturu Layout</button>
   </div>
 
+  <!-- Gallery Grid -->
+  <section class="gallery-grid container">
+    <!-- Bandikodigenahalli photos -->
+    <div class="gallery-item" data-branch="bandikodigenahalli">
+      <img src="images/bandi1.jpg" alt="Bandi Celebration 1">
+    </div>
+    <div class="gallery-item" data-branch="bandikodigenahalli">
+      <img src="images/bandi2.jpg" alt="Bandi Program 2">
+    </div>
+    <!-- Atturu Layout photos -->
+    <div class="gallery-item" data-branch="atturu">
+      <img src="images/attu1.jpg" alt="Atturu Celebration 1">
+    </div>
+    <div class="gallery-item" data-branch="atturu">
+      <img src="images/attu2.jpg" alt="Atturu Program 2">
+    </div>
+    <!-- Add more items as needed -->
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>© 2025 SJVM Schools. All Rights Reserved.</p>
+  </footer>
 </body>
 </html>
