@@ -3,174 +3,131 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SJVM Schools – Admission Form</title>
+  <title>SJVM Admission Form</title>
   <style>
-    body { font-family: Arial, sans-serif; background: #e6f0ff; color: #333; margin: 0; padding: 0; }
-    header, footer { background: #0047ab; color: #fff; text-align: center; padding: 1rem 0; }
-    h1, h2 { color: #0047ab; }
-    .container { max-width: 800px; margin: auto; padding: 2rem; background: #fff; }
-    label { display: block; margin-top: 1rem; font-weight: bold; }
-    input, select, textarea { width: 100%; padding: 0.5rem; margin-top: 0.3rem; }
-    .section { margin-bottom: 2rem; }
-    .hidden { display: none; }
-    button { background: #0047ab; color: #fff; padding: 0.6rem 1.2rem; border: none; margin-top: 1.5rem; cursor: pointer; }
-    button:hover { background: #003380; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #eef6fb;
+      color: #333;
+      padding: 20px;
+    }
+    h2 {
+      color: #1d3557;
+    }
+    form {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 700px;
+      margin: auto;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    select, input, textarea {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      background: #0077cc;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      margin-top: 20px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
 
-<header>
-  <h1>SJVM Schools</h1>
-  <p>Where Education Meets Excellence</p>
-</header>
+<h2>🎓 SJVM Admission Form</h2>
 
-<div class="container">
-  <h2>Admission Form</h2>
-  <form id="admissionForm">
+<form>
+  <label for="studentName">Name of the Student:</label>
+  <input type="text" id="studentName" name="studentName" required />
 
-    <!-- Basic Details -->
-    <div class="section">
-      <label>Student Name</label>
-      <input type="text" name="studentName" required />
+  <label for="classApply">Class Applying For:</label>
+  <select id="classApply" name="classApply" required>
+    <option value="">--Select--</option>
+    <option>PKG</option>
+    <option>LKG</option>
+    <option>UKG</option>
+    <option>Class 1</option>
+    <option>Class 2</option>
+    <option>Class 3</option>
+    <option>Class 4</option>
+    <option>Class 5</option>
+    <option>Class 6</option>
+    <option>Class 7</option>
+    <option>Class 8</option>
+    <option>Class 9</option>
+    <option>Class 10</option>
+  </select>
 
-      <label>Class Applying For</label>
-      <select name="classApplying" required>
-        <option value="">-- Select Class --</option>
-        <option>PKG</option>
-        <option>LKG</option>
-        <option>UKG</option>
-        <option>Class 1</option>
-        <option>Class 2</option>
-        <option>Class 3</option>
-        <option>Class 4</option>
-        <option>Class 5</option>
-        <option>Class 6</option>
-        <option>Class 7</option>
-        <option>Class 8</option>
-        <option>Class 9</option>
-        <option>Class 10</option>
-      </select>
+  <label for="state">Native State:</label>
+  <select id="state" required>
+    <option value="">--Select State--</option>
+  </select>
 
-      <label>Is child under</label>
-      <select id="guardianType" name="guardianType" onchange="toggleGuardianSection()">
-        <option value="">-- Select --</option>
-        <option value="parent">Parent</option>
-        <option value="guardian">Guardian</option>
-      </select>
-    </div>
+  <label for="district">District:</label>
+  <select id="district" required>
+    <option value="">--Select District--</option>
+  </select>
 
-    <!-- Parent/Guardian Section -->
-    <div id="parentSection" class="hidden section">
-      <label>Does the child have a single parent?</label>
-      <select id="singleParent" onchange="toggleSingleParent()">
-        <option value="">-- Select --</option>
-        <option value="no">No</option>
-        <option value="yes">Yes</option>
-      </select>
+  <label for="dob">Date of Birth:</label>
+  <input type="date" id="dob" name="dob" required />
 
-      <div id="bothParents" class="hidden">
-        <label>Father's Name</label>
-        <input type="text" name="fatherName" />
-        <label>Father's Occupation</label>
-        <input type="text" name="fatherOccupation" />
-        <label>Father's Aadhar Number</label>
-        <input type="text" name="fatherAadhar" maxlength="12" />
-        <label>Mother's Name</label>
-        <input type="text" name="motherName" />
-        <label>Mother's Occupation</label>
-        <input type="text" name="motherOccupation" />
-        <label>Mother's Aadhar Number</label>
-        <input type="text" name="motherAadhar" maxlength="12" />
-      </div>
+  <label for="aadhar">Aadhar Number:</label>
+  <input type="text" id="aadhar" name="aadhar" maxlength="12" pattern="\d{12}" required />
 
-      <div id="onlyMother" class="hidden">
-        <label>Mother's Name</label>
-        <input type="text" name="singleMotherName" />
-        <label>Mother's Occupation</label>
-        <input type="text" name="singleMotherOccupation" />
-        <label>Mother's Aadhar Number</label>
-        <input type="text" name="singleMotherAadhar" maxlength="12" />
-      </div>
-    </div>
+  <label for="address">Permanent Address:</label>
+  <textarea id="address" rows="3" required></textarea>
 
-    <div id="guardianSection" class="hidden section">
-      <label>Guardian's Name</label>
-      <input type="text" name="guardianName" />
-      <label>Guardian's Occupation</label>
-      <input type="text" name="guardianOccupation" />
-      <label>Guardian's Aadhar Number</label>
-      <input type="text" name="guardianAadhar" maxlength="12" />
-    </div>
+  <label for="mobile">Mobile Number:</label>
+  <input type="tel" id="mobile" name="mobile" pattern="\d{10}" maxlength="10" required />
 
-    <!-- Contact & Reference -->
-    <div class="section">
-      <label>Mobile Number (10 digits)</label>
-      <input type="text" name="mobile" pattern="\d{10}" required />
-
-      <label>Previous School Name</label>
-      <input type="text" name="prevSchool" />
-
-      <label>Native State</label>
-      <select id="stateDropdown" name="nativeState" onchange="populateDistricts()" required>
-        <option value="">-- Select State --</option>
-        <option value="Karnataka">Karnataka</option>
-        <option value="Tamil Nadu">Tamil Nadu</option>
-        <!-- Add other states -->
-      </select>
-
-      <label>District</label>
-      <select id="districtDropdown" name="district" required></select>
-
-      <label>Permanent Address</label>
-      <textarea name="permAddress" rows="2"></textarea>
-
-      <label>DOB</label>
-      <input type="date" name="dob" required />
-
-      <label>Aadhar Number</label>
-      <input type="text" name="aadhar" maxlength="12" pattern="\d{12}" required />
-    </div>
-
-    <button type="submit">Submit Admission Form</button>
-  </form>
-</div>
-
-<footer>
-  <p>© 2025 SJVM Schools. All Rights Reserved.</p>
-</footer>
+  <button type="submit">Submit Admission Request</button>
+</form>
 
 <script>
-  function toggleGuardianSection() {
-    const type = document.getElementById('guardianType').value;
-    document.getElementById('parentSection').classList.toggle('hidden', type !== 'parent');
-    document.getElementById('guardianSection').classList.toggle('hidden', type !== 'guardian');
+  const stateDistrictMap = {
+    "Andhra Pradesh": ["Adilabad", "Anantapur", "Chittoor", "East Godavari", "Guntur", "Hyderabad", "Kadapa", "Karimnagar", "Khammam", "Krishna", "Kurnool", "Nellore", "Prakasam", "Srikakulam", "Visakhapatnam", "Vizianagaram", "West Godavari"],
+    "Arunachal Pradesh": ["Anjaw", "Changlang", "East Kameng", "East Siang", "Kurung Kumey", "Lohit", "Lower Dibang Valley", "Lower Subansiri", "Papum Pare", "Tawang", "Tirap", "Upper Dibang Valley", "Upper Siang", "Upper Subansiri", "West Kameng", "West Siang"],
+    "Assam": ["Baksa", "Barpeta", "Bongaigaon", "Cachar", "Chirang", "Darrang", "Dhemaji", "Dhubri", "Dibrugarh", "Goalpara", "Golaghat", "Hailakandi", "Jorhat", "Kamrup", "Karbi Anglong", "Karimganj", "Kokrajhar", "Lakhimpur", "Morigaon", "Nagaon", "Nalbari", "Sibsagar", "Sonitpur", "Tinsukia", "Udalguri"],
+    "Bihar": ["Araria", "Arwal", "Aurangabad", "Banka", "Begusarai", "Bhagalpur", "Bhojpur", "Buxar", "Darbhanga", "East Champaran", "Gaya", "Gopalganj", "Jamui", "Jehanabad", "Kaimur", "Katihar", "Khagaria", "Kishanganj", "Lakhisarai", "Madhepura", "Madhubani", "Munger", "Muzaffarpur", "Nalanda", "Nawada", "Patna", "Purnia", "Rohtas", "Saharsa", "Samastipur", "Saran", "Sheikhpura", "Sheohar", "Sitamarhi", "Siwan", "Supaul", "Vaishali", "West Champaran"],
+    "Karnataka": ["Bagalkot", "Ballari", "Belagavi", "Bengaluru Rural", "Bengaluru Urban", "Bidar", "Chamarajanagar", "Chikkaballapur", "Chikkamagaluru", "Chitradurga", "Dakshina Kannada", "Davanagere", "Dharwad", "Gadag", "Hassan", "Haveri", "Kalaburagi", "Kodagu", "Kolar", "Koppal", "Mandya", "Mysuru", "Raichur", "Ramanagara", "Shivamogga", "Tumakuru", "Udupi", "Uttara Kannada", "Vijayapura", "Yadgir"],
+    "West Bengal": ["Alipurduar", "Bankura", "Birbhum", "Cooch Behar", "Dakshin Dinajpur", "Darjeeling", "Hooghly", "Howrah", "Jalpaiguri", "Jhargram", "Kalimpong", "Kolkata", "Malda", "Murshidabad", "Nadia", "North 24 Parganas", "Paschim Bardhaman", "Paschim Medinipur", "Purba Bardhaman", "Purba Medinipur", "Purulia", "South 24 Parganas", "Uttar Dinajpur"]
+    // Add all other states here...
+  };
+
+  const stateSelect = document.getElementById("state");
+  const districtSelect = document.getElementById("district");
+
+  for (let state in stateDistrictMap) {
+    let opt = document.createElement("option");
+    opt.value = state;
+    opt.textContent = state;
+    stateSelect.appendChild(opt);
   }
 
-  function toggleSingleParent() {
-    const status = document.getElementById('singleParent').value;
-    document.getElementById('bothParents').classList.toggle('hidden', status !== 'no');
-    document.getElementById('onlyMother').classList.toggle('hidden', status !== 'yes');
-  }
-
-  function populateDistricts() {
-    const state = document.getElementById('stateDropdown').value;
-    const districtDropdown = document.getElementById('districtDropdown');
-    districtDropdown.innerHTML = '';
-
-    let districts = [];
-    if (state === 'Karnataka') {
-      districts = ['Bengaluru Urban', 'Tumakuru', 'Mysuru'];
-    } else if (state === 'Tamil Nadu') {
-      districts = ['Chennai', 'Coimbatore', 'Madurai'];
-    }
-
+  stateSelect.addEventListener("change", () => {
+    const selectedState = stateSelect.value;
+    const districts = stateDistrictMap[selectedState] || [];
+    districtSelect.innerHTML = '<option value="">--Select District--</option>';
     districts.forEach(dist => {
-      const opt = document.createElement('option');
+      const opt = document.createElement("option");
       opt.value = dist;
       opt.textContent = dist;
-      districtDropdown.appendChild(opt);
+      districtSelect.appendChild(opt);
     });
-  }
+  });
 </script>
 
 </body>
