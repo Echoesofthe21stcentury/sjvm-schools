@@ -1,111 +1,177 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>SJVM Schools – Gallery</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SJVM Schools – Admission Form</title>
   <style>
-    /* Reset & Base */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: Arial, sans-serif; background: #e6f0ff; color: #333; }
-    .container { width: 90%; max-width: 1200px; margin: auto; }
-
-    /* Header & Nav */
-    header { background: #0047ab; color: #fff; padding: 1rem 0; }
-    .logo { display: inline-block; margin-left: 1rem; font-size: 1.6rem; }
-    .nav-list { list-style: none; float: right; margin-right: 1rem; }
-    .nav-list li { display: inline; margin-left: 1.5rem; }
-    .nav-list a { color: #fff; text-decoration: none; font-weight: bold; }
-    .nav-list a.active,
-    .nav-list a:hover { text-decoration: underline; }
-
-    /* Branch filter */
-    .branch-filter { text-align: center; margin: 2rem 0; }
-    .branch-filter button {
-      background: #0047ab; color: #fff;
-      border: none; padding: 0.6rem 1.2rem;
-      margin: 0 0.5rem; border-radius: 4px;
-      cursor: pointer;
-    }
-    .branch-filter button.active { background: #003380; }
-
-    /* Gallery grid */
-    .gallery-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit,minmax(200px,1fr));
-      gap: 1rem;
-    }
-    .gallery-item {
-      overflow: hidden; border-radius: 6px;
-      box-shadow: 0 0 8px rgba(0,102,204,0.2);
-    }
-    .gallery-item img {
-      width: 100%; height: 150px; object-fit: cover;
-      display: block;
-    }
-
-    /* Footer */
-    footer { background: #0047ab; color: #fff; text-align: center; padding: 1rem 0; margin-top: 2rem; }
+    body { font-family: Arial, sans-serif; background: #e6f0ff; color: #333; margin: 0; padding: 0; }
+    header, footer { background: #0047ab; color: #fff; text-align: center; padding: 1rem 0; }
+    h1, h2 { color: #0047ab; }
+    .container { max-width: 800px; margin: auto; padding: 2rem; background: #fff; }
+    label { display: block; margin-top: 1rem; font-weight: bold; }
+    input, select, textarea { width: 100%; padding: 0.5rem; margin-top: 0.3rem; }
+    .section { margin-bottom: 2rem; }
+    .hidden { display: none; }
+    button { background: #0047ab; color: #fff; padding: 0.6rem 1.2rem; border: none; margin-top: 1.5rem; cursor: pointer; }
+    button:hover { background: #003380; }
   </style>
-  <script>
-    function showBranch(branch) {
-      document.querySelectorAll('.gallery-item').forEach(item => {
-        item.style.display = item.dataset.branch === branch || branch === 'all' ? 'block' : 'none';
-      });
-      document.querySelectorAll('.branch-filter button').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.branch === branch);
-      });
-    }
-    window.onload = () => showBranch('all');
-  </script>
 </head>
 <body>
-  <!-- Header/Nav -->
-  <header>
-    <div class="container">
-      <h1 class="logo">SJVM Schools</h1>
-      <nav>
-        <ul class="nav-list">
-          <li><a href="index.html">Home</a></li>
-          <li><a href="branches.html">Branches</a></li>
-          <li><a href="gallery.html" class="active">Gallery</a></li>
-          <li><a href="admission.html">Admission</a></li>
-          <li><a href="request.html">Request Login</a></li>
-          <li><a href="login.html">Login</a></li>
-        </ul>
-      </nav>
-    </div>
-  </header>
 
-  <!-- Branch Filter -->
-  <div class="branch-filter container">
-    <button data-branch="all" onclick="showBranch('all')">All Branches</button>
-    <button data-branch="bandikodigenahalli" onclick="showBranch('bandikodigenahalli')">Bandikodigenahalli</button>
-    <button data-branch="atturu" onclick="showBranch('atturu')">Atturu Layout</button>
-  </div>
+<header>
+  <h1>SJVM Schools</h1>
+  <p>Where Education Meets Excellence</p>
+</header>
 
-  <!-- Gallery Grid -->
-  <section class="gallery-grid container">
-    <!-- Bandikodigenahalli photos -->
-    <div class="gallery-item" data-branch="bandikodigenahalli">
-      <img src="images/bandi1.jpg" alt="Bandi Celebration 1">
-    </div>
-    <div class="gallery-item" data-branch="bandikodigenahalli">
-      <img src="images/bandi2.jpg" alt="Bandi Program 2">
-    </div>
-    <!-- Atturu Layout photos -->
-    <div class="gallery-item" data-branch="atturu">
-      <img src="images/attu1.jpg" alt="Atturu Celebration 1">
-    </div>
-    <div class="gallery-item" data-branch="atturu">
-      <img src="images/attu2.jpg" alt="Atturu Program 2">
-    </div>
-    <!-- Add more items as needed -->
-  </section>
+<div class="container">
+  <h2>Admission Form</h2>
+  <form id="admissionForm">
 
-  <!-- Footer -->
-  <footer>
-    <p>© 2025 SJVM Schools. All Rights Reserved.</p>
-  </footer>
+    <!-- Basic Details -->
+    <div class="section">
+      <label>Student Name</label>
+      <input type="text" name="studentName" required />
+
+      <label>Class Applying For</label>
+      <select name="classApplying" required>
+        <option value="">-- Select Class --</option>
+        <option>PKG</option>
+        <option>LKG</option>
+        <option>UKG</option>
+        <option>Class 1</option>
+        <option>Class 2</option>
+        <option>Class 3</option>
+        <option>Class 4</option>
+        <option>Class 5</option>
+        <option>Class 6</option>
+        <option>Class 7</option>
+        <option>Class 8</option>
+        <option>Class 9</option>
+        <option>Class 10</option>
+      </select>
+
+      <label>Is child under</label>
+      <select id="guardianType" name="guardianType" onchange="toggleGuardianSection()">
+        <option value="">-- Select --</option>
+        <option value="parent">Parent</option>
+        <option value="guardian">Guardian</option>
+      </select>
+    </div>
+
+    <!-- Parent/Guardian Section -->
+    <div id="parentSection" class="hidden section">
+      <label>Does the child have a single parent?</label>
+      <select id="singleParent" onchange="toggleSingleParent()">
+        <option value="">-- Select --</option>
+        <option value="no">No</option>
+        <option value="yes">Yes</option>
+      </select>
+
+      <div id="bothParents" class="hidden">
+        <label>Father's Name</label>
+        <input type="text" name="fatherName" />
+        <label>Father's Occupation</label>
+        <input type="text" name="fatherOccupation" />
+        <label>Father's Aadhar Number</label>
+        <input type="text" name="fatherAadhar" maxlength="12" />
+        <label>Mother's Name</label>
+        <input type="text" name="motherName" />
+        <label>Mother's Occupation</label>
+        <input type="text" name="motherOccupation" />
+        <label>Mother's Aadhar Number</label>
+        <input type="text" name="motherAadhar" maxlength="12" />
+      </div>
+
+      <div id="onlyMother" class="hidden">
+        <label>Mother's Name</label>
+        <input type="text" name="singleMotherName" />
+        <label>Mother's Occupation</label>
+        <input type="text" name="singleMotherOccupation" />
+        <label>Mother's Aadhar Number</label>
+        <input type="text" name="singleMotherAadhar" maxlength="12" />
+      </div>
+    </div>
+
+    <div id="guardianSection" class="hidden section">
+      <label>Guardian's Name</label>
+      <input type="text" name="guardianName" />
+      <label>Guardian's Occupation</label>
+      <input type="text" name="guardianOccupation" />
+      <label>Guardian's Aadhar Number</label>
+      <input type="text" name="guardianAadhar" maxlength="12" />
+    </div>
+
+    <!-- Contact & Reference -->
+    <div class="section">
+      <label>Mobile Number (10 digits)</label>
+      <input type="text" name="mobile" pattern="\d{10}" required />
+
+      <label>Previous School Name</label>
+      <input type="text" name="prevSchool" />
+
+      <label>Native State</label>
+      <select id="stateDropdown" name="nativeState" onchange="populateDistricts()" required>
+        <option value="">-- Select State --</option>
+        <option value="Karnataka">Karnataka</option>
+        <option value="Tamil Nadu">Tamil Nadu</option>
+        <!-- Add other states -->
+      </select>
+
+      <label>District</label>
+      <select id="districtDropdown" name="district" required></select>
+
+      <label>Permanent Address</label>
+      <textarea name="permAddress" rows="2"></textarea>
+
+      <label>DOB</label>
+      <input type="date" name="dob" required />
+
+      <label>Aadhar Number</label>
+      <input type="text" name="aadhar" maxlength="12" pattern="\d{12}" required />
+    </div>
+
+    <button type="submit">Submit Admission Form</button>
+  </form>
+</div>
+
+<footer>
+  <p>© 2025 SJVM Schools. All Rights Reserved.</p>
+</footer>
+
+<script>
+  function toggleGuardianSection() {
+    const type = document.getElementById('guardianType').value;
+    document.getElementById('parentSection').classList.toggle('hidden', type !== 'parent');
+    document.getElementById('guardianSection').classList.toggle('hidden', type !== 'guardian');
+  }
+
+  function toggleSingleParent() {
+    const status = document.getElementById('singleParent').value;
+    document.getElementById('bothParents').classList.toggle('hidden', status !== 'no');
+    document.getElementById('onlyMother').classList.toggle('hidden', status !== 'yes');
+  }
+
+  function populateDistricts() {
+    const state = document.getElementById('stateDropdown').value;
+    const districtDropdown = document.getElementById('districtDropdown');
+    districtDropdown.innerHTML = '';
+
+    let districts = [];
+    if (state === 'Karnataka') {
+      districts = ['Bengaluru Urban', 'Tumakuru', 'Mysuru'];
+    } else if (state === 'Tamil Nadu') {
+      districts = ['Chennai', 'Coimbatore', 'Madurai'];
+    }
+
+    districts.forEach(dist => {
+      const opt = document.createElement('option');
+      opt.value = dist;
+      opt.textContent = dist;
+      districtDropdown.appendChild(opt);
+    });
+  }
+</script>
+
 </body>
 </html>
