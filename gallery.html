@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SJVM Gallery</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #003366;
+      color: white;
+      padding: 15px 20px;
+      text-align: center;
+    }
+
+    nav {
+      background-color: #0059b3;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    nav a {
+      color: white;
+      padding: 14px 20px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    nav a:hover {
+      background-color: #003366;
+    }
+
+    .gallery-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      padding: 20px;
+      justify-content: center;
+    }
+
+    .photo-card {
+      width: 300px;
+      background: white;
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .photo-card img {
+      width: 100%;
+      border-radius: 5px;
+    }
+
+    .upload-form {
+      display: none;
+      background: #eee;
+      padding: 20px;
+      margin: 20px;
+      border-radius: 8px;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .upload-form input, .upload-form select, .upload-form textarea {
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 8px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background-color: #0059b3;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #003366;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>SJVM Schools – Gallery</h1>
+  </header>
+
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="#" onclick="showGallery('bandi')">Bandikodigenahalli</a>
+    <a href="#" onclick="showGallery('atturu')">Atturu Layout</a>
+    <a href="#" onclick="toggleUpload()">Upload (Co-ordinators+)</a>
+  </nav>
+
+  <div class="upload-form" id="uploadForm">
+    <h3>Upload New Photo</h3>
+    <form action="https://YOUR_REPLIT_URL/upload_gallery.php" method="POST" enctype="multipart/form-data">
+      <label>Select Branch:</label>
+      <select name="branch" required>
+        <option value="bandi">Bandikodigenahalli</option>
+        <option value="atturu">Atturu Layout</option>
+      </select><br>
+
+      <label>Select Image:</label>
+      <input type="file" name="photo" accept="image/*" required><br>
+
+      <label>Description (3–5 lines):</label>
+      <textarea name="description" rows="4" required></textarea><br>
+
+      <button type="submit">Upload</button>
+    </form>
+  </div>
+
+  <div class="gallery-container" id="galleryArea">
+    <!-- Loaded photos go here -->
+  </div>
+
+  <script>
+    function showGallery(branch) {
+      fetch(`https://YOUR_REPLIT_URL/gallery_${branch}.json`)
+        .then(res => res.json())
+        .then(data => {
+          const container = document.getElementById("galleryArea");
+          container.innerHTML = "";
+          data.forEach(photo => {
+            const div = document.createElement("div");
+            div.className = "photo-card";
+            div.innerHTML = `
+              <img src="${photo.url}" alt="photo" />
+              <p>${photo.description}</p>
+            `;
+            container.appendChild(div);
+          });
+        })
+        .catch(() => {
+          document.getElementById("galleryArea").innerHTML = "<p>No images found for this branch.</p>";
+        });
+    }
+
+    function toggleUpload() {
+      const form = document.getElementById("uploadForm");
+      form.style.display = form.style.display === "none" ? "block" : "none";
+    }
+  </script>
+
+</body>
+</html>
