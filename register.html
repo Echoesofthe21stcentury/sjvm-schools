@@ -2,145 +2,181 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Register - SJVM Schools</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
+  <title>Request Login – SJVM Schools</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     body {
-      font-family: 'Poppins', sans-serif;
-      background: #f0f8ff;
-      padding: 40px;
-    }
-    .register-form {
-      background: #fff;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f8fb;
       padding: 30px;
-      max-width: 650px;
+    }
+    .form-container {
+      max-width: 700px;
       margin: auto;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      background: white;
+      padding: 25px;
+      border-radius: 8px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
     }
     h2 {
       text-align: center;
-      color: #004080;
+      color: #003366;
+      margin-bottom: 20px;
     }
     label {
       display: block;
-      margin-top: 15px;
+      margin-top: 12px;
+      font-weight: bold;
     }
     input, select, textarea {
       width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      border-radius: 6px;
+      padding: 8px;
+      margin-top: 6px;
       border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    input[type="file"] {
+      padding: 3px;
+    }
+    .section {
+      margin-top: 20px;
+      padding: 15px;
+      border-top: 1px solid #ddd;
     }
     button {
-      background-color: #004080;
+      margin-top: 25px;
+      width: 100%;
+      padding: 12px;
+      background-color: #003366;
       color: white;
       border: none;
-      padding: 12px;
       border-radius: 6px;
-      margin-top: 20px;
-      width: 100%;
       font-size: 16px;
       cursor: pointer;
     }
-    button:hover {
-      background-color: #002f5f;
-    }
-    .note {
-      font-size: 14px;
-      margin-top: 10px;
-      color: #666;
-    }
-    .success {
-      color: green;
-      text-align: center;
-      margin-top: 20px;
-    }
+    button:hover { background-color: #0059b3; }
   </style>
 </head>
 <body>
+  <div class="form-container">
+    <h2>Request User ID & Password</h2>
+    <form action="request.php" method="POST" enctype="multipart/form-data">
+      <label for="role">I am requesting for*</label>
+      <select id="role" name="role" onchange="handleRole(this.value)" required>
+        <option value="">--Select--</option>
+        <option value="Teacher">Teacher</option>
+        <option value="Student">Student</option>
+      </select>
 
-<form class="register-form" action="submit_registration.php" method="POST" onsubmit="return validatePhone()">
-  <h2>Register (Student / Teacher)</h2>
+      <!-- TEACHER SECTION -->
+      <div id="teacherFields" class="section" style="display:none;">
+        <label>Name*</label><input type="text" name="teacher_name" required>
+        <label>Branch*</label>
+        <select name="teacher_branch" required>
+          <option value="">--Select Branch--</option>
+          <option>SJVM Bandikodigenahalli</option>
+          <option>SJVM Atturu Layout</option>
+        </select>
+        <label>Contact Number*</label>
+        <input type="tel" name="teacher_contact" pattern="[0-9]{10}" required>
+        <label>Class Teacher of (Number only)*</label>
+        <input type="number" name="teacher_class" required min="1" max="12">
+        <label>Email*</label><input type="email" name="teacher_email" required>
+        <label>Photo*</label><input type="file" name="teacher_photo" accept="image/*" required>
+      </div>
 
-  <label for="name">Full Name:</label>
-  <input type="text" name="name" required>
+      <!-- STUDENT SECTION -->
+      <div id="studentFields" class="section" style="display:none;">
+        <label>Student Name*</label><input type="text" name="student_name">
+        <label>Father Name*</label><input type="text" name="father_name">
+        <label>Mother Name*</label><input type="text" name="mother_name">
+        <label>Date of Birth*</label><input type="date" name="dob">
+        <label>Branch*</label>
+        <select name="student_branch">
+          <option value="">--Select Branch--</option>
+          <option>SJVM Bandikodigenahalli</option>
+          <option>SJVM Atturu Layout</option>
+        </select>
+        <label>Gender*</label>
+        <select name="gender"><option>Male</option><option>Female</option><option>Other</option></select>
+        <label>Religion*</label>
+        <select name="religion">
+          <option>Hindu</option><option>Muslim</option><option>Christian</option>
+          <option>Sikh</option><option>Parsi</option><option>Buddhist</option>
+          <option>Jain</option><option>Other</option>
+        </select>
+        <label>Nationality*</label>
+        <select name="nationality"><option>Indian</option><option>Other</option></select>
+        <label>Aadhaar Number*</label><input type="text" name="aadhar" pattern="\d{12}">
+        <label>Blood Group*</label>
+        <select name="blood_group">
+          <option>A+</option><option>A−</option><option>B+</option><option>B−</option>
+          <option>O+</option><option>O−</option><option>AB+</option><option>AB−</option>
+        </select>
+        <label>Social Category*</label>
+        <select name="social_category" onchange="handleCategory(this.value)">
+          <option>General</option><option>SC</option><option>ST</option>
+          <option>OBC</option>
+        </select>
+        <div id="casteFields"></div>
+        <label>BPL?*</label><select name="bpl" onchange="handleBPL(this.value)">
+          <option>No</option><option>Yes</option>
+        </select><div id="bplField"></div>
+        <div id="girlField"></div>
+        <label>Current Address*</label><input type="text" name="curr_address">
+        <label>Pin Code*</label><input type="text" name="curr_pincode">
+        <label>District*</label><input type="text" name="curr_district">
+        <label>Local Body*</label><input type="text" name="curr_localbody">
+        <label>Permanent Address*</label><select onchange="handlePerm(this.value)">
+          <option value="same">Same as above</option><option value="diff">Different</option>
+        </select>
+        <div id="permAddress"></div>
+        <label>Student Email</label><input type="email" name="student_email">
+        <label>Father Mobile*</label><input type="tel" name="father_mobile" pattern="[0-9]{10}">
+        <label>Mother Mobile*</label><input type="tel" name="mother_mobile" pattern="[0-9]{10}">
+        <label>Father Email*</label><input type="email" name="father_email">
+        <label>Mother Email*</label><input type="email" name="mother_email">
+        <label>Student Photo*</label><input type="file" name="student_photo" accept="image/*" required>
+        <label>Aadhar Photo*</label><input type="file" name="aadhar_photo" accept="image/*" required>
+        <label>Caste Certificate Photo</label><input type="file" name="caste_photo" accept="image/*">
+      </div>
 
-  <label for="email">Email ID:</label>
-  <input type="email" name="email" required>
-
-  <label for="country_code">Country Code:</label>
-  <select name="country_code" id="country_code" required>
-    <option value="+91">🇮🇳 +91 (India)</option>
-    <option value="+1">🇺🇸 +1 (USA)</option>
-    <option value="+44">🇬🇧 +44 (UK)</option>
-    <!-- Add more if needed -->
-  </select>
-
-  <label for="phone">Mobile Number (10 digits):</label>
-  <input type="text" name="phone" id="phone" maxlength="10" required>
-
-  <label for="role">Role:</label>
-  <select name="role" id="role" required onchange="toggleFields()">
-    <option value="">-- Select Role --</option>
-    <option value="student">Student</option>
-    <option value="teacher">Teacher</option>
-  </select>
-
-  <!-- Student Specific -->
-  <div id="studentFields" style="display:none;">
-    <label for="aadhar">Aadhaar Number (12 digits):</label>
-    <input type="text" name="aadhar" id="aadhar" maxlength="12">
-
-    <label for="mother">Mother's Name:</label>
-    <input type="text" name="mother" id="mother">
-
-    <label for="father">Father's Name:</label>
-    <input type="text" name="father" id="father">
-
-    <label for="class">Class:</label>
-    <input type="text" name="class">
-    
-    <p class="note">Note: The details submitted above will become your student profile if accepted.</p>
+      <button type="submit">Submit Request</button>
+    </form>
   </div>
 
-  <!-- Teacher Specific -->
-  <div id="teacherFields" style="display:none;">
-    <label for="class_teacher_of">Class Teacher Of (optional):</label>
-    <input type="text" name="class_teacher_of" id="class_teacher_of">
-
-    <label for="branch">Branch:</label>
-    <select name="branch" id="branch">
-      <option value="">-- Select Branch --</option>
-      <option value="Bandikodigenahalli">Bandikodigenahalli</option>
-      <option value="Atturu Layout">Atturu Layout</option>
-    </select>
-  </div>
-
-  <label for="message">Message / Extra Info (optional):</label>
-  <textarea name="message" rows="4"></textarea>
-
-  <button type="submit">Submit Registration</button>
-</form>
-
-<script>
-  function toggleFields() {
-    const role = document.getElementById('role').value;
-    document.getElementById('studentFields').style.display = role === 'student' ? 'block' : 'none';
-    document.getElementById('teacherFields').style.display = role === 'teacher' ? 'block' : 'none';
-  }
-
-  function validatePhone() {
-    const phone = document.getElementById('phone').value.trim();
-    const phoneRegex = /^[0-9]{10}$/;
-    if (!phoneRegex.test(phone)) {
-      alert("Please enter a valid 10-digit mobile number.");
-      return false;
+  <script>
+    function handleRole(role) {
+      document.getElementById('teacherFields').style.display = role === 'Teacher' ? 'block' : 'none';
+      document.getElementById('studentFields').style.display = role === 'Student' ? 'block' : 'none';
     }
-    return true;
-  }
-</script>
-
+    function handleCategory(cat) {
+      const div = document.getElementById('casteFields');
+      div.innerHTML = '';
+      if (cat === 'SC' || cat === 'ST') {
+        div.innerHTML = `<label>Student Caste Certificate No*</label><input type="text" name="student_caste_cert">`;
+      } else if (cat === 'OBC') {
+        div.innerHTML = `<label>OBC Sub-Category*</label>
+          <select name="obc_subcat"><option>1</option><option>2A</option><option>2B</option><option>3A</option><option>3B</option></select>
+          <label>Father Caste Cert No*</label><input type="text" name="father_caste_cert">
+          <label>Mother Caste Cert No*</label><input type="text" name="mother_caste_cert">`;
+      }
+    }
+    function handleBPL(val) {
+      document.getElementById('bplField').innerHTML =
+        val === 'Yes' ? `<label>BPL Card No*</label><input type="text" name="bpl_card_no">` : '';
+    }
+    function handlePerm(val) {
+      const div = document.getElementById('permAddress');
+      div.innerHTML = val === 'diff'
+        ? `<label>Permanent Address*</label><input type="text" name="perm_address">` : '';
+    }
+    document.getElementById('role').addEventListener('change', () => {
+      document.getElementById('girlField').innerHTML = '';
+      if (document.querySelector("select[name='gender']").value === 'Female') {
+        document.getElementById('girlField').innerHTML = `<label>Bhagyalakshmi Bond No*</label><input type="text" name="bhagya_bond">`;
+      }
+    });
+  </script>
 </body>
 </html>
