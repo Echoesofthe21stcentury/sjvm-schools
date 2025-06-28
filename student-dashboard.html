@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Student Dashboard – SJVM</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: 'Segoe UI', sans-serif; background: #e6f2ff; text-align: center; padding: 50px; }
+    h1 { color: #003366; }
+    .info { margin-top: 20px; font-size: 18px; }
+    button { margin-top: 30px; padding: 10px 20px; font-size: 16px; background-color: #003366; color: white; border: none; border-radius: 6px; cursor: pointer; }
+  </style>
+</head>
+<body>
+
+  <h1>🎓 Welcome, <span id="student-id"></span></h1>
+  <div class="info">
+    You are now logged in to your SJVM Student Portal.
+  </div>
+  <button onclick="logout()">Logout</button>
+
+  <script>
+    const id = localStorage.getItem("user");
+    const role = localStorage.getItem("role");
+    if (!id || role !== "Student") {
+      window.location.href = "login.html";
+    }
+    document.getElementById("student-id").textContent = id;
+
+    function logout() {
+      localStorage.clear();
+      window.location.href = "login.html";
+    }
+  </script>
+
+</body>
+</html>
