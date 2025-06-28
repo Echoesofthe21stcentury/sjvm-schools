@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Request Student Login ID – SJVM Schools</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <title>Request Login ID – SJVM Schools</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -12,13 +12,13 @@
       padding: 40px 20px;
     }
 
-    .form-container {
-      max-width: 500px;
-      margin: auto;
-      background-color: #ffffff;
+    .form-box {
+      background-color: white;
       padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+      max-width: 550px;
+      margin: auto;
+      border-radius: 12px;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
     }
 
     h2 {
@@ -39,9 +39,13 @@
       padding: 10px;
       margin-top: 6px;
       font-size: 16px;
-      border: 1px solid #ccc;
       border-radius: 6px;
+      border: 1px solid #ccc;
       box-sizing: border-box;
+    }
+
+    input[type="file"] {
+      border: none;
     }
 
     button {
@@ -49,12 +53,11 @@
       padding: 12px;
       width: 100%;
       font-size: 16px;
-      background-color: #003366;
+      background: #003366;
       color: white;
       border: none;
       border-radius: 6px;
       cursor: pointer;
-      transition: background-color 0.3s;
     }
 
     button:hover {
@@ -69,7 +72,7 @@
     }
 
     @media (max-width: 600px) {
-      .form-container {
+      .form-box {
         padding: 20px;
       }
     }
@@ -77,20 +80,40 @@
 </head>
 <body>
 
-  <div class="form-container">
-    <h2>Request Your SJVM Student Login ID</h2>
-    
-    <form action="https://formsubmit.co/echoesofthe21stcentury@gmail.com" method="POST">
+  <div class="form-box">
+    <h2>Request Your SJVM Login ID</h2>
+
+    <form action="https://formsubmit.co/echoesofthe21stcentury@gmail.com" method="POST" enctype="multipart/form-data">
       
+      <label for="role">Select Your Role</label>
+      <select name="role" id="role" required>
+        <option value="">-- Select Role --</option>
+        <option value="Student">Student</option>
+        <option value="Teacher">Teacher</option>
+      </select>
+
       <label for="name">Full Name</label>
-      <input type="text" id="name" name="name" required>
+      <input type="text" id="name" name="Full Name" required>
 
       <label for="dob">Date of Birth</label>
-      <input type="date" id="dob" name="dob" required>
+      <input type="date" id="dob" name="Date of Birth" required>
 
-      <label for="class">Class Applying For</label>
-      <select name="class" id="class" required>
-        <option value="">Select Class</option>
+      <label for="mobile">Mobile Number</label>
+      <input type="tel" id="mobile" name="Mobile Number" required pattern="[0-9]{10}" placeholder="10-digit number">
+
+      <label for="email">Email ID</label>
+      <input type="email" id="email" name="Email ID" required>
+
+      <label for="branch">School Branch</label>
+      <select name="Branch" id="branch" required>
+        <option value="">Select Branch</option>
+        <option value="Atturu Layout">Atturu Layout</option>
+        <option value="Bandikodigenahalli">Bandikodigenahalli</option>
+      </select>
+
+      <label for="class">Class (Students only)</label>
+      <select name="Class" id="class">
+        <option value="">Select Class (if Student)</option>
         <option value="PKG">PKG</option>
         <option value="LKG">LKG</option>
         <option value="UKG">UKG</option>
@@ -106,20 +129,10 @@
         <option value="10">Class 10</option>
       </select>
 
-      <label for="mobile">Parent Mobile Number</label>
-      <input type="tel" id="mobile" name="mobile" required pattern="[0-9]{10}" placeholder="10-digit mobile number">
+      <label for="photo">Upload Your Photo (Max 2MB)</label>
+      <input type="file" name="Photo Upload" accept="image/*" required>
 
-      <label for="email">Email ID</label>
-      <input type="email" id="email" name="email" required placeholder="yourname@email.com">
-
-      <label for="schoolbranch">School Branch</label>
-      <select name="branch" id="schoolbranch" required>
-        <option value="">Select Branch</option>
-        <option value="Atturu Layout">Atturu Layout</option>
-        <option value="Bandikodigenahalli">Bandikodigenahalli</option>
-      </select>
-
-      <!-- FormSubmit Hidden Fields -->
+      <!-- Hidden fields for formsubmit -->
       <input type="hidden" name="_captcha" value="false">
       <input type="hidden" name="_next" value="https://sjvmschools.org/thankyou.html">
 
