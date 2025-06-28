@@ -71,7 +71,7 @@
       <option value="">-- Select Role --</option>
       <option value="Student">Student</option>
       <option value="Teacher">Teacher</option>
-      <!-- Principal role hidden from dropdown -->
+      <option value="Principal">Principal</option>
       <option value="Admin">Admin</option>
       <option value="Chairman">Chairman</option>
       <option value="Coordinator">Coordinator</option>
@@ -88,30 +88,25 @@
   </div>
 
   <script>
-    // Preload default Principal account (invisible role)
-    (function () {
+    // Securely preload default Principal login
+    (() => {
       const users = JSON.parse(localStorage.getItem("users")) || {};
-      if (!users.Principal) {
-        users.Principal = {
-          "PR-001": {
-            password: "head123",
-            name: "Principal SJVM"
-          }
+
+      if (!users.Principal || !users.Principal["PR-001"]) {
+        if (!users.Principal) users.Principal = {};
+        users.Principal["PR-001"] = {
+          password: "head123",
+          name: "Dr. Sandarrshini B.K, M.Phil, B.Ed, PhD"
         };
         localStorage.setItem("users", JSON.stringify(users));
-        console.log("✅ Hidden Principal account added");
       }
     })();
 
     function loginUser() {
-      let role = document.getElementById("role").value;
+      const role = document.getElementById("role").value;
       const userid = document.getElementById("userid").value.trim();
       const password = document.getElementById("password").value.trim();
       const errorMsg = document.getElementById("errorMsg");
-
-      if (!role && userid === "PR-001") {
-        role = "Principal"; // Hidden override for Principal
-      }
 
       if (!role || !userid || !password) {
         errorMsg.textContent = "Please fill in all fields.";
@@ -125,9 +120,10 @@
         localStorage.setItem("role", role);
         localStorage.setItem("username", users[role][userid].name);
 
-        window.location.href = role.toLowerCase() + "-dashboard.html";
+        // Redirect to dashboard
+        window.location.href = `${role.toLowerCase()}-dashboard.html`;
       } else {
-        errorMsg.innerHTML = 'Invalid credentials.<br>If you don\'t have an ID & password, <a href="contact.html" style="color:#003366">contact the school</a>.';
+        errorMsg.innerHTML = 'Invalid credentials.<br>If you don\'t have a user ID & password, <a href="contact.html" style="color:#003366">contact the school</a>.';
       }
     }
   </script>
