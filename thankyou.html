@@ -3,16 +3,107 @@
 <head>
   <meta charset="UTF-8">
   <title>Thank You – SJVM Schools</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body { font-family: Arial, sans-serif; text-align: center; padding: 40px; }
-    h2 { color: green; }
-    a { color: #007bff; text-decoration: none; }
-    a:hover { text-decoration: underline; }
+    body {
+      margin: 0;
+      padding: 0;
+      background: #f7faff;
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .container {
+      margin-top: 100px;
+    }
+
+    h2 {
+      color: #0066cc;
+      font-size: 32px;
+    }
+
+    p {
+      font-size: 18px;
+      color: #333;
+      margin-top: 10px;
+    }
+
+    a.button {
+      display: inline-block;
+      margin-top: 30px;
+      padding: 12px 25px;
+      background-color: #004080;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      transition: background 0.3s ease;
+    }
+
+    a.button:hover {
+      background-color: #002c5f;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
   </style>
 </head>
 <body>
-  <h2>Thank You!</h2>
-  <p>Your message was sent successfully. We will respond shortly.</p>
-  <p><a href="index.html">Back to Home</a></p>
+
+  <canvas id="confetti"></canvas>
+
+  <div class="container">
+    <h2>🎉 Thank You!</h2>
+    <p>Your message has been successfully sent.</p>
+    <p>We will respond to you as soon as possible.</p>
+    <a class="button" href="index.html">Back to Home</a>
+  </div>
+
+  <script>
+    // Confetti animation
+    const canvas = document.getElementById('confetti');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const pieces = [];
+    for (let i = 0; i < 100; i++) {
+      pieces.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height - canvas.height,
+        size: Math.random() * 8 + 2,
+        color: `hsl(${Math.random() * 360}, 70%, 60%)`,
+        speed: Math.random() * 3 + 2,
+        swing: Math.random() * 10
+      });
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let p of pieces) {
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x + Math.sin(p.y * 0.05) * p.swing, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+        p.y += p.speed;
+        if (p.y > canvas.height) {
+          p.y = -10;
+          p.x = Math.random() * canvas.width;
+        }
+      }
+      requestAnimationFrame(draw);
+    }
+
+    draw();
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+  </script>
+
 </body>
 </html>
