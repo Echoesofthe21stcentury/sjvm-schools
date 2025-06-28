@@ -58,6 +58,12 @@
       color: crimson;
       margin-top: 10px;
     }
+
+    .dev-button {
+      margin-top: 10px;
+      background-color: #999;
+      font-size: 14px;
+    }
   </style>
 </head>
 <body>
@@ -83,7 +89,11 @@
     <input type="password" id="password" placeholder="Enter your password" />
 
     <button onclick="loginUser()">Login</button>
+
     <div class="error" id="errorMsg"></div>
+
+    <!-- Developer only: Create default user -->
+    <button class="dev-button" onclick="createDefaultPrincipal()">Create Default Principal</button>
   </div>
 
   <script>
@@ -110,8 +120,27 @@
         let page = role.toLowerCase() + "-dashboard.html";
         window.location.href = page;
       } else {
-        errorMsg.textContent = "Invalid credentials. Please try again.If you have not got user ID & Password contact Admin or fill the Contact form link: https://sjvmschools.org/contact";
+        errorMsg.textContent = "Invalid credentials. Please try again. If you don't have a User ID & Password, contact Admin or use the contact form.";
       }
+    }
+
+    function createDefaultPrincipal() {
+      const users = JSON.parse(localStorage.getItem("users")) || {};
+
+      if (users.Principal && users.Principal["principal001"]) {
+        alert("👤 Default Principal already exists.");
+        return;
+      }
+
+      users.Principal = {
+        "principal001": {
+          password: "sjvm123",
+          name: "Main Principal"
+        }
+      };
+
+      localStorage.setItem("users", JSON.stringify(users));
+      alert("✅ Default Principal created!\n\nUser ID: principal001\nPassword: sjvm123");
     }
   </script>
 
