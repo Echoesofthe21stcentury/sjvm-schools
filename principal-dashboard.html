@@ -114,17 +114,25 @@
     const role = row.children[1].innerText;
     const id = row.children[4].children[0].value;
     const pass = row.children[5].children[0].value;
-    
-    alert(`✅ Approved: ${name}\nRole: ${role}\nID: ${id}\nPassword: ${pass}\n\nNow add to userlogin.html script.`);
 
-    row.style.backgroundColor = "#d4edda";
-    row.style.textDecoration = "line-through";
+    alert(`✅ Approved: ${name}\nRole: ${role}\nID: ${id}\nPassword: ${pass}\n\nNow add this ID/password in userlogin.html.`);
+
+    // Save approved ID to localStorage
+    let approved = JSON.parse(localStorage.getItem("approvedIDs")) || [];
+    approved.push(id);
+    localStorage.setItem("approvedIDs", JSON.stringify(approved));
+
+    row.remove();
   }
 
   function reject(btn) {
     const row = btn.closest("tr");
-    const name = row.children[0].innerText;
-    alert(`❌ Rejected request from ${name}`);
+    const email = row.children[3].innerText;
+
+    let rejected = JSON.parse(localStorage.getItem("rejectedEmails")) || [];
+    rejected.push(email);
+    localStorage.setItem("rejectedEmails", JSON.stringify(rejected));
+
     row.remove();
   }
 
@@ -133,12 +141,26 @@
     window.location.href = "userlogin.html";
   }
 
-  // Access protection
+  // Access check
   const role = localStorage.getItem("role");
   if (role !== "Principal") {
     alert("Access denied. Only Principals allowed.");
     window.location.href = "userlogin.html";
   }
+
+  // Hide rejected requests on page load
+  window.onload = function () {
+    let rejected = JSON.parse(localStorage.getItem("rejectedEmails")) || [];
+
+    const rows = document.querySelectorAll("#request-table tr");
+    rows.forEach((row, index) => {
+      if (index === 0) return; // skip header
+      const email = row.children[3].innerText;
+      if (rejected.includes(email)) {
+        row.remove();
+      }
+    });
+  };
 </script>
 
 </body>
