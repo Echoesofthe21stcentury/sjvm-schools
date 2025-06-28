@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f0f8ff;
+      padding: 20px;
+    }
+    h2, h3 {
+      color: #003366;
+    }
+    label {
+      font-weight: bold;
+    }
+    input {
+      width: 300px;
+      padding: 8px;
+      margin-top: 5px;
+      margin-bottom: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    button {
+      padding: 10px 20px;
+      background: #003366;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>⚙️ Admin Dashboard</h2>
+  <p>Hello, <span id="name"></span>! Manage school settings below.</p>
+
+  <a href="assign-id.html">📌 Assign User ID</a> | 
+  <button onclick="logout()">Logout</button>
+
+  <hr>
+
+  <h3>💸 Assign Fee to Student</h3>
+  <div>
+    <label>Student User ID:</label><br>
+    <input type="text" id="studentId" placeholder="e.g. stu123"><br>
+
+    <label>Amount (₹):</label><br>
+    <input type="number" id="feeAmount" placeholder="e.g. 15000"><br>
+
+    <label>Reason/Term (optional):</label><br>
+    <input type="text" id="feeReason" placeholder="e.g. Term 1 Fee"><br>
+
+    <button onclick="assignFee()">Assign Fee</button>
+  </div>
+
+  <script>
+    const role = localStorage.getItem("role");
+    if (role !== "Admin") {
+      alert("Access Denied");
+      window.location.href = "userlogin.html";
+    }
+
+    document.getElementById("name").textContent = localStorage.getItem("username");
+
+    function logout() {
+      localStorage.clear();
+      window.location.href = "userlogin.html";
+    }
+
+    function assignFee() {
+      const studentId = document.getElementById("studentId").value.trim();
+      const feeAmount = document.getElementById("feeAmount").value.trim();
+      const feeReason = document.getElementById("feeReason").value.trim();
+
+      if (!studentId || !feeAmount) {
+        alert("Please enter student ID and fee amount.");
+        return;
+      }
+
+      const newFee = {
+        id: studentId,
+        amount: feeAmount,
+        reason: feeReason,
+        date: new Date().toLocaleDateString()
+      };
+
+      let fees = JSON.parse(localStorage.getItem("fees")) || [];
+      fees.push(newFee);
+      localStorage.setItem("fees", JSON.stringify(fees));
+
+      alert("✅ Fee assigned to " + studentId);
+      document.getElementById("studentId").value = "";
+      document.getElementById("feeAmount").value = "";
+      document.getElementById("feeReason").value = "";
+    }
+  </script>
+
+</body>
+</html>
