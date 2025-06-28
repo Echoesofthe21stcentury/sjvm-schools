@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Chairman Dashboard</title>
+</head>
+<body>
+  <h2>🏛️ Chairman Dashboard</h2>
+  <p>Welcome, <span id="name"></span>. You have highest privileges.</p>
+
+  <a href="assign-id.html">Assign User ID</a>
+  <br><br>
+  <button onclick="logout()">Logout</button>
+
+  <script>
+    const role = localStorage.getItem("role");
+    if (role !== "Chairman") {
+      alert("Access Denied");
+      window.location.href = "userlogin.html";
+    }
+    document.getElementById("name").textContent = localStorage.getItem("username");
+
+    function logout() {
+      localStorage.clear();
+      window.location.href = "userlogin.html";
+    }
+  </script>
+</body>
+</html>
