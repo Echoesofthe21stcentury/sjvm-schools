@@ -8,7 +8,7 @@
     body {
       margin: 0;
       padding: 0;
-      background: #f7faff;
+      background: #f0f8ff;
       font-family: 'Segoe UI', sans-serif;
       text-align: center;
       overflow: hidden;
@@ -19,7 +19,7 @@
     }
 
     h2 {
-      color: #0066cc;
+      color: #003366;
       font-size: 32px;
     }
 
@@ -38,6 +38,7 @@
       text-decoration: none;
       border-radius: 8px;
       transition: background 0.3s ease;
+      font-weight: bold;
     }
 
     a.button:hover {
@@ -58,13 +59,12 @@
 
   <div class="container">
     <h2>🎉 Thank You!</h2>
-    <p>Your message has been successfully sent.</p>
-    <p>We will respond to you as soon as possible.</p>
+    <p>Your admission form has been successfully submitted.</p>
     <a class="button" href="index.html">Back to Home</a>
+    <a class="button" href="#" onclick="window.print()">🖨️ Download Admission Copy (PDF)</a>
   </div>
 
   <script>
-    // Confetti animation
     const canvas = document.getElementById('confetti');
     const ctx = canvas.getContext('2d');
     canvas.width = window.innerWidth;
