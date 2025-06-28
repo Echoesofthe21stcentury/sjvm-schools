@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Teacher Dashboard</title>
+</head>
+<body>
+  <h2>📚 Welcome, Teacher</h2>
+  <p>Hello, <span id="name"></span>! Manage your classes here.</p>
+
+  <button onclick="logout()">Logout</button>
+
+  <script>
+    const role = localStorage.getItem("role");
+    if (role !== "Teacher") {
+      alert("Access Denied");
+      window.location.href = "userlogin.html";
+    }
+    document.getElementById("name").textContent = localStorage.getItem("username");
+
+    function logout() {
+      localStorage.clear();
+      window.location.href = "userlogin.html";
+    }
+  </script>
+</body>
+</html>
