@@ -57,7 +57,10 @@
     .error {
       color: crimson;
       margin-top: 10px;
-      font-size: 14px;
+    }
+
+    #class-container {
+      display: none;
     }
   </style>
 </head>
@@ -67,7 +70,7 @@
 
   <div class="login-box">
     <label for="role">Select Role</label>
-    <select id="role">
+    <select id="role" onchange="showClassDropdown()">
       <option value="">-- Select Role --</option>
       <option value="Student">Student</option>
       <option value="Teacher">Teacher</option>
@@ -76,6 +79,26 @@
       <option value="Chairman">Chairman</option>
       <option value="Coordinator">Coordinator</option>
     </select>
+
+    <div id="class-container">
+      <label for="class">Select Class</label>
+      <select id="class">
+        <option value="">-- Select Class --</option>
+        <option>PKG</option>
+        <option>LKG</option>
+        <option>UKG</option>
+        <option>Class 1</option>
+        <option>Class 2</option>
+        <option>Class 3</option>
+        <option>Class 4</option>
+        <option>Class 5</option>
+        <option>Class 6</option>
+        <option>Class 7</option>
+        <option>Class 8</option>
+        <option>Class 9</option>
+        <option>Class 10</option>
+      </select>
+    </div>
 
     <label for="userid">User ID</label>
     <input type="text" id="userid" placeholder="Enter your user ID" />
@@ -88,42 +111,48 @@
   </div>
 
   <script>
-    // Securely preload default Principal login
-    (() => {
-      const users = JSON.parse(localStorage.getItem("users")) || {};
-
-      if (!users.Principal || !users.Principal["PR-001"]) {
-        if (!users.Principal) users.Principal = {};
-        users.Principal["PR-001"] = {
-          password: "head123",
-          name: "Dr. Sandarrshini B.K, M.Phil, B.Ed, PhD"
-        };
-        localStorage.setItem("users", JSON.stringify(users));
-      }
-    })();
+    function showClassDropdown() {
+      const role = document.getElementById("role").value;
+      const classBox = document.getElementById("class-container");
+      classBox.style.display = role === "Student" ? "block" : "none";
+    }
 
     function loginUser() {
       const role = document.getElementById("role").value;
+      const userClass = document.getElementById("class").value;
       const userid = document.getElementById("userid").value.trim();
       const password = document.getElementById("password").value.trim();
       const errorMsg = document.getElementById("errorMsg");
 
-      if (!role || !userid || !password) {
+      if (!role || !userid || !password || (role === "Student" && !userClass)) {
         errorMsg.textContent = "Please fill in all fields.";
         return;
       }
 
       const users = JSON.parse(localStorage.getItem("users")) || {};
 
-      if (users[role] && users[role][userid] && users[role][userid].password === password) {
-        localStorage.setItem("userid", userid);
-        localStorage.setItem("role", role);
-        localStorage.setItem("username", users[role][userid].name);
+      if (users[role] && users[role][userid]) {
+        const user = users[role][userid];
 
-        // Redirect to dashboard
-        window.location.href = `${role.toLowerCase()}-dashboard.html`;
+        if (user.password === password) {
+          if (role === "Student" && user.class !== userClass) {
+            errorMsg.textContent = `❌ Wrong class selected. You belong to ${user.class}.`;
+            return;
+          }
+
+          // Login success
+          localStorage.setItem("userid", userid);
+          localStorage.setItem("role", role);
+          localStorage.setItem("username", user.name);
+          localStorage.setItem("class", user.class || "");
+
+          const page = role.toLowerCase() + "-dashboard.html";
+          window.location.href = page;
+        } else {
+          errorMsg.textContent = "❌ Incorrect password.";
+        }
       } else {
-        errorMsg.innerHTML = 'Invalid credentials.<br>If you don\'t have a user ID & password, <a href="contact.html" style="color:#003366">contact the school</a>.';
+        errorMsg.textContent = "❌ Invalid credentials. Contact Admin.";
       }
     }
   </script>
