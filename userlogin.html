@@ -70,7 +70,7 @@
 
   <div class="login-box">
     <label for="role">Select Role</label>
-    <select id="role" onchange="showClassDropdown()">
+    <select id="role" onchange="toggleClassDropdown()">
       <option value="">-- Select Role --</option>
       <option value="Student">Student</option>
       <option value="Teacher">Teacher</option>
@@ -111,13 +111,13 @@
   </div>
 
   <script>
-    function showClassDropdown() {
+    function toggleClassDropdown() {
       const role = document.getElementById("role").value;
-      const classBox = document.getElementById("class-container");
-      classBox.style.display = role === "Student" ? "block" : "none";
+      const classDiv = document.getElementById("class-container");
+      classDiv.style.display = role === "Student" ? "block" : "none";
     }
 
-    function loginUser() {
+    async function loginUser() {
       const role = document.getElementById("role").value;
       const userClass = document.getElementById("class").value;
       const userid = document.getElementById("userid").value.trim();
@@ -129,30 +129,33 @@
         return;
       }
 
-      const users = JSON.parse(localStorage.getItem("users")) || {};
+      try {
+        const res = await fetch("https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/users.json");
+        const users = await res.json();
 
-      if (users[role] && users[role][userid]) {
-        const user = users[role][userid];
+        if (users[role] && users[role][userid]) {
+          const user = users[role][userid];
 
-        if (user.password === password) {
-          if (role === "Student" && user.class !== userClass) {
-            errorMsg.textContent = `❌ Wrong class selected. You belong to ${user.class}.`;
+          if (user.password !== password) {
+            errorMsg.textContent = "❌ Incorrect password.";
             return;
           }
 
-          // Login success
-          localStorage.setItem("userid", userid);
-          localStorage.setItem("role", role);
-          localStorage.setItem("username", user.name);
-          localStorage.setItem("class", user.class || "");
+          if (role === "Student" && user.class !== userClass) {
+            errorMsg.textContent = `❌ Wrong class. You belong to ${user.class}.`;
+            return;
+          }
 
+          // ✅ Success — redirect to dashboard
           const page = role.toLowerCase() + "-dashboard.html";
           window.location.href = page;
+
         } else {
-          errorMsg.textContent = "❌ Incorrect password.";
+          errorMsg.textContent = "❌ User ID not found.";
         }
-      } else {
-        errorMsg.textContent = "❌ Invalid credentials. Contact Admin.";
+      } catch (e) {
+        console.error(e);
+        errorMsg.textContent = "⚠️ Failed to load users.json.";
       }
     }
   </script>
