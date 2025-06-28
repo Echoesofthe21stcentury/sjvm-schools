@@ -1,0 +1,20 @@
+{
+  "Student": {
+    "ST-001": { "password": "abc123", "name": "Rahul M" }
+  },
+  "Teacher": {
+    "TE-001": { "password": "teach@2025", "name": "Ms. Suma" }
+  },
+  "Principal": {
+    "PR-001": { "password": "head123", "name": "Dr. Sandarrshini B.K" }
+  },
+  "Admin": {
+    "AD-001": { "password": "admin@123", "name": "Mr. Admin" }
+  },
+  "Chairman": {
+    "CH-001": { "password": "chairman@sjvm", "name": "Sri Kumar" }
+  },
+  "Coordinator": {
+    "CO-001": { "password": "coord123", "name": "Ms. Jyoti" }
+  }
+}
