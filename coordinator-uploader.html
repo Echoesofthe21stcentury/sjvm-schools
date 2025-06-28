@@ -2,105 +2,143 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Gallery JSON Generator</title>
+  <title>Coordinator Dashboard – SJVM</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     body {
-      font-family: sans-serif;
+      font-family: Arial, sans-serif;
+      background-color: #f0f8ff;
+      margin: 0;
       padding: 20px;
-      background: #f5f5f5;
     }
 
-    h1 {
+    header {
+      background-color: #003366;
+      color: white;
+      padding: 15px;
+      text-align: center;
+    }
+
+    h2 {
+      text-align: center;
       color: #003366;
     }
 
-    input, textarea, select {
-      padding: 10px;
+    .upload-form {
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 500px;
+      margin: 30px auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .upload-form input,
+    .upload-form select,
+    .upload-form textarea,
+    .upload-form button {
       width: 100%;
-      margin-bottom: 10px;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
     }
 
     button {
-      background: #0059b3;
+      background-color: #0059b3;
       color: white;
-      padding: 10px;
+      font-weight: bold;
       border: none;
-      margin-top: 10px;
+    }
+
+    button:hover {
+      background-color: #003366;
+    }
+
+    .logout {
+      position: absolute;
+      right: 20px;
+      top: 20px;
+      background: #ff4444;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 4px;
       cursor: pointer;
     }
 
-    .preview img {
-      max-width: 100px;
-      margin: 5px;
+    .logout:hover {
+      background: #cc0000;
     }
   </style>
 </head>
 <body>
 
-  <h1>SJVM Gallery Uploader – Offline Tool</h1>
+  <header>
+    <h1>Coordinator Dashboard</h1>
+    <button class="logout" onclick="logout()">Logout</button>
+  </header>
 
-  <label>Select Branch:</label>
-  <select id="branch">
-    <option value="bandi">Bandikodigenahalli</option>
-    <option value="atturu">Atturu Layout</option>
-  </select>
+  <h2>Upload Gallery Photo</h2>
 
-  <label>Select Image:</label>
-  <input type="file" id="imageInput" accept="image/*">
+  <div class="upload-form">
+    <form onsubmit="return generateJSON(event)">
+      <label>Choose Branch:</label>
+      <select id="branch" required>
+        <option value="bandi">Bandikodigenahalli</option>
+        <option value="atturu">Atturu Layout</option>
+      </select>
 
-  <label>Write Description (2–3 lines):</label>
-  <textarea id="description" rows="3"></textarea>
+      <label>Select Image:</label>
+      <input type="file" id="photo" accept="image/*" required>
 
-  <button onclick="addToGallery()">➕ Add to Gallery List</button>
+      <label>Description (2–3 lines):</label>
+      <textarea id="desc" rows="3" required></textarea>
 
-  <div class="preview" id="preview"></div>
-
-  <button onclick="downloadJSON()">📄 Download JSON File</button>
+      <button type="submit">📄 Download JSON</button>
+    </form>
+  </div>
 
   <script>
-    const gallery = [];
-
-    function addToGallery() {
-      const fileInput = document.getElementById("imageInput");
-      const description = document.getElementById("description").value;
-      const branch = document.getElementById("branch").value;
-
-      if (!fileInput.files[0] || !description) {
-        alert("Please select an image and enter a description.");
-        return;
-      }
-
-      const fileName = fileInput.files[0].name;
-
-      // Coordinator must upload image manually to GitHub 'images/' folder
-      const url = `images/${fileName}`;
-
-      gallery.push({ url, description });
-
-      // Show thumbnail
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        const img = document.createElement("img");
-        img.src = e.target.result;
-        document.getElementById("preview").appendChild(img);
-      };
-      reader.readAsDataURL(fileInput.files[0]);
-
-      // Clear fields
-      fileInput.value = "";
-      document.getElementById("description").value = "";
-
-      alert("✅ Added to list. Don’t forget to upload the image manually to GitHub.");
+    // Ensure only Coordinators can view
+    const role = localStorage.getItem("role");
+    if (role !== "Coordinator") {
+      alert("Access denied. Only Coordinators allowed.");
+      window.location.href = "userlogin.html";
     }
 
-    function downloadJSON() {
+    function generateJSON(event) {
+      event.preventDefault();
+
       const branch = document.getElementById("branch").value;
-      const json = JSON.stringify(gallery, null, 2);
-      const blob = new Blob([json], { type: "application/json" });
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = `gallery_${branch}.json`;
-      a.click();
+      const photo = document.getElementById("photo").files[0];
+      const desc = document.getElementById("desc").value;
+
+      if (!photo || !desc) {
+        alert("Please select an image and enter a description.");
+        return false;
+      }
+
+      const url = "images/" + photo.name;
+
+      const data = [{
+        url: url,
+        description: desc
+      }];
+
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `gallery_${branch}.json`;
+      link.click();
+
+      alert("✅ JSON downloaded. Upload it with the image to GitHub.");
+      return false;
+    }
+
+    function logout() {
+      localStorage.clear();
+      window.location.href = "userlogin.html";
     }
   </script>
 
