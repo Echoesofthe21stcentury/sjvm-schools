@@ -103,6 +103,17 @@
       background-color: #00264d;
     }
 
+    video, canvas {
+      display: block;
+      margin: 10px auto;
+      max-width: 100%;
+      border-radius: 8px;
+    }
+
+    .photo-buttons {
+      text-align: center;
+    }
+
     footer {
       background-color: #003366;
       color: white;
@@ -173,8 +184,13 @@
       <label for="aadhaar">Aadhaar Number</label>
       <input type="text" name="aadhaar" id="aadhaar" required>
 
-      <label for="photo_drive_link">Student Photo (Google Drive Link)</label>
-      <input type="url" name="photo_drive_link" id="photo_drive_link" placeholder="Paste Drive link here" required>
+      <label>Capture Student Photo</label>
+      <video id="video" autoplay playsinline width="320" height="240"></video>
+      <div class="photo-buttons">
+        <button type="button" onclick="capturePhoto()">📸 Capture Photo</button>
+      </div>
+      <canvas id="canvas" width="320" height="240" style="display:none;"></canvas>
+      <input type="hidden" name="studentphoto" id="studentphoto">
 
       <label for="parentname">Parent/Guardian Name</label>
       <input type="text" name="parentname" id="parentname" required>
@@ -199,6 +215,29 @@
   <footer>
     &copy; 2025 SJVM Schools. All rights reserved.
   </footer>
+
+  <script>
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const studentphoto = document.getElementById('studentphoto');
+
+    // Ask for camera permission
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then((stream) => {
+        video.srcObject = stream;
+      })
+      .catch((err) => {
+        alert("Camera access denied or not supported: " + err.message);
+      });
+
+    function capturePhoto() {
+      const context = canvas.getContext('2d');
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const dataURL = canvas.toDataURL('image/png');
+      studentphoto.value = dataURL;
+      alert("Photo captured and attached to form!");
+    }
+  </script>
 
 </body>
 </html>
