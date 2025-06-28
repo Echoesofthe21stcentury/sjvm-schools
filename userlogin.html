@@ -1,64 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>SJVM User Login</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: #f0f8ff;
-      padding: 40px 20px;
-      text-align: center;
+      background: #e6f2ff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 60px 20px;
     }
-    .box {
-      background: white;
-      padding: 30px;
-      max-width: 450px;
-      margin: auto;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
+
     h2 {
       color: #003366;
+      margin-bottom: 20px;
     }
-    input, select {
-      width: 90%;
-      padding: 10px;
-      margin: 12px auto;
+
+    .login-box {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    label {
+      font-weight: bold;
       display: block;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      font-size: 16px;
+      margin-top: 15px;
     }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
     button {
-      padding: 10px 20px;
+      margin-top: 20px;
+      width: 100%;
+      padding: 12px;
       background-color: #003366;
       color: white;
       border: none;
       border-radius: 6px;
+      font-size: 16px;
       cursor: pointer;
     }
-    button:hover {
-      background-color: #002244;
-    }
+
     .error {
-      color: red;
+      color: crimson;
       margin-top: 10px;
-    }
-    .request-link {
-      margin-top: 20px;
-      font-size: 14px;
-      display: block;
     }
   </style>
 </head>
 <body>
 
-  <div class="box">
-    <h2>SJVM Login Portal</h2>
-    
-    <select id="role" required>
+  <h2>🔐 SJVM User Login</h2>
+
+  <div class="login-box">
+    <label for="role">Select Role</label>
+    <select id="role">
       <option value="">-- Select Role --</option>
       <option value="Student">Student</option>
       <option value="Teacher">Teacher</option>
@@ -68,56 +76,41 @@
       <option value="Coordinator">Coordinator</option>
     </select>
 
-    <input type="text" id="userid" placeholder="Enter ID" required>
-    <input type="password" id="password" placeholder="Enter Password" required>
-    <button onclick="login()">Login</button>
+    <label for="userid">User ID</label>
+    <input type="text" id="userid" placeholder="Enter your user ID" />
 
-    <div class="error" id="error"></div>
+    <label for="password">Password</label>
+    <input type="password" id="password" placeholder="Enter your password" />
 
-    <a class="request-link" href="requestid.html">Don't have an ID? Request Here</a>
+    <button onclick="loginUser()">Login</button>
+    <div class="error" id="errorMsg"></div>
   </div>
 
   <script>
-    // Manually added users and passwords
-    const users = {
-      Student: {
-        "stu001": "abc123",
-        "stu002": "xyz123"
-      },
-      Teacher: {
-        "t001": "teach@sjvm"
-      },
-      Principal: {
-        "p001": "head2025"
-      },
-      Admin: {
-        "admin001": "admin@sjvm"
-      },
-      Chairman: {
-        "c001": "chairman123"
-      },
-      Coordinator: {
-        "co001": "coord2025"
-      }
-    };
-
-    function login() {
+    function loginUser() {
       const role = document.getElementById("role").value;
-      const id = document.getElementById("userid").value.trim();
-      const pwd = document.getElementById("password").value.trim();
-      const error = document.getElementById("error");
+      const userid = document.getElementById("userid").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const errorMsg = document.getElementById("errorMsg");
 
-      if (!role || !id || !pwd) {
-        error.textContent = "Please fill in all fields.";
+      if (!role || !userid || !password) {
+        errorMsg.textContent = "Please fill in all fields.";
         return;
       }
 
-      if (users[role] && users[role][id] === pwd) {
-        localStorage.setItem("user", id);
+      const users = JSON.parse(localStorage.getItem("users")) || {};
+
+      if (users[role] && users[role][userid] && users[role][userid].password === password) {
+        // Save login session
+        localStorage.setItem("userid", userid);
         localStorage.setItem("role", role);
-        window.location.href = role.toLowerCase() + "-dashboard.html";
+        localStorage.setItem("username", users[role][userid].name);
+
+        // Redirect to dashboard
+        let page = role.toLowerCase() + "-dashboard.html";
+        window.location.href = page;
       } else {
-        error.textContent = "Invalid ID or password for selected role.";
+        errorMsg.textContent = "Invalid credentials. Please try again.";
       }
     }
   </script>
