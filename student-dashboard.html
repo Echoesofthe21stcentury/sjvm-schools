@@ -109,6 +109,7 @@
     <a href="#" onclick="showProfile()">Profile</a>
     <a href="#" onclick="showPayments()">Payments</a>
     <a href="#" onclick="showAttendance()">Attendance</a>
+    <a href="#" onclick="showHomework()">Homework</a>
   </nav>
 
   <div class="container" id="dashboardContent">
@@ -123,6 +124,7 @@
     const usersURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/users.json";
     const feesURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/fees.json";
     const attendanceURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/attendance.json";
+    const homeworkURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/homeworks.json";
 
     const role = localStorage.getItem("role");
     const userid = localStorage.getItem("userid");
@@ -216,6 +218,40 @@
         `;
       } catch {
         document.getElementById("dashboardContent").innerHTML = "<p>Error loading attendance data.</p>";
+      }
+    }
+
+    async function showHomework() {
+      try {
+        const res = await fetch(homeworkURL);
+        const data = await res.json();
+        const entries = data?.[studentClass]?.[branch];
+
+        if (!entries || entries.length === 0) {
+          document.getElementById("dashboardContent").innerHTML = `
+            <div class="info"><h3>📚 Homework</h3><p>No homework assigned yet.</p></div>`;
+          return;
+        }
+
+        const rows = entries.map(hw => `
+          <tr>
+            <td>${hw.date}</td>
+            <td>${hw.title}</td>
+            <td>${hw.description}</td>
+          </tr>`).join("");
+
+        document.getElementById("dashboardContent").innerHTML = `
+          <div class="info">
+            <h3>📚 Homework for ${studentClass} – ${branch}</h3>
+            <table>
+              <tr><th>Date</th><th>Title</th><th>Description</th></tr>
+              ${rows}
+            </table>
+          </div>
+        `;
+      } catch {
+        document.getElementById("dashboardContent").innerHTML = `
+          <div class="info"><h3>Homework</h3><p style="color:red;">Error loading homework data.</p></div>`;
       }
     }
 
