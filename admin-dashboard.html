@@ -2,121 +2,155 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Admin Dashboard – SJVM</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard | SJVM</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #f5f5f5;
-      padding: 20px;
+      background: #f2f7fb;
+      margin: 0;
+      padding: 0;
     }
-    h1 {
+
+    header {
+      background-color: #003366;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    nav {
+      background-color: #0059b3;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    nav a {
+      color: white;
+      padding: 14px 20px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    nav a:hover {
+      background-color: #003366;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: auto;
+      padding: 30px;
+      background: white;
+      margin-top: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .section {
+      margin-bottom: 30px;
+    }
+
+    h3 {
       color: #003366;
     }
-    label, select, input, button {
-      display: block;
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
       margin-top: 10px;
-      width: 100%;
-      max-width: 400px;
-      padding: 10px;
     }
-    textarea {
-      width: 100%;
-      height: 300px;
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #e6f2ff;
+    }
+
+    .logout {
+      text-align: center;
       margin-top: 20px;
     }
-    .section {
-      margin-bottom: 40px;
+
+    .logout button {
+      background-color: #b30000;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .logout button:hover {
+      background-color: #800000;
     }
   </style>
 </head>
 <body>
 
-  <h1>👨‍💼 Admin Dashboard – SJVM</h1>
+  <header>
+    <h1>SJVM Admin Dashboard</h1>
+  </header>
 
-  <div class="section">
-    <h2>Assign New User</h2>
-    <label for="role">Role</label>
-    <select id="role">
-      <option value="Student">Student</option>
-      <option value="Teacher">Teacher</option>
-      <option value="Coordinator">Coordinator</option>
-      <option value="Admin">Admin</option>
-      <option value="Principal">Principal</option>
-      <option value="Chairman">Chairman</option>
-    </select>
+  <nav>
+    <a href="#" onclick="loadStudents()">View Students</a>
+    <a href="#" onclick="logout()">Logout</a>
+  </nav>
 
-    <label for="userid">User ID</label>
-    <input type="text" id="userid" placeholder="e.g., STU-101" />
-
-    <label for="name">Full Name</label>
-    <input type="text" id="name" />
-
-    <label for="password">Password</label>
-    <input type="text" id="password" />
-
-    <label for="class">Class (for students only)</label>
-    <select id="class">
-      <option value="">--Select Class--</option>
-      <option value="PKG">PKG</option>
-      <option value="LKG">LKG</option>
-      <option value="UKG">UKG</option>
-      <option value="1">1</option>
-      <option value="2">2</option>
-      <option value="3">3</option>
-      <option value="4">4</option>
-      <option value="5">5</option>
-      <option value="6">6</option>
-      <option value="7">7</option>
-      <option value="8">8</option>
-      <option value="9">9</option>
-      <option value="10">10</option>
-    </select>
-
-    <button onclick="assignUser()">Assign User</button>
+  <div class="container" id="adminContent">
+    <p>Welcome, Admin. Use the menu above to manage students.</p>
   </div>
 
-  <div class="section">
-    <h2>All Users</h2>
-    <textarea id="output" readonly></textarea>
+  <div class="logout">
+    <button onclick="logout()">Logout</button>
   </div>
 
   <script>
-    const users = JSON.parse(localStorage.getItem("users")) || {};
+    const usersURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/users.json";
 
-    function assignUser() {
-      const role = document.getElementById("role").value;
-      const userid = document.getElementById("userid").value.trim();
-      const name = document.getElementById("name").value.trim();
-      const password = document.getElementById("password").value.trim();
-      const selectedClass = document.getElementById("class").value;
-
-      if (!role || !userid || !name || !password) {
-        alert("Please fill all fields");
+    async function loadStudents() {
+      const role = localStorage.getItem("role");
+      if (role !== "Admin") {
+        document.getElementById("adminContent").innerHTML = "<p style='color:red'>Access Denied.</p>";
         return;
       }
 
-      if (!users[role]) users[role] = {};
+      try {
+        const res = await fetch(usersURL);
+        const data = await res.json();
 
-      users[role][userid] = {
-        name,
-        password
-      };
+        if (!data.Student) {
+          document.getElementById("adminContent").innerHTML = "<p>No students found.</p>";
+          return;
+        }
 
-      if (role === "Student") {
-        users[role][userid].class = selectedClass;
+        let html = "<div class='section'><h3>📘 All Students</h3>";
+
+        for (let cls in data.Student) {
+          html += `<h4>${cls}</h4><table><tr><th>User ID</th><th>Name</th><th>Password</th></tr>`;
+          for (let uid in data.Student[cls]) {
+            const student = data.Student[cls][uid];
+            html += `<tr><td>${uid}</td><td>${student.name}</td><td>${student.password}</td></tr>`;
+          }
+          html += `</table>`;
+        }
+
+        html += "</div>";
+        document.getElementById("adminContent").innerHTML = html;
+
+      } catch (err) {
+        document.getElementById("adminContent").innerHTML = "<p style='color:red'>Failed to fetch student data.</p>";
       }
-
-      localStorage.setItem("users", JSON.stringify(users));
-      alert("✅ User assigned!");
-      showUsers();
     }
 
-    function showUsers() {
-      document.getElementById("output").value = JSON.stringify(users, null, 2);
+    function logout() {
+      localStorage.clear();
+      window.location.href = "userlogin.html";
     }
-
-    showUsers();
   </script>
 
 </body>
