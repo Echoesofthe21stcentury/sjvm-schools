@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Principal Dashboard | SJVM</title>
+  <script src="auth-check.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -13,14 +14,14 @@
     }
 
     header {
-      background-color: #2e3b4e;
+      background-color: #003366;
       color: white;
       padding: 20px;
       text-align: center;
     }
 
     nav {
-      background-color: #446084;
+      background-color: #0059b3;
       display: flex;
       justify-content: center;
       flex-wrap: wrap;
@@ -31,11 +32,10 @@
       padding: 14px 20px;
       text-decoration: none;
       font-weight: bold;
-      cursor: pointer;
     }
 
     nav a:hover {
-      background-color: #2e3b4e;
+      background-color: #003366;
     }
 
     .container {
@@ -48,39 +48,43 @@
       border-radius: 10px;
     }
 
-    .section {
-      margin-bottom: 30px;
+    select, input, button {
+      padding: 10px;
+      margin: 10px 5px;
     }
 
-    input, select {
+    table {
       width: 100%;
-      max-width: 400px;
-      padding: 10px;
-      margin: 10px 0;
-      border-radius: 5px;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    table, th, td {
       border: 1px solid #ccc;
     }
 
-    button {
-      background: #446084;
+    th {
+      background-color: #003366;
       color: white;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
     }
 
-    button:hover {
-      background: #2e3b4e;
+    th, td {
+      padding: 10px;
+      text-align: left;
     }
 
     .logout {
       text-align: center;
-      margin-top: 20px;
+      margin-top: 30px;
     }
 
     .logout button {
       background-color: #b30000;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
     }
 
     .logout button:hover {
@@ -90,17 +94,15 @@
 </head>
 <body>
   <header>
-    <h1>SJVM Principal Dashboard</h1>
+    <h1>🏫 Principal Dashboard – SJVM Schools</h1>
   </header>
 
   <nav>
-    <a onclick="showAssignUser()">Assign ID</a>
-    <a onclick="showPromoteStudent()">Promote Student</a>
-    <a onclick="showAllUsers()">View All Users</a>
+    <a href="#" onclick="loadAttendance()">View Attendance</a>
   </nav>
 
   <div class="container" id="dashboardContent">
-    <p>Select an option from the menu.</p>
+    <p>Select options from the menu to get started.</p>
   </div>
 
   <div class="logout">
@@ -108,12 +110,12 @@
   </div>
 
   <script>
-    let usersData = {};
-    const usersURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/users.json";
+    const attendanceURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/attendance.json";
+    const role = localStorage.getItem("role");
 
-    async function fetchUsers() {
-      const res = await fetch(usersURL);
-      usersData = await res.json();
+    if (role !== "Principal") {
+      alert("Access denied.");
+      window.location.href = "userlogin.html";
     }
 
     function logout() {
@@ -121,65 +123,55 @@
       window.location.href = "userlogin.html";
     }
 
-    function showAssignUser() {
-      document.getElementById("dashboardContent").innerHTML = `
-        <div class="section">
-          <h3>Assign User ID & Password</h3>
-          <label>Role:</label>
-          <select id="role">
-            <option value="Student">Student</option>
-            <option value="Teacher">Teacher</option>
-            <option value="Coordinator">Coordinator</option>
-          </select>
-          <label>Class (for Student):</label>
-          <input type="text" id="classInput" placeholder="Eg: Class 5"/>
-          <label>User ID:</label>
-          <input type="text" id="userid" placeholder="Eg: STU-005"/>
-          <label>Full Name:</label>
-          <input type="text" id="name" />
-          <label>Password:</label>
-          <input type="text" id="password" />
-          <button onclick="addUser()">➕ Assign</button>
-        </div>
-      `;
-    }
+    async function loadAttendance() {
+      const date = prompt("📅 Enter date (YYYY-MM-DD):");
+      if (!date) return;
 
-    function showPromoteStudent() {
-      document.getElementById("dashboardContent").innerHTML = `
-        <div class="section">
-          <h3>Promote or Remove Student</h3>
-          <p>📌 In the GitHub version, you'll have to manually update users.json to promote or remove.</p>
-        </div>
-      `;
-    }
+      try {
+        const res = await fetch(attendanceURL);
+        const data = await res.json();
 
-    function showAllUsers() {
-      let output = "<h3>All Users</h3>";
-      for (let role in usersData) {
-        output += `<h4>${role}</h4><ul>`;
-        if (role === "Student") {
-          for (let className in usersData[role]) {
-            output += `<strong>${className}</strong><ul>`;
-            for (let uid in usersData[role][className]) {
-              output += `<li>${uid}: ${usersData[role][className][uid].name}</li>`;
+        const records = data[date];
+        if (!records) {
+          document.getElementById("dashboardContent").innerHTML = `<p style='color:red'>No attendance found for ${date}</p>`;
+          return;
+        }
+
+        let content = `<h3>📅 Attendance for ${date}</h3>`;
+
+        for (let cls in records) {
+          for (let branch in records[cls]) {
+            const students = records[cls][branch];
+            let presentCount = 0;
+            let absentCount = 0;
+            let rows = "";
+
+            for (let sid in students) {
+              const status = students[sid];
+              if (status === "Present") presentCount++;
+              else absentCount++;
+
+              rows += `<tr><td>${sid}</td><td>${status}</td>`;
             }
-            output += `</ul>`;
-          }
-        } else {
-          for (let uid in usersData[role]) {
-            output += `<li>${uid}: ${usersData[role][uid].name}</li>`;
+
+            content += `
+              <h4>Class: ${cls} | Branch: ${branch}</h4>
+              <p>Total: ${presentCount + absentCount}, Present: ${presentCount}, Absent: ${absentCount}</p>
+              <table>
+                <tr><th>Student ID</th><th>Status</th></tr>
+                ${rows}
+              </table>
+              <br>
+            `;
           }
         }
-        output += "</ul>";
+
+        document.getElementById("dashboardContent").innerHTML = content;
+
+      } catch {
+        document.getElementById("dashboardContent").innerHTML = `<p style='color:red'>Error loading attendance data.</p>`;
       }
-      document.getElementById("dashboardContent").innerHTML = output;
     }
-
-    function addUser() {
-      alert("⚠ This action will only update data locally.\n\nTo save permanently, update users.json manually on GitHub.");
-    }
-
-    fetchUsers();
   </script>
 </body>
 </html>
