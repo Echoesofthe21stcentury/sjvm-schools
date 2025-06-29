@@ -2,111 +2,168 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Assign User | SJVM</title>
+  <title>Assign User – SJVM</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="auth-check.js"></script>
   <style>
-    body { font-family: Arial; padding: 20px; background: #f4f4f4; }
-    label { display: block; margin-top: 10px; font-weight: bold; }
-    input, select, button {
-      padding: 10px; margin-top: 5px; width: 100%; max-width: 400px;
+    body {
+      font-family: Arial, sans-serif;
+      background: #e6f2ff;
+      padding: 30px;
     }
-    textarea { width: 100%; height: 300px; margin-top: 15px; font-family: monospace; }
+
+    h1 {
+      color: #003366;
+    }
+
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 15px;
+    }
+
+    input, select {
+      padding: 10px;
+      width: 100%;
+      max-width: 400px;
+      margin-top: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      margin-top: 20px;
+      background: #003366;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #002244;
+    }
   </style>
 </head>
 <body>
+  <h1>👤 Assign New User</h1>
 
-<h2>👤 Assign New User</h2>
+  <label for="role">Select Role:</label>
+  <select id="role" onchange="toggleFields()">
+    <option value="">-- Select Role --</option>
+    <option value="Student">Student</option>
+    <option value="Teacher">Teacher</option>
+    <option value="Coordinator">Coordinator</option>
+    <option value="Admin">Admin</option>
+    <option value="Principal">Principal</option>
+    <option value="Chairman">Chairman</option>
+  </select>
 
-<label>Role:</label>
-<select id="role">
-  <option value="Student">Student</option>
-  <option value="Teacher">Teacher</option>
-  <option value="Coordinator">Coordinator</option>
-  <option value="Admin">Admin</option>
-</select>
+  <div id="extraFields"></div>
 
-<label>Class (Only for Students):</label>
-<input id="studentClass" placeholder="e.g. Class 5" />
+  <label for="userid">User ID:</label>
+  <input type="text" id="userid" placeholder="e.g. STU-001" />
 
-<label>User ID:</label>
-<input id="userid" placeholder="e.g. STU-005" />
+  <label for="name">Full Name:</label>
+  <input type="text" id="name" />
 
-<label>Name:</label>
-<input id="name" placeholder="Full Name" />
+  <label for="password">Password:</label>
+  <input type="text" id="password" />
 
-<label>Password:</label>
-<input id="password" placeholder="Password" />
+  <button onclick="assignUser()">➕ Add to GitHub users.json</button>
 
-<button onclick="assignUser()">➕ Assign & Upload to GitHub</button>
+  <script>
+    const owner = "Echoesofthe21stcentury";
+    const repo = "sjvm-schools";
+    const filePath = "users.json";
 
-<textarea id="output" readonly></textarea>
+    function toggleFields() {
+      const role = document.getElementById("role").value;
+      let html = "";
 
-<script>
-  const token = prompt("🔐 Enter your GitHub PAT securely:");
-  const repo = "Echoesofthe21stcentury/sjvm-schools";
-  const filePath = "users.json";
-  const branch = "main";
+      if (role === "Student") {
+        html += `<label for='class'>Class:</label>
+                 <input type='text' id='class' placeholder='e.g. Class 5' />`;
+      } else if (role === "Teacher" || role === "Coordinator") {
+        html += `<label for='branch'>Branch:</label>
+                 <select id='branch'>
+                   <option value='Bandikodigenahalli'>Bandikodigenahalli</option>
+                   <option value='Atturu Layout'>Atturu Layout</option>
+                 </select>`;
+      }
 
-  async function assignUser() {
-    const role = document.getElementById("role").value;
-    const studentClass = document.getElementById("studentClass").value.trim();
-    const userid = document.getElementById("userid").value.trim();
-    const name = document.getElementById("name").value.trim();
-    const password = document.getElementById("password").value.trim();
-    const output = document.getElementById("output");
-
-    if (!role || !userid || !name || !password || (role === "Student" && !studentClass)) {
-      alert("Fill all fields properly.");
-      return;
+      document.getElementById("extraFields").innerHTML = html;
     }
 
-    // Fetch current users.json from GitHub
-    const getURL = `https://api.github.com/repos/${repo}/contents/${filePath}`;
-    const headers = {
-      Authorization: `Bearer ${token}`,
-      Accept: "application/vnd.github.v3+json"
-    };
+    async function assignUser() {
+      const role = document.getElementById("role").value;
+      const userid = document.getElementById("userid").value.trim();
+      const name = document.getElementById("name").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const studentClass = document.getElementById("class")?.value.trim();
+      const branch = document.getElementById("branch")?.value;
 
-    let usersData = {}, sha = "";
+      if (!role || !userid || !name || !password) {
+        alert("❗ Please fill in all fields.");
+        return;
+      }
 
-    try {
-      const res = await fetch(getURL, { headers });
-      const json = await res.json();
-      sha = json.sha;
-      usersData = JSON.parse(atob(json.content));
-    } catch (err) {
-      output.value = "⚠️ Failed to load existing users.json\n" + err;
-      return;
+      const token = prompt("🔐 Enter your GitHub Personal Access Token:");
+      if (!token) return alert("Token is required");
+
+      const apiURL = `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`;
+      const headers = {
+        Authorization: `token ${token}`,
+        Accept: "application/vnd.github.v3+json"
+      };
+
+      try {
+        // Get current users.json
+        const res = await fetch(apiURL, { headers });
+        const file = await res.json();
+        const sha = file.sha;
+        const content = atob(file.content);
+        let users = JSON.parse(content);
+
+        if (!users[role]) users[role] = {};
+
+        if (role === "Student") {
+          if (!studentClass) return alert("Please enter class for student.");
+          if (!users[role][studentClass]) users[role][studentClass] = {};
+          users[role][studentClass][userid] = { name, password, class: studentClass };
+        } else if (role === "Teacher" || role === "Coordinator") {
+          if (!branch) return alert("Please select branch.");
+          if (!users[role][branch]) users[role][branch] = {};
+          users[role][branch][userid] = { name, password, branch };
+        } else {
+          users[role][userid] = { name, password };
+        }
+
+        // Encode updated file
+        const updatedContent = btoa(JSON.stringify(users, null, 2));
+
+        // Commit changes to GitHub
+        const commit = await fetch(apiURL, {
+          method: "PUT",
+          headers,
+          body: JSON.stringify({
+            message: `Add ${userid} to ${role}`,
+            content: updatedContent,
+            sha: sha
+          })
+        });
+
+        if (commit.ok) {
+          alert(`✅ User ${userid} assigned successfully.`);
+        } else {
+          alert("❌ Failed to commit to GitHub.");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("❌ Error: " + err.message);
+      }
     }
-
-    // Add new user
-    if (!usersData[role]) usersData[role] = {};
-    if (role === "Student") {
-      if (!usersData[role][studentClass]) usersData[role][studentClass] = {};
-      usersData[role][studentClass][userid] = { name, password, class: studentClass };
-    } else {
-      usersData[role][userid] = { name, password };
-    }
-
-    // Upload back to GitHub
-    const update = await fetch(getURL, {
-      method: "PUT",
-      headers,
-      body: JSON.stringify({
-        message: `🎓 Added user ${userid}`,
-        content: btoa(JSON.stringify(usersData, null, 2)),
-        sha: sha,
-        branch: branch
-      })
-    });
-
-    if (update.ok) {
-      output.value = "✅ users.json updated on GitHub!\n\n" + JSON.stringify(usersData, null, 2);
-    } else {
-      const err = await update.json();
-      output.value = "❌ Failed to update:\n" + JSON.stringify(err, null, 2);
-    }
-  }
-</script>
-
+  </script>
 </body>
 </html>
