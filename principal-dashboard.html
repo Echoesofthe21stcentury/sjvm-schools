@@ -98,11 +98,15 @@
   </header>
 
   <nav>
+    <a href="#" onclick="showHome()">Home</a>
     <a href="#" onclick="loadAttendance()">View Attendance</a>
+    <a href="assign-users.html">Assign Users</a>
+    <a href="promote-students.html">Promote / Remove Students</a>
+    <a href="view-profiles.html">View All Profiles</a>
   </nav>
 
   <div class="container" id="dashboardContent">
-    <p>Select options from the menu to get started.</p>
+    <!-- Dynamic content -->
   </div>
 
   <div class="logout">
@@ -111,7 +115,10 @@
 
   <script>
     const attendanceURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/attendance.json";
+
     const role = localStorage.getItem("role");
+    const username = localStorage.getItem("username");
+    const userid = localStorage.getItem("userid");
 
     if (role !== "Principal") {
       alert("Access denied.");
@@ -121,6 +128,16 @@
     function logout() {
       localStorage.clear();
       window.location.href = "userlogin.html";
+    }
+
+    function showHome() {
+      document.getElementById("dashboardContent").innerHTML = `
+        <div class="info">
+          <h3>🏠 Welcome to SJVM ${role} Portal</h3>
+          <p><strong>User ID:</strong> ${userid}</p>
+          <p><strong>Name:</strong> ${username}</p>
+        </div>
+      `;
     }
 
     async function loadAttendance() {
@@ -151,7 +168,7 @@
               if (status === "Present") presentCount++;
               else absentCount++;
 
-              rows += `<tr><td>${sid}</td><td>${status}</td>`;
+              rows += `<tr><td>${sid}</td><td>${status}</td></tr>`;
             }
 
             content += `
@@ -172,6 +189,9 @@
         document.getElementById("dashboardContent").innerHTML = `<p style='color:red'>Error loading attendance data.</p>`;
       }
     }
+
+    // Load welcome screen on page load
+    window.onload = showHome;
   </script>
 </body>
 </html>
