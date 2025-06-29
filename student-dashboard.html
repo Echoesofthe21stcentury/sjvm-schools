@@ -105,15 +105,16 @@
     <h1>🎓 SJVM Student Dashboard</h1>
   </header>
 
-<nav>
-  <a href="#" onclick="showProfile()">Profile</a>
-  <a href="#" onclick="showPayments()">Payments</a>
-  <a href="#" onclick="showAttendance()">Attendance</a>
-  <a href="#" onclick="showHomework()">Homework</a>
-</nav>
+  <nav>
+    <a href="#" onclick="showHome()">Home</a>
+    <a href="#" onclick="showProfile()">Profile</a>
+    <a href="#" onclick="showPayments()">Payments</a>
+    <a href="#" onclick="showAttendance()">Attendance</a>
+    <a href="#" onclick="showHomework()">Homework</a>
+  </nav>
 
   <div class="container" id="dashboardContent">
-    <!-- Content dynamically inserted here -->
+    <!-- Dynamic content here -->
   </div>
 
   <div class="logout">
@@ -130,13 +131,31 @@
     const userid = localStorage.getItem("userid");
     const studentClass = localStorage.getItem("studentClass");
     const branch = localStorage.getItem("branch");
+    const username = localStorage.getItem("username");
 
-    async function loadStudentData() {
-      if (role !== "Student" || !userid || !studentClass) {
-        document.getElementById("dashboardContent").innerHTML = "<p style='color:red'>Access Denied. Please login as Student.</p>";
-        return;
-      }
+    if (role !== "Student") {
+      alert("Access denied.");
+      window.location.href = "userlogin.html";
+    }
 
+    function logout() {
+      localStorage.clear();
+      window.location.href = "userlogin.html";
+    }
+
+    function showHome() {
+      document.getElementById("dashboardContent").innerHTML = `
+        <div class="info">
+          <h3>🏠 Welcome to SJVM ${role} Portal</h3>
+          <p><strong>User ID:</strong> ${userid}</p>
+          <p><strong>Name:</strong> ${username}</p>
+          <p><strong>Class:</strong> ${studentClass}</p>
+          <p><strong>Branch:</strong> ${branch}</p>
+        </div>
+      `;
+    }
+
+    async function showProfile() {
       try {
         const res = await fetch(usersURL);
         const data = await res.json();
@@ -147,22 +166,18 @@
           return;
         }
 
-        showProfile(student);
+        document.getElementById("dashboardContent").innerHTML = `
+          <div class="info">
+            <h3>👤 Profile</h3>
+            <p><strong>User ID:</strong> ${userid}</p>
+            <p><strong>Name:</strong> ${student.name}</p>
+            <p><strong>Class:</strong> ${student.class}</p>
+            <p><strong>Branch:</strong> ${branch}</p>
+          </div>
+        `;
       } catch {
         document.getElementById("dashboardContent").innerHTML = "<p style='color:red'>Failed to load student data.</p>";
       }
-    }
-
-    function showProfile(student) {
-      document.getElementById("dashboardContent").innerHTML = `
-        <div class="info">
-          <h3>👤 Profile</h3>
-          <p><strong>User ID:</strong> ${userid}</p>
-          <p><strong>Name:</strong> ${student.name}</p>
-          <p><strong>Class:</strong> ${student.class}</p>
-          <p><strong>Branch:</strong> ${branch}</p>
-        </div>
-      `;
     }
 
     async function showPayments() {
@@ -256,12 +271,8 @@
       }
     }
 
-    function logout() {
-      localStorage.clear();
-      window.location.href = "userlogin.html";
-    }
-
-    window.onload = loadStudentData;
+    // On page load show home
+    window.onload = showHome;
   </script>
 </body>
 </html>
