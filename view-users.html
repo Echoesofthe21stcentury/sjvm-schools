@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>View Users – SJVM</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="auth-check.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f9ff;
+      padding: 30px;
+    }
+    h1 {
+      color: #003366;
+    }
+    h2 {
+      margin-top: 30px;
+      color: #0059b3;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-bottom: 30px;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ccc;
+      text-align: left;
+    }
+    th {
+      background: #003366;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>📋 All Registered Users</h1>
+  <div id="output"></div>
+
+  <script>
+    const allowedRoles = ["Principal", "Admin", "Chairman"];
+    const currentRole = localStorage.getItem("role");
+
+    if (!allowedRoles.includes(currentRole)) {
+      alert("Access denied! Only Admin, Principal, and Chairman can view this.");
+      window.location.href = "userlogin.html";
+    }
+
+    const usersURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/users.json";
+
+    async function fetchUsers() {
+      try {
+        const res = await fetch(usersURL);
+        const data = await res.json();
+        const container = document.getElementById("output");
+
+        for (let role in data) {
+          let html = `<h2>🔷 ${role}s</h2><table><tr><th>User ID</th><th>Name</th><th>Class/Branch</th></tr>`;
+          
+          if (role === "Student") {
+            for (let className in data[role]) {
+              for (let id in data[role][className]) {
+                let user = data[role][className][id];
+                html += `<tr><td>${id}</td><td>${user.name}</td><td>${className}</td></tr>`;
+              }
+            }
+          } else if (role === "Teacher" || role === "Coordinator") {
+            for (let branch in data[role]) {
+              for (let id in data[role][branch]) {
+                let user = data[role][branch][id];
+                html += `<tr><td>${id}</td><td>${user.name}</td><td>${branch}</td></tr>`;
+              }
+            }
+          } else {
+            for (let id in data[role]) {
+              let user = data[role][id];
+              html += `<tr><td>${id}</td><td>${user.name}</td><td>-</td></tr>`;
+            }
+          }
+
+          html += "</table>";
+          container.innerHTML += html;
+        }
+
+      } catch (err) {
+        document.getElementById("output").innerHTML = "<p style='color:red'>Failed to load users.</p>";
+      }
+    }
+
+    fetchUsers();
+  </script>
+</body>
+</html>
