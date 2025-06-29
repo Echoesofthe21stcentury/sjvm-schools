@@ -1,22 +1,8 @@
 {
-  "Student": {
-    "Class 5": {
-      "SBK-501": {
-        "name": "Kushal M",
-        "password": "student123",
-        "class": "Class 5"
-    }
-  },
   "Principal": {
     "PR-001": {
       "name": "Dr. Sandarshini B.K",
       "password": "head123"
-    }
-  },
-  "Admin": {
-    "AD-001": {
-      "name": "Admin User",
-      "password": "admin123"
     }
   }
 }
