@@ -1,29 +1,140 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Principal Dashboard</title>
+  <meta charset="UTF-8">
+  <title>Principal Dashboard – Assign Users</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f8ff;
+      padding: 20px;
+    }
+    h1 {
+      color: #003366;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+    input, select {
+      width: 100%;
+      max-width: 400px;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #003366;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    textarea {
+      width: 100%;
+      height: 300px;
+      margin-top: 20px;
+      font-family: monospace;
+    }
+  </style>
 </head>
 <body>
-  <h2>🎩 Principal Dashboard</h2>
-  <p>Welcome, <span id="name"></span>. You have full access.</p>
+  <h1>👩‍🏫 Principal Dashboard – Assign Users</h1>
 
-  <a href="assign-id.html">Assign User ID</a>
-  <br><br>
-  <button onclick="logout()">Logout</button>
+  <label for="role">Role:</label>
+  <select id="role">
+    <option value="">-- Select Role --</option>
+    <option value="Student">Student</option>
+    <option value="Teacher">Teacher</option>
+    <option value="Admin">Admin</option>
+    <option value="Chairman">Chairman</option>
+    <option value="Coordinator">Coordinator</option>
+  </select>
+
+  <label for="userid">User ID (e.g. STU-001):</label>
+  <input type="text" id="userid">
+
+  <label for="name">Full Name:</label>
+  <input type="text" id="name">
+
+  <label for="password">Password:</label>
+  <input type="text" id="password">
+
+  <div id="classSection" style="display:none;">
+    <label for="class">Class:</label>
+    <select id="class">
+      <option value="">-- Select Class --</option>
+      <option value="PKG">PKG</option>
+      <option value="LKG">LKG</option>
+      <option value="UKG">UKG</option>
+      <option value="Class 1">Class 1</option>
+      <option value="Class 2">Class 2</option>
+      <option value="Class 3">Class 3</option>
+      <option value="Class 4">Class 4</option>
+      <option value="Class 5">Class 5</option>
+      <option value="Class 6">Class 6</option>
+      <option value="Class 7">Class 7</option>
+      <option value="Class 8">Class 8</option>
+      <option value="Class 9">Class 9</option>
+      <option value="Class 10">Class 10</option>
+    </select>
+  </div>
+
+  <button onclick="assignUser()">Assign User</button>
+
+  <textarea id="jsonPreview" readonly></textarea>
 
   <script>
-    const role = localStorage.getItem("role");
-    if (role !== "Principal") {
-      alert("Access Denied");
-      window.location.href = "userlogin.html";
-    }
-    document.getElementById("name").textContent = localStorage.getItem("username");
+    let users = {};
 
-    function logout() {
-      localStorage.clear();
-      window.location.href = "userlogin.html";
+    // Load existing users from localStorage (simulating GitHub users.json)
+    if (localStorage.getItem("users")) {
+      users = JSON.parse(localStorage.getItem("users"));
     }
+
+    function assignUser() {
+      const role = document.getElementById("role").value;
+      const userid = document.getElementById("userid").value.trim();
+      const name = document.getElementById("name").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const studentClass = document.getElementById("class").value;
+
+      if (!role || !userid || !name || !password || (role === "Student" && !studentClass)) {
+        alert("Please fill all required fields.");
+        return;
+      }
+
+      if (!users[role]) users[role] = {};
+      users[role][userid] = { name, password };
+
+      if (role === "Student") {
+        users[role][userid].class = studentClass;
+      }
+
+      localStorage.setItem("users", JSON.stringify(users));
+      document.getElementById("jsonPreview").value = JSON.stringify(users, null, 2);
+
+      alert("✅ User assigned and stored in local data.");
+
+      // Clear fields
+      document.getElementById("userid").value = "";
+      document.getElementById("name").value = "";
+      document.getElementById("password").value = "";
+      document.getElementById("class").value = "";
+    }
+
+    document.getElementById("role").addEventListener("change", function() {
+      if (this.value === "Student") {
+        document.getElementById("classSection").style.display = "block";
+      } else {
+        document.getElementById("classSection").style.display = "none";
+      }
+    });
   </script>
+
 </body>
 </html>
