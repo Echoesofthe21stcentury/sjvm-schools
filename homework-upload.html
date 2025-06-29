@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Upload Homework – SJVM</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="auth-check.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f7ff;
+      padding: 30px;
+    }
+
+    h2 {
+      color: #003366;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      max-width: 500px;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      margin-top: 20px;
+      background: #003366;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #001f4d;
+    }
+  </style>
+</head>
+<body>
+  <h2>📝 Upload Homework</h2>
+
+  <label for="class">Select Class:</label>
+  <select id="class">
+    <option value="Class 5">Class 5</option>
+    <option value="Class 6">Class 6</option>
+    <option value="Class 7">Class 7</option>
+    <!-- Add more classes -->
+  </select>
+
+  <label for="title">Homework Title:</label>
+  <input type="text" id="title" placeholder="e.g. Science Chapter 3" />
+
+  <label for="desc">Description:</label>
+  <textarea id="desc" rows="4" placeholder="Describe the assignment..."></textarea>
+
+  <label for="date">Date:</label>
+  <input type="date" id="date" value="${new Date().toISOString().split('T')[0]}" />
+
+  <button onclick="submitHomework()">📤 Upload to GitHub</button>
+
+  <script>
+    const branch = localStorage.getItem("branch");
+    const teacherID = localStorage.getItem("userid");
+
+    async function submitHomework() {
+      const cls = document.getElementById("class").value;
+      const title = document.getElementById("title").value.trim();
+      const description = document.getElementById("desc").value.trim();
+      const date = document.getElementById("date").value;
+
+      if (!cls || !title || !description || !date) {
+        alert("Please fill all fields");
+        return;
+      }
+
+      const token = prompt("🔐 Enter your GitHub PAT:");
+      if (!token) return;
+
+      const url = "https://api.github.com/repos/Echoesofthe21stcentury/sjvm-schools/contents/homeworks.json";
+      const headers = {
+        Authorization: `token ${token}`,
+        Accept: "application/vnd.github.v3+json"
+      };
+
+      try {
+        const res = await fetch(url, { headers });
+        const file = await res.json();
+        const sha = file.sha;
+        const content = atob(file.content);
+        let data = JSON.parse(content);
+
+        if (!data[cls]) data[cls] = {};
+        if (!data[cls][branch]) data[cls][branch] = [];
+
+        data[cls][branch].push({ title, description, date, uploadedBy: teacherID });
+
+        const updatedContent = btoa(JSON.stringify(data, null, 2));
+
+        const commit = await fetch(url, {
+          method: "PUT",
+          headers,
+          body: JSON.stringify({
+            message: `📤 Homework uploaded by ${teacherID} for ${cls}`,
+            content: updatedContent,
+            sha
+          })
+        });
+
+        if (commit.ok) {
+          alert("✅ Homework uploaded successfully!");
+        } else {
+          alert("❌ GitHub upload failed.");
+        }
+      } catch (err) {
+        alert("❌ Error: " + err.message);
+      }
+    }
+  </script>
+</body>
+</html>
