@@ -2,25 +2,202 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Teacher Dashboard</title>
+  <title>Teacher Dashboard | SJVM</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="auth-check.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f8fc;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #003366;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    nav {
+      background-color: #0059b3;
+      display: flex;
+      justify-content: center;
+    }
+    nav a {
+      color: white;
+      padding: 14px 20px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    nav a:hover {
+      background-color: #003366;
+    }
+    .container {
+      padding: 30px;
+      max-width: 900px;
+      margin: auto;
+      background: white;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      margin-top: 30px;
+      border-radius: 10px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #003366;
+      color: white;
+    }
+    select, button {
+      padding: 8px;
+      margin-top: 10px;
+    }
+    .logout {
+      text-align: center;
+      margin-top: 30px;
+    }
+    .logout button {
+      background-color: #b30000;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .logout button:hover {
+      background-color: #800000;
+    }
+  </style>
 </head>
 <body>
-  <h2>📚 Welcome, Teacher</h2>
-  <p>Hello, <span id="name"></span>! Manage your classes here.</p>
+  <header>
+    <h1>👩‍🏫 SJVM Teacher Dashboard</h1>
+  </header>
 
-  <button onclick="logout()">Logout</button>
+  <nav>
+    <a href="#" onclick="loadAttendanceForm()">Mark Attendance</a>
+    <a href="#">Upload Homework (Next)</a>
+  </nav>
+
+  <div class="container" id="dashboardContent">
+    <p>Welcome! Please select an option from the menu above.</p>
+  </div>
+
+  <div class="logout">
+    <button onclick="logout()">Logout</button>
+  </div>
 
   <script>
-    const role = localStorage.getItem("role");
-    if (role !== "Teacher") {
-      alert("Access Denied");
-      window.location.href = "userlogin.html";
-    }
-    document.getElementById("name").textContent = localStorage.getItem("username");
+    const usersURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/users.json";
+    const branch = localStorage.getItem("branch");
 
     function logout() {
       localStorage.clear();
       window.location.href = "userlogin.html";
+    }
+
+    async function loadAttendanceForm() {
+      const res = await fetch(usersURL);
+      const data = await res.json();
+      const studentData = data["Student"];
+
+      let classOptions = Object.keys(studentData).map(cls => `<option value="${cls}">${cls}</option>`).join("");
+
+      document.getElementById("dashboardContent").innerHTML = `
+        <h2>📅 Mark Attendance</h2>
+        <label>Select Date:</label><input type="date" id="attDate" value="${new Date().toISOString().split('T')[0]}"><br>
+        <label>Select Class:</label>
+        <select id="attClass">${classOptions}</select>
+        <button onclick="generateAttendance()">Load Students</button>
+        <form id="attForm"></form>
+      `;
+    }
+
+    async function generateAttendance() {
+      const cls = document.getElementById("attClass").value;
+      const res = await fetch(usersURL);
+      const data = await res.json();
+      const students = data["Student"]?.[cls];
+      let html = `<h3>Class: ${cls} | Branch: ${branch}</h3><table><tr><th>Student ID</th><th>Name</th><th>Status</th></tr>`;
+
+      for (let id in students) {
+        html += `
+          <tr>
+            <td>${id}</td>
+            <td>${students[id].name}</td>
+            <td>
+              <select name="${id}">
+                <option value="Present">Present</option>
+                <option value="Absent">Absent</option>
+              </select>
+            </td>
+          </tr>`;
+      }
+
+      html += `</table><br><button onclick="submitAttendance(event)">Submit Attendance</button>`;
+      document.getElementById("attForm").innerHTML = html;
+    }
+
+    async function submitAttendance(e) {
+      e.preventDefault();
+      const form = document.getElementById("attForm");
+      const selects = form.querySelectorAll("select");
+      const attendance = {};
+      selects.forEach(sel => {
+        attendance[sel.name] = sel.value;
+      });
+
+      const date = document.getElementById("attDate").value;
+      const cls = document.getElementById("attClass").value;
+      const token = prompt("🔐 Enter your GitHub PAT to save attendance:");
+
+      const url = "https://api.github.com/repos/Echoesofthe21stcentury/sjvm-schools/contents/attendance.json";
+      const headers = {
+        Authorization: `token ${token}`,
+        Accept: "application/vnd.github.v3+json"
+      };
+
+      try {
+        const res = await fetch(url, { headers });
+        const file = await res.json();
+        const sha = file.sha;
+        const content = atob(file.content);
+        let data = JSON.parse(content);
+
+        if (!data[date]) data[date] = {};
+        if (!data[date][cls]) data[date][cls] = {};
+        if (!data[date][cls][branch]) data[date][cls][branch] = {};
+
+        data[date][cls][branch] = attendance;
+
+        const updatedContent = btoa(JSON.stringify(data, null, 2));
+
+        const commit = await fetch(url, {
+          method: "PUT",
+          headers,
+          body: JSON.stringify({
+            message: `📅 Attendance added for ${cls} (${branch}) on ${date}`,
+            content: updatedContent,
+            sha
+          })
+        });
+
+        if (commit.ok) {
+          alert("✅ Attendance submitted successfully!");
+          document.getElementById("attForm").innerHTML = "";
+        } else {
+          alert("❌ Failed to commit to GitHub.");
+        }
+      } catch (err) {
+        alert("❌ Error: " + err.message);
+      }
     }
   </script>
 </body>
