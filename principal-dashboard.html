@@ -1,140 +1,185 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Principal Dashboard – Assign Users</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Principal Dashboard | SJVM</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f0f8ff;
+      background: #f4f8fc;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #2e3b4e;
+      color: white;
       padding: 20px;
+      text-align: center;
     }
-    h1 {
-      color: #003366;
+
+    nav {
+      background-color: #446084;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
     }
-    label {
-      display: block;
-      margin-top: 10px;
+
+    nav a {
+      color: white;
+      padding: 14px 20px;
+      text-decoration: none;
+      font-weight: bold;
+      cursor: pointer;
     }
+
+    nav a:hover {
+      background-color: #2e3b4e;
+    }
+
+    .container {
+      padding: 30px;
+      max-width: 900px;
+      margin: auto;
+      background: white;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      margin-top: 30px;
+      border-radius: 10px;
+    }
+
+    .section {
+      margin-bottom: 30px;
+    }
+
     input, select {
       width: 100%;
       max-width: 400px;
       padding: 10px;
-      margin-top: 5px;
+      margin: 10px 0;
+      border-radius: 5px;
       border: 1px solid #ccc;
-      border-radius: 5px;
     }
+
     button {
-      margin-top: 20px;
-      padding: 10px 20px;
-      background-color: #003366;
+      background: #446084;
       color: white;
+      padding: 10px 20px;
       border: none;
-      border-radius: 5px;
+      border-radius: 6px;
       cursor: pointer;
     }
-    textarea {
-      width: 100%;
-      height: 300px;
+
+    button:hover {
+      background: #2e3b4e;
+    }
+
+    .logout {
+      text-align: center;
       margin-top: 20px;
-      font-family: monospace;
+    }
+
+    .logout button {
+      background-color: #b30000;
+    }
+
+    .logout button:hover {
+      background-color: #800000;
     }
   </style>
 </head>
 <body>
-  <h1>👩‍🏫 Principal Dashboard – Assign Users</h1>
+  <header>
+    <h1>SJVM Principal Dashboard</h1>
+  </header>
 
-  <label for="role">Role:</label>
-  <select id="role">
-    <option value="">-- Select Role --</option>
-    <option value="Student">Student</option>
-    <option value="Teacher">Teacher</option>
-    <option value="Admin">Admin</option>
-    <option value="Chairman">Chairman</option>
-    <option value="Coordinator">Coordinator</option>
-  </select>
+  <nav>
+    <a onclick="showAssignUser()">Assign ID</a>
+    <a onclick="showPromoteStudent()">Promote Student</a>
+    <a onclick="showAllUsers()">View All Users</a>
+  </nav>
 
-  <label for="userid">User ID (e.g. STU-001):</label>
-  <input type="text" id="userid">
-
-  <label for="name">Full Name:</label>
-  <input type="text" id="name">
-
-  <label for="password">Password:</label>
-  <input type="text" id="password">
-
-  <div id="classSection" style="display:none;">
-    <label for="class">Class:</label>
-    <select id="class">
-      <option value="">-- Select Class --</option>
-      <option value="PKG">PKG</option>
-      <option value="LKG">LKG</option>
-      <option value="UKG">UKG</option>
-      <option value="Class 1">Class 1</option>
-      <option value="Class 2">Class 2</option>
-      <option value="Class 3">Class 3</option>
-      <option value="Class 4">Class 4</option>
-      <option value="Class 5">Class 5</option>
-      <option value="Class 6">Class 6</option>
-      <option value="Class 7">Class 7</option>
-      <option value="Class 8">Class 8</option>
-      <option value="Class 9">Class 9</option>
-      <option value="Class 10">Class 10</option>
-    </select>
+  <div class="container" id="dashboardContent">
+    <p>Select an option from the menu.</p>
   </div>
 
-  <button onclick="assignUser()">Assign User</button>
-
-  <textarea id="jsonPreview" readonly></textarea>
+  <div class="logout">
+    <button onclick="logout()">Logout</button>
+  </div>
 
   <script>
-    let users = {};
+    let usersData = {};
+    const usersURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/users.json";
 
-    // Load existing users from localStorage (simulating GitHub users.json)
-    if (localStorage.getItem("users")) {
-      users = JSON.parse(localStorage.getItem("users"));
+    async function fetchUsers() {
+      const res = await fetch(usersURL);
+      usersData = await res.json();
     }
 
-    function assignUser() {
-      const role = document.getElementById("role").value;
-      const userid = document.getElementById("userid").value.trim();
-      const name = document.getElementById("name").value.trim();
-      const password = document.getElementById("password").value.trim();
-      const studentClass = document.getElementById("class").value;
-
-      if (!role || !userid || !name || !password || (role === "Student" && !studentClass)) {
-        alert("Please fill all required fields.");
-        return;
-      }
-
-      if (!users[role]) users[role] = {};
-      users[role][userid] = { name, password };
-
-      if (role === "Student") {
-        users[role][userid].class = studentClass;
-      }
-
-      localStorage.setItem("users", JSON.stringify(users));
-      document.getElementById("jsonPreview").value = JSON.stringify(users, null, 2);
-
-      alert("✅ User assigned and stored in local data.");
-
-      // Clear fields
-      document.getElementById("userid").value = "";
-      document.getElementById("name").value = "";
-      document.getElementById("password").value = "";
-      document.getElementById("class").value = "";
+    function logout() {
+      localStorage.clear();
+      window.location.href = "userlogin.html";
     }
 
-    document.getElementById("role").addEventListener("change", function() {
-      if (this.value === "Student") {
-        document.getElementById("classSection").style.display = "block";
-      } else {
-        document.getElementById("classSection").style.display = "none";
+    function showAssignUser() {
+      document.getElementById("dashboardContent").innerHTML = `
+        <div class="section">
+          <h3>Assign User ID & Password</h3>
+          <label>Role:</label>
+          <select id="role">
+            <option value="Student">Student</option>
+            <option value="Teacher">Teacher</option>
+            <option value="Coordinator">Coordinator</option>
+          </select>
+          <label>Class (for Student):</label>
+          <input type="text" id="classInput" placeholder="Eg: Class 5"/>
+          <label>User ID:</label>
+          <input type="text" id="userid" placeholder="Eg: STU-005"/>
+          <label>Full Name:</label>
+          <input type="text" id="name" />
+          <label>Password:</label>
+          <input type="text" id="password" />
+          <button onclick="addUser()">➕ Assign</button>
+        </div>
+      `;
+    }
+
+    function showPromoteStudent() {
+      document.getElementById("dashboardContent").innerHTML = `
+        <div class="section">
+          <h3>Promote or Remove Student</h3>
+          <p>📌 In the GitHub version, you'll have to manually update users.json to promote or remove.</p>
+        </div>
+      `;
+    }
+
+    function showAllUsers() {
+      let output = "<h3>All Users</h3>";
+      for (let role in usersData) {
+        output += `<h4>${role}</h4><ul>`;
+        if (role === "Student") {
+          for (let className in usersData[role]) {
+            output += `<strong>${className}</strong><ul>`;
+            for (let uid in usersData[role][className]) {
+              output += `<li>${uid}: ${usersData[role][className][uid].name}</li>`;
+            }
+            output += `</ul>`;
+          }
+        } else {
+          for (let uid in usersData[role]) {
+            output += `<li>${uid}: ${usersData[role][uid].name}</li>`;
+          }
+        }
+        output += "</ul>";
       }
-    });
+      document.getElementById("dashboardContent").innerHTML = output;
+    }
+
+    function addUser() {
+      alert("⚠ This action will only update data locally.\n\nTo save permanently, update users.json manually on GitHub.");
+    }
+
+    fetchUsers();
   </script>
-
 </body>
 </html>
