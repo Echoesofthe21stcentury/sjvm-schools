@@ -105,12 +105,12 @@
     <h1>🎓 SJVM Student Dashboard</h1>
   </header>
 
-  <nav>
-    <a href="#" onclick="showProfile()">Profile</a>
-    <a href="#" onclick="showPayments()">Payments</a>
-    <a href="#" onclick="showAttendance()">Attendance</a>
-    <a href="#" onclick="showHomework()">Homework</a>
-  </nav>
+<nav>
+  <a href="#" onclick="showProfile()">Profile</a>
+  <a href="#" onclick="showPayments()">Payments</a>
+  <a href="#" onclick="showAttendance()">Attendance</a>
+  <a href="#" onclick="showHomework()">Homework</a>
+</nav>
 
   <div class="container" id="dashboardContent">
     <!-- Content dynamically inserted here -->
@@ -225,15 +225,16 @@
       try {
         const res = await fetch(homeworkURL);
         const data = await res.json();
-        const entries = data?.[studentClass]?.[branch];
 
-        if (!entries || entries.length === 0) {
+        const homeworks = data?.[studentClass]?.[branch];
+
+        if (!homeworks || homeworks.length === 0) {
           document.getElementById("dashboardContent").innerHTML = `
             <div class="info"><h3>📚 Homework</h3><p>No homework assigned yet.</p></div>`;
           return;
         }
 
-        const rows = entries.map(hw => `
+        let rows = homeworks.map(hw => `
           <tr>
             <td>${hw.date}</td>
             <td>${hw.title}</td>
