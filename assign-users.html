@@ -2,38 +2,62 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Assign User – SJVM</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <script src="auth-check.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Assign Users – SJVM</title>
+
+  <script>
+    const role = localStorage.getItem("role");
+    const userid = localStorage.getItem("userid");
+
+    const allowedRoles = ["Principal", "Admin", "Chairman"];
+
+    if (!userid || !allowedRoles.includes(role)) {
+      alert("Access Denied. Please log in.");
+      window.location.href = "userlogin.html";
+    } else {
+      if (!sessionStorage.getItem("access_granted")) {
+        const code = prompt("🔐 Enter Access Code:");
+        if (code !== "2011") {
+          alert("Incorrect Code. Access Denied.");
+          window.location.href = "userlogin.html";
+        } else {
+          sessionStorage.setItem("access_granted", "true");
+        }
+      }
+    }
+  </script>
+
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #e6f2ff;
-      padding: 30px;
+      background: #f4f8fc;
+      margin: 0;
+      padding: 20px;
     }
 
     h1 {
       color: #003366;
+      text-align: center;
     }
 
     label {
-      font-weight: bold;
       display: block;
       margin-top: 15px;
+      font-weight: bold;
     }
 
     input, select {
-      padding: 10px;
       width: 100%;
       max-width: 400px;
+      padding: 10px;
       margin-top: 5px;
-      border-radius: 5px;
+      border-radius: 6px;
       border: 1px solid #ccc;
     }
 
     button {
       margin-top: 20px;
-      background: #003366;
+      background: #0059b3;
       color: white;
       padding: 10px 20px;
       border: none;
@@ -42,15 +66,25 @@
     }
 
     button:hover {
-      background: #002244;
+      background: #003366;
+    }
+
+    textarea {
+      margin-top: 20px;
+      width: 100%;
+      height: 300px;
+      padding: 10px;
+      font-family: monospace;
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
-  <h1>👤 Assign New User</h1>
+
+  <h1>👥 Assign New User</h1>
 
   <label for="role">Select Role:</label>
-  <select id="role" onchange="toggleFields()">
+  <select id="role">
     <option value="">-- Select Role --</option>
     <option value="Student">Student</option>
     <option value="Teacher">Teacher</option>
@@ -60,7 +94,15 @@
     <option value="Chairman">Chairman</option>
   </select>
 
-  <div id="extraFields"></div>
+  <label for="class">Class (Only for Students):</label>
+  <input type="text" id="class" placeholder="e.g. Class 5 or leave empty for other roles" />
+
+  <label for="branch">Branch:</label>
+  <select id="branch">
+    <option value="">-- Select Branch --</option>
+    <option value="Bandikodigenahalli">Bandikodigenahalli</option>
+    <option value="Atturu Layout">Atturu Layout</option>
+  </select>
 
   <label for="userid">User ID:</label>
   <input type="text" id="userid" placeholder="e.g. STU-001" />
@@ -71,99 +113,73 @@
   <label for="password">Password:</label>
   <input type="text" id="password" />
 
-  <button onclick="assignUser()">➕ Add to GitHub users.json</button>
+  <button onclick="addUser()">➕ Add to users.json</button>
+
+  <h2>📁 users.json (Preview)</h2>
+  <textarea id="jsonOutput" readonly></textarea>
+
+  <button onclick="downloadJSON()">📥 Download users.json</button>
 
   <script>
-    const owner = "Echoesofthe21stcentury";
-    const repo = "sjvm-schools";
-    const filePath = "users.json";
+    let users = {};
 
-    function toggleFields() {
-      const role = document.getElementById("role").value;
-      let html = "";
-
-      if (role === "Student") {
-        html += `<label for='class'>Class:</label>
-                 <input type='text' id='class' placeholder='e.g. Class 5' />`;
-      } else if (role === "Teacher" || role === "Coordinator") {
-        html += `<label for='branch'>Branch:</label>
-                 <select id='branch'>
-                   <option value='Bandikodigenahalli'>Bandikodigenahalli</option>
-                   <option value='Atturu Layout'>Atturu Layout</option>
-                 </select>`;
-      }
-
-      document.getElementById("extraFields").innerHTML = html;
-    }
-
-    async function assignUser() {
+    function addUser() {
       const role = document.getElementById("role").value;
       const userid = document.getElementById("userid").value.trim();
       const name = document.getElementById("name").value.trim();
       const password = document.getElementById("password").value.trim();
-      const studentClass = document.getElementById("class")?.value.trim();
-      const branch = document.getElementById("branch")?.value;
+      const userClass = document.getElementById("class").value.trim();
+      const branch = document.getElementById("branch").value.trim();
 
-      if (!role || !userid || !name || !password) {
-        alert("❗ Please fill in all fields.");
+      if (!role || !userid || !name || !password || !branch) {
+        alert("Please fill in all required fields.");
         return;
       }
 
-      const token = prompt("🔐 Enter your GitHub Personal Access Token:");
-      if (!token) return alert("Token is required");
-
-      const apiURL = `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`;
-      const headers = {
-        Authorization: `token ${token}`,
-        Accept: "application/vnd.github.v3+json"
-      };
-
-      try {
-        // Get current users.json
-        const res = await fetch(apiURL, { headers });
-        const file = await res.json();
-        const sha = file.sha;
-        const content = atob(file.content);
-        let users = JSON.parse(content);
-
-        if (!users[role]) users[role] = {};
-
-        if (role === "Student") {
-          if (!studentClass) return alert("Please enter class for student.");
-          if (!users[role][studentClass]) users[role][studentClass] = {};
-          users[role][studentClass][userid] = { name, password, class: studentClass };
-        } else if (role === "Teacher" || role === "Coordinator") {
-          if (!branch) return alert("Please select branch.");
-          if (!users[role][branch]) users[role][branch] = {};
-          users[role][branch][userid] = { name, password, branch };
-        } else {
-          users[role][userid] = { name, password };
-        }
-
-        // Encode updated file
-        const updatedContent = btoa(JSON.stringify(users, null, 2));
-
-        // Commit changes to GitHub
-        const commit = await fetch(apiURL, {
-          method: "PUT",
-          headers,
-          body: JSON.stringify({
-            message: `Add ${userid} to ${role}`,
-            content: updatedContent,
-            sha: sha
-          })
-        });
-
-        if (commit.ok) {
-          alert(`✅ User ${userid} assigned successfully.`);
-        } else {
-          alert("❌ Failed to commit to GitHub.");
-        }
-      } catch (err) {
-        console.error(err);
-        alert("❌ Error: " + err.message);
+      if (role === "Student" && !userClass) {
+        alert("Please provide class for student.");
+        return;
       }
+
+      if (!users[role]) users[role] = {};
+
+      if (role === "Student") {
+        if (!users[role][userClass]) users[role][userClass] = {};
+        if (!users[role][userClass][userid]) {
+          users[role][userClass][userid] = {
+            name,
+            password,
+            class: userClass,
+            branch
+          };
+        }
+      } else {
+        if (!users[role][userid]) {
+          users[role][userid] = {
+            name,
+            password,
+            branch
+          };
+        }
+      }
+
+      document.getElementById("jsonOutput").value = JSON.stringify(users, null, 2);
+
+      // Clear fields
+      document.getElementById("userid").value = "";
+      document.getElementById("name").value = "";
+      document.getElementById("password").value = "";
+      document.getElementById("class").value = "";
+    }
+
+    function downloadJSON() {
+      const blob = new Blob([JSON.stringify(users, null, 2)], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "users.json";
+      a.click();
     }
   </script>
+
 </body>
 </html>
