@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Assign User | SJVM</title>
+  <style>
+    body { font-family: Arial; padding: 20px; background: #f4f4f4; }
+    label { display: block; margin-top: 10px; font-weight: bold; }
+    input, select, button {
+      padding: 10px; margin-top: 5px; width: 100%; max-width: 400px;
+    }
+    textarea { width: 100%; height: 300px; margin-top: 15px; font-family: monospace; }
+  </style>
+</head>
+<body>
+
+<h2>👤 Assign New User</h2>
+
+<label>Role:</label>
+<select id="role">
+  <option value="Student">Student</option>
+  <option value="Teacher">Teacher</option>
+  <option value="Coordinator">Coordinator</option>
+  <option value="Admin">Admin</option>
+</select>
+
+<label>Class (Only for Students):</label>
+<input id="studentClass" placeholder="e.g. Class 5" />
+
+<label>User ID:</label>
+<input id="userid" placeholder="e.g. STU-005" />
+
+<label>Name:</label>
+<input id="name" placeholder="Full Name" />
+
+<label>Password:</label>
+<input id="password" placeholder="Password" />
+
+<button onclick="assignUser()">➕ Assign & Upload to GitHub</button>
+
+<textarea id="output" readonly></textarea>
+
+<script>
+  const token = prompt("🔐 Enter your GitHub PAT securely:");
+  const repo = "Echoesofthe21stcentury/sjvm-schools";
+  const filePath = "users.json";
+  const branch = "main";
+
+  async function assignUser() {
+    const role = document.getElementById("role").value;
+    const studentClass = document.getElementById("studentClass").value.trim();
+    const userid = document.getElementById("userid").value.trim();
+    const name = document.getElementById("name").value.trim();
+    const password = document.getElementById("password").value.trim();
+    const output = document.getElementById("output");
+
+    if (!role || !userid || !name || !password || (role === "Student" && !studentClass)) {
+      alert("Fill all fields properly.");
+      return;
+    }
+
+    // Fetch current users.json from GitHub
+    const getURL = `https://api.github.com/repos/${repo}/contents/${filePath}`;
+    const headers = {
+      Authorization: `Bearer ${token}`,
+      Accept: "application/vnd.github.v3+json"
+    };
+
+    let usersData = {}, sha = "";
+
+    try {
+      const res = await fetch(getURL, { headers });
+      const json = await res.json();
+      sha = json.sha;
+      usersData = JSON.parse(atob(json.content));
+    } catch (err) {
+      output.value = "⚠️ Failed to load existing users.json\n" + err;
+      return;
+    }
+
+    // Add new user
+    if (!usersData[role]) usersData[role] = {};
+    if (role === "Student") {
+      if (!usersData[role][studentClass]) usersData[role][studentClass] = {};
+      usersData[role][studentClass][userid] = { name, password, class: studentClass };
+    } else {
+      usersData[role][userid] = { name, password };
+    }
+
+    // Upload back to GitHub
+    const update = await fetch(getURL, {
+      method: "PUT",
+      headers,
+      body: JSON.stringify({
+        message: `🎓 Added user ${userid}`,
+        content: btoa(JSON.stringify(usersData, null, 2)),
+        sha: sha,
+        branch: branch
+      })
+    });
+
+    if (update.ok) {
+      output.value = "✅ users.json updated on GitHub!\n\n" + JSON.stringify(usersData, null, 2);
+    } else {
+      const err = await update.json();
+      output.value = "❌ Failed to update:\n" + JSON.stringify(err, null, 2);
+    }
+  }
+</script>
+
+</body>
+</html>
