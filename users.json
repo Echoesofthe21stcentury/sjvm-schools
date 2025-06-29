@@ -1,9 +1,11 @@
 {
   "Student": {
-    "STU-001": {
-      "name": "Ravi Kumar",
-      "password": "pass123",
-      "class": "Class 5"
+    "Class 6": {
+      "STU-001": {
+        "name": "Rahul M",
+        "password": "abc123",
+        "class": "Class 6"
+      }
     }
   },
   "Principal": {
