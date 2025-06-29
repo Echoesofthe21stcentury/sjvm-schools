@@ -1,16 +1,21 @@
 {
-  "Admin": {
-    "AD-001": {
-      "name": "Office Bandikodigenahalli",
-      "password": "0ffice@BK"
+  "Student": {
+    "STU-001": {
+      "name": "Ravi Kumar",
+      "password": "pass123",
+      "class": "Class 5"
     }
-  }
-}
-{
+  },
   "Principal": {
     "PR-001": {
-      "name": "Dr.Sandarrshini.B.K",
-      "password": "head2025"
+      "name": "Dr. Sandarshini B.K",
+      "password": "head123"
+    }
+  },
+  "Admin": {
+    "AD-001": {
+      "name": "Admin User",
+      "password": "admin123"
     }
   }
 }
