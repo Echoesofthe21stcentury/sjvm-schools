@@ -2,28 +2,184 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Chairman Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Chairman Dashboard | SJVM</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9fbff;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #4b0082;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    nav {
+      background-color: #6a0dad;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    nav a {
+      color: white;
+      padding: 14px 20px;
+      text-decoration: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    nav a:hover {
+      background-color: #4b0082;
+    }
+
+    .container {
+      padding: 30px;
+      max-width: 900px;
+      margin: auto;
+      background: white;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      margin-top: 30px;
+      border-radius: 10px;
+    }
+
+    .section {
+      margin-bottom: 30px;
+    }
+
+    input, select {
+      width: 100%;
+      max-width: 400px;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background: #6a0dad;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #4b0082;
+    }
+
+    .logout {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .logout button {
+      background-color: #b30000;
+    }
+
+    .logout button:hover {
+      background-color: #800000;
+    }
+  </style>
 </head>
 <body>
-  <h2>🏛️ Chairman Dashboard</h2>
-  <p>Welcome, <span id="name"></span>. You have highest privileges.</p>
+  <header>
+    <h1>SJVM Chairman Dashboard</h1>
+  </header>
 
-  <a href="assign-id.html">Assign User ID</a>
-  <br><br>
-  <button onclick="logout()">Logout</button>
+  <nav>
+    <a onclick="showAssignUser()">Assign ID</a>
+    <a onclick="showPromoteStudent()">Promote Student</a>
+    <a onclick="showAllUsers()">View All Users</a>
+  </nav>
+
+  <div class="container" id="dashboardContent">
+    <p>Select an option from the menu.</p>
+  </div>
+
+  <div class="logout">
+    <button onclick="logout()">Logout</button>
+  </div>
 
   <script>
-    const role = localStorage.getItem("role");
-    if (role !== "Chairman") {
-      alert("Access Denied");
-      window.location.href = "userlogin.html";
+    let usersData = {};
+    const usersURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/users.json";
+
+    async function fetchUsers() {
+      const res = await fetch(usersURL);
+      usersData = await res.json();
     }
-    document.getElementById("name").textContent = localStorage.getItem("username");
 
     function logout() {
       localStorage.clear();
       window.location.href = "userlogin.html";
     }
+
+    function showAssignUser() {
+      document.getElementById("dashboardContent").innerHTML = `
+        <div class="section">
+          <h3>Assign User ID & Password</h3>
+          <label>Role:</label>
+          <select id="role">
+            <option value="Student">Student</option>
+            <option value="Teacher">Teacher</option>
+            <option value="Coordinator">Coordinator</option>
+          </select>
+          <label>Class (for Student):</label>
+          <input type="text" id="classInput" placeholder="Eg: Class 6"/>
+          <label>User ID:</label>
+          <input type="text" id="userid" placeholder="Eg: STU-010"/>
+          <label>Full Name:</label>
+          <input type="text" id="name" />
+          <label>Password:</label>
+          <input type="text" id="password" />
+          <button onclick="addUser()">➕ Assign</button>
+        </div>
+      `;
+    }
+
+    function showPromoteStudent() {
+      document.getElementById("dashboardContent").innerHTML = `
+        <div class="section">
+          <h3>Promote or Remove Student</h3>
+          <p>⚠️ This feature requires manual update of users.json on GitHub to be permanent.</p>
+        </div>
+      `;
+    }
+
+    function showAllUsers() {
+      let output = "<h3>All Users</h3>";
+      for (let role in usersData) {
+        output += `<h4>${role}</h4><ul>`;
+        if (role === "Student") {
+          for (let className in usersData[role]) {
+            output += `<strong>${className}</strong><ul>`;
+            for (let uid in usersData[role][className]) {
+              output += `<li>${uid}: ${usersData[role][className][uid].name}</li>`;
+            }
+            output += `</ul>`;
+          }
+        } else {
+          for (let uid in usersData[role]) {
+            output += `<li>${uid}: ${usersData[role][uid].name}</li>`;
+          }
+        }
+        output += "</ul>";
+      }
+      document.getElementById("dashboardContent").innerHTML = output;
+    }
+
+    function addUser() {
+      alert("Note: User will only be added locally in browser.\nTo save permanently, edit users.json on GitHub.");
+    }
+
+    fetchUsers();
   </script>
 </body>
 </html>
