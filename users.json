@@ -11,6 +11,40 @@
         "name": "Gayathri",
         "password": "29082004"
       }
+    },
+    "Atturu Layout": {
+      "TAT-001": {
+        "name": "Shobha",
+        "password": "teacher001"
+      }
+    }
+  },
+  "Admin": {
+    "Bandikodigenahalli": {
+      "ABK-001": {
+        "name": "Office Bandikodigenahalli",
+        "password": "admin001"
+      }
+    }
+  },
+  "Student": {
+    "Class 5": {
+      "Bandikodigenahalli": {
+        "SBK-501": {
+          "name": "Kushal M",
+          "password": "student123",
+          "class": "Class 5",
+          "branch": "Bandikodigenahalli"
+        }
+      },
+      "Atturu Layout": {
+        "SAT-502": {
+          "name": "Meena P",
+          "password": "student456",
+          "class": "Class 5",
+          "branch": "Atturu Layout"
+        }
+      }
     }
   }
 }
