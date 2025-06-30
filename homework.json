@@ -1,0 +1,32 @@
+{
+  "Class 5": {
+    "Bandikodigenahalli": [
+      {
+        "subject": "Mathematics",
+        "date": "2025-06-29",
+        "description": "Solve exercise 5.3 from the textbook."
+      },
+      {
+        "subject": "English",
+        "date": "2025-06-29",
+        "description": "Read Chapter 4 and write summary."
+      }
+    ],
+    "Atturu Layout": [
+      {
+        "subject": "Science",
+        "date": "2025-06-29",
+        "description": "Draw diagram of digestive system."
+      }
+    ]
+  },
+  "Class 6": {
+    "Bandikodigenahalli": [
+      {
+        "subject": "Social",
+        "date": "2025-06-29",
+        "description": "Write notes on Ancient India."
+      }
+    ]
+  }
+}
