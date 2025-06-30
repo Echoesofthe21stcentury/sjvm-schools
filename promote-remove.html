@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Promote or Remove Students | SJVM</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f8fc;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #003366;
+    }
+    select, button {
+      padding: 10px;
+      margin: 10px;
+      font-size: 16px;
+    }
+    table {
+      width: 100%;
+      margin-top: 20px;
+      border-collapse: collapse;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 12px;
+      text-align: left;
+    }
+    th {
+      background-color: #003366;
+      color: white;
+    }
+    .action-btn {
+      margin-right: 5px;
+      padding: 6px 10px;
+      cursor: pointer;
+    }
+    .promote {
+      background-color: #28a745;
+      color: white;
+    }
+    .remove {
+      background-color: #dc3545;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎓 Promote / Remove Students</h1>
+
+  <div style="text-align:center;">
+    <select id="classSelect">
+      <option value="">-- Select Class --</option>
+      <option value="PKG">PKG</option>
+      <option value="LKG">LKG</option>
+      <option value="UKG">UKG</option>
+      <option value="Class 1">Class 1</option>
+      <option value="Class 2">Class 2</option>
+      <option value="Class 3">Class 3</option>
+      <option value="Class 4">Class 4</option>
+      <option value="Class 5">Class 5</option>
+      <option value="Class 6">Class 6</option>
+      <option value="Class 7">Class 7</option>
+      <option value="Class 8">Class 8</option>
+      <option value="Class 9">Class 9</option>
+    </select>
+
+    <select id="branchSelect">
+      <option value="">-- Select Branch --</option>
+      <option value="Bandikodigenahalli">Bandikodigenahalli</option>
+      <option value="Atturu Layout">Atturu Layout</option>
+    </select>
+
+    <button onclick="loadStudents()">📥 Load Students</button>
+  </div>
+
+  <table id="studentTable" style="display:none;">
+    <thead>
+      <tr>
+        <th>User ID</th>
+        <th>Name</th>
+        <th>Branch</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="studentBody"></tbody>
+  </table>
+
+  <script>
+    const REPO = "Echoesofthe21stcentury/sjvm-schools";
+    const usersRaw = "https://raw.githubusercontent.com/" + REPO + "/main/users.json";
+    const apiURL = "https://api.github.com/repos/" + REPO + "/contents/users.json";
+
+    let users = {};
+
+    async function loadStudents() {
+      const cls = document.getElementById("classSelect").value;
+      const branch = document.getElementById("branchSelect").value;
+      const table = document.getElementById("studentTable");
+      const tbody = document.getElementById("studentBody");
+
+      if (!cls || !branch) return alert("Select both class and branch.");
+
+      try {
+        const res = await fetch(usersRaw);
+        users = await res.json();
+
+        const data = users.Student?.[cls];
+        tbody.innerHTML = "";
+        if (!data) {
+          tbody.innerHTML = "<tr><td colspan='4'>No students found.</td></tr>";
+          return;
+        }
+
+        for (let id in data) {
+          if (data[id].branch === branch) {
+            tbody.innerHTML += `
+              <tr>
+                <td>${id}</td>
+                <td>${data[id].name}</td>
+                <td>${data[id].branch}</td>
+                <td>
+                  <button class="action-btn promote" onclick="promote('${id}', '${cls}')">Promote</button>
+                  <button class="action-btn remove" onclick="removeStudent('${id}', '${cls}')">Remove</button>
+                </td>
+              </tr>
+            `;
+          }
+        }
+        table.style.display = "table";
+      } catch {
+        alert("❌ Failed to load users.json");
+      }
+    }
+
+    function getNextClass(currentClass) {
+      const classes = ["PKG", "LKG", "UKG", "Class 1", "Class 2", "Class 3", "Class 4", "Class 5", "Class 6", "Class 7", "Class 8", "Class 9", "Class 10"];
+      const idx = classes.indexOf(currentClass);
+      return idx >= 0 && idx < classes.length - 1 ? classes[idx + 1] : null;
+    }
+
+    async function promote(id, currentClass) {
+      const nextClass = getNextClass(currentClass);
+      if (!nextClass) return alert("Already in highest class.");
+
+      const student = users.Student[currentClass][id];
+      student.class = nextClass;
+
+      if (!users.Student[nextClass]) users.Student[nextClass] = {};
+      users.Student[nextClass][id] = student;
+      delete users.Student[currentClass][id];
+
+      await uploadUsers();
+    }
+
+    async function removeStudent(id, cls) {
+      if (!confirm("Are you sure to remove this student?")) return;
+      delete users.Student[cls][id];
+      await uploadUsers();
+    }
+
+    async function uploadUsers() {
+      const token = prompt("🔐 Enter your GitHub PAT:");
+      if (!token) return alert("Canceled.");
+
+      const shaRes = await fetch(apiURL, {
+        headers: { Authorization: "token " + token }
+      });
+      const shaData = await shaRes.json();
+      const sha = shaData.sha;
+
+      const content = btoa(unescape(encodeURIComponent(JSON.stringify(users, null, 2))));
+
+      const body = {
+        message: "📌 Promote/Remove student update",
+        content: content,
+        sha: sha
+      };
+
+      const uploadRes = await fetch(apiURL, {
+        method: "PUT",
+        headers: {
+          Authorization: "token " + token,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(body)
+      });
+
+      if (uploadRes.ok) {
+        alert("✅ users.json updated.");
+        loadStudents();
+      } else {
+        alert("❌ Upload failed. Check PAT or repo settings.");
+      }
+    }
+  </script>
+</body>
+</html>
