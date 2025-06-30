@@ -4,5 +4,13 @@
       "name": "Dr. Sandarshini B.K",
       "password": "head123"
     }
+  },
+  "Teacher": {
+    "Bandikodigenahalli": {
+      "TBK-001": {
+        "name": "Gayathri",
+        "password": "29082004"
+      }
+    }
   }
 }
