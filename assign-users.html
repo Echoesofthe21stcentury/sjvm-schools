@@ -2,40 +2,17 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Assign Users – SJVM</title>
-
-  <script>
-    const role = localStorage.getItem("role");
-    const userid = localStorage.getItem("userid");
-
-    const allowedRoles = ["Principal", "Admin", "Chairman"];
-
-    if (!userid || !allowedRoles.includes(role)) {
-      alert("Access Denied. Please log in.");
-      window.location.href = "userlogin.html";
-    } else {
-      if (!sessionStorage.getItem("access_granted")) {
-        const code = prompt("🔐 Enter Access Code:");
-        if (code !== "2011") {
-          alert("Incorrect Code. Access Denied.");
-          window.location.href = "userlogin.html";
-        } else {
-          sessionStorage.setItem("access_granted", "true");
-        }
-      }
-    }
-  </script>
-
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
       background: #f4f8fc;
-      margin: 0;
       padding: 20px;
     }
 
-    h1 {
+    h1, h2 {
       color: #003366;
       text-align: center;
     }
@@ -77,14 +54,44 @@
       font-family: monospace;
       font-size: 14px;
     }
+
+    .qr-container {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .qr-container #qrcode {
+      margin-bottom: 10px;
+    }
   </style>
+
+  <script>
+    // Access security
+    const role = localStorage.getItem("role");
+    const userid = localStorage.getItem("userid");
+    const allowed = ["Principal", "Admin", "Chairman"];
+    if (!userid || !allowed.includes(role)) {
+      alert("Access Denied.");
+      window.location.href = "userlogin.html";
+    } else {
+      if (!sessionStorage.getItem("access_granted")) {
+        const code = prompt("🔐 Enter Access Code:");
+        if (code !== "2011") {
+          alert("Incorrect code. Access denied.");
+          window.location.href = "userlogin.html";
+        } else {
+          sessionStorage.setItem("access_granted", "true");
+        }
+      }
+    }
+  </script>
 </head>
 <body>
 
-  <h1>👥 Assign New User</h1>
+  <h1>👤 Assign New User</h1>
 
   <label for="role">Select Role:</label>
-  <select id="role">
+  <select id="role" onchange="toggleClassDropdown()">
     <option value="">-- Select Role --</option>
     <option value="Student">Student</option>
     <option value="Teacher">Teacher</option>
@@ -94,8 +101,25 @@
     <option value="Chairman">Chairman</option>
   </select>
 
-  <label for="class">Class (Only for Students):</label>
-  <input type="text" id="class" placeholder="e.g. Class 5 or leave empty for other roles" />
+  <div id="classBlock" style="display:none;">
+    <label for="class">Select Class (Students only):</label>
+    <select id="class">
+      <option value="">-- Select Class --</option>
+      <option value="PKG">PKG</option>
+      <option value="LKG">LKG</option>
+      <option value="UKG">UKG</option>
+      <option value="Class 1">Class 1</option>
+      <option value="Class 2">Class 2</option>
+      <option value="Class 3">Class 3</option>
+      <option value="Class 4">Class 4</option>
+      <option value="Class 5">Class 5</option>
+      <option value="Class 6">Class 6</option>
+      <option value="Class 7">Class 7</option>
+      <option value="Class 8">Class 8</option>
+      <option value="Class 9">Class 9</option>
+      <option value="Class 10">Class 10</option>
+    </select>
+  </div>
 
   <label for="branch">Branch:</label>
   <select id="branch">
@@ -113,31 +137,72 @@
   <label for="password">Password:</label>
   <input type="text" id="password" />
 
-  <button onclick="addUser()">➕ Add to users.json</button>
+  <button onclick="addUser()">➕ Add User & Upload</button>
 
-  <h2>📁 users.json (Preview)</h2>
+  <h2>📁 Preview users.json + QR Login Link</h2>
   <textarea id="jsonOutput" readonly></textarea>
 
-  <button onclick="downloadJSON()">📥 Download users.json</button>
+  <div class="qr-container">
+    <div id="qrcode"></div>
+    <button onclick="window.print()">🖨 Print QR</button>
+  </div>
 
   <script>
     let users = {};
 
-    function addUser() {
+    function toggleClassDropdown() {
+      const role = document.getElementById("role").value;
+      document.getElementById("classBlock").style.display = role === "Student" ? "block" : "none";
+    }
+
+    async function getFileSHA(token) {
+      const res = await fetch("https://api.github.com/repos/Echoesofthe21stcentury/sjvm-schools/contents/users.json", {
+        headers: {
+          Authorization: `token ${token}`,
+          Accept: "application/vnd.github.v3+json"
+        }
+      });
+      const data = await res.json();
+      return data.sha;
+    }
+
+    async function uploadUsersJSON(token) {
+      const sha = await getFileSHA(token);
+      const content = btoa(unescape(encodeURIComponent(JSON.stringify(users, null, 2))));
+      const body = {
+        message: "👤 Added user to users.json",
+        content,
+        sha,
+        branch: "main"
+      };
+
+      const res = await fetch("https://api.github.com/repos/Echoesofthe21stcentury/sjvm-schools/contents/users.json", {
+        method: "PUT",
+        headers: {
+          Authorization: `token ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(body)
+      });
+
+      if (!res.ok) throw new Error("Upload failed.");
+    }
+
+    async function addUser() {
       const role = document.getElementById("role").value;
       const userid = document.getElementById("userid").value.trim();
       const name = document.getElementById("name").value.trim();
       const password = document.getElementById("password").value.trim();
-      const userClass = document.getElementById("class").value.trim();
-      const branch = document.getElementById("branch").value.trim();
+      const userClass = document.getElementById("class").value;
+      const branch = document.getElementById("branch").value;
 
       if (!role || !userid || !name || !password || !branch) {
-        alert("Please fill in all required fields.");
+        alert("Fill all fields.");
         return;
       }
 
       if (role === "Student" && !userClass) {
-        alert("Please provide class for student.");
+        alert("Student class required.");
         return;
       }
 
@@ -145,39 +210,35 @@
 
       if (role === "Student") {
         if (!users[role][userClass]) users[role][userClass] = {};
-        if (!users[role][userClass][userid]) {
-          users[role][userClass][userid] = {
-            name,
-            password,
-            class: userClass,
-            branch
-          };
-        }
+        users[role][userClass][userid] = { name, password, class: userClass, branch };
       } else {
-        if (!users[role][userid]) {
-          users[role][userid] = {
-            name,
-            password,
-            branch
-          };
-        }
+        users[role][userid] = { name, password, branch };
       }
 
-      document.getElementById("jsonOutput").value = JSON.stringify(users, null, 2);
+      const token = prompt("🔑 Enter your GitHub Personal Access Token:");
+      if (!token) return alert("Token required.");
 
-      // Clear fields
+      try {
+        await uploadUsersJSON(token);
+        const qrLink = `https://sjvmschools.org/userlogin.html?role=${role}&userid=${userid}${role === "Student" ? `&class=${encodeURIComponent(userClass)}` : ""}`;
+        document.getElementById("jsonOutput").value = JSON.stringify(users, null, 2) + `\n\n🔗 QR Login Link:\n${qrLink}`;
+
+        // Show QR
+        document.getElementById("qrcode").innerHTML = "";
+        new QRCode(document.getElementById("qrcode"), {
+          text: qrLink,
+          width: 200,
+          height: 200
+        });
+
+        alert("✅ User uploaded & QR generated.");
+      } catch (e) {
+        alert("❌ Error uploading: " + e.message);
+      }
+
       document.getElementById("userid").value = "";
       document.getElementById("name").value = "";
       document.getElementById("password").value = "";
-      document.getElementById("class").value = "";
-    }
-
-    function downloadJSON() {
-      const blob = new Blob([JSON.stringify(users, null, 2)], { type: "application/json" });
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = "users.json";
-      a.click();
     }
   </script>
 
