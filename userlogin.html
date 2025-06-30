@@ -126,6 +126,7 @@
     const branch = document.getElementById("branch")?.value;
     const errorMsg = document.getElementById("errorMsg");
 
+    // Validate inputs
     if (!role || !userid || !password ||
         (role === "Student" && (!studentClass || !branch)) ||
         ((role === "Teacher" || role === "Admin") && !branch)) {
@@ -139,9 +140,13 @@
       let user;
 
       if (role === "Student") {
-        user = data.Student?.[studentClass]?.[userid];
+        user = data.Student?.[studentClass]?.[branch]?.[userid];
+      } else if (role === "Teacher") {
+        user = data.Teacher?.[branch]?.[userid];
+      } else if (role === "Admin") {
+        user = data.Admin?.[branch]?.[userid];
       } else {
-        user = data[role]?.[userid];
+        user = data[role]?.[userid]; // Principal, Chairman, Coordinator (no branch)
       }
 
       if (user && user.password === password) {
