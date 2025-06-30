@@ -22,6 +22,7 @@
       background-color: #0059b3;
       display: flex;
       justify-content: center;
+      flex-wrap: wrap;
     }
     nav a {
       color: white;
@@ -56,10 +57,10 @@
       color: white;
     }
     select, input, textarea, button {
-      padding: 8px;
-      margin-top: 10px;
+      padding: 10px;
+      margin: 10px 5px;
       width: 100%;
-      max-width: 100%;
+      max-width: 400px;
     }
     .logout {
       text-align: center;
@@ -80,12 +81,14 @@
 </head>
 <body>
   <header>
-    <h1>👩‍🏫 SJVM Teacher Dashboard</h1>
+    <h1>👩‍🏫 Welcome to SJVM Teacher Dashboard</h1>
+    <p>Branch: <strong><span id="branchName"></span></strong></p>
   </header>
 
   <nav>
-    <a href="#" onclick="loadAttendanceForm()">Mark Attendance</a>
-    <a href="#" onclick="loadHomeworkForm()">Upload Homework</a>
+    <a href="#" onclick="loadAttendanceForm()">📅 Mark Attendance</a>
+    <a href="#" onclick="loadHomeworkForm()">📚 Upload Homework</a>
+    <a href="#" onclick="viewCirculars()">📢 View Circulars</a>
   </nav>
 
   <div class="container" id="dashboardContent">
@@ -98,7 +101,9 @@
 
   <script>
     const usersURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/users.json";
+    const circularsURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/circulars.json";
     const branch = localStorage.getItem("branch");
+    document.getElementById("branchName").textContent = branch || "Unknown";
 
     function logout() {
       localStorage.clear();
@@ -109,12 +114,11 @@
       const res = await fetch(usersURL);
       const data = await res.json();
       const studentData = data["Student"];
-
       let classOptions = Object.keys(studentData).map(cls => `<option value="${cls}">${cls}</option>`).join("");
 
       document.getElementById("dashboardContent").innerHTML = `
         <h2>📅 Mark Attendance</h2>
-        <label>Select Date:</label><input type="date" id="attDate" value="${new Date().toISOString().split('T')[0]}"><br>
+        <label>Select Date:</label><input type="date" id="attDate" value="${new Date().toISOString().split('T')[0]}">
         <label>Select Class:</label>
         <select id="attClass">${classOptions}</select>
         <button onclick="generateAttendance()">Load Students</button>
@@ -126,7 +130,7 @@
       const cls = document.getElementById("attClass").value;
       const res = await fetch(usersURL);
       const data = await res.json();
-      const students = data["Student"]?.[cls]?.[branch] || {};
+      const students = data["Student"]?.[cls];
       let html = `<h3>Class: ${cls} | Branch: ${branch}</h3><table><tr><th>Student ID</th><th>Name</th><th>Status</th></tr>`;
 
       for (let id in students) {
@@ -143,7 +147,7 @@
           </tr>`;
       }
 
-      html += `</table><br><button onclick="submitAttendance(event)">Submit Attendance</button>`;
+      html += `</table><br><button onclick="submitAttendance(event)">✅ Submit Attendance</button>`;
       document.getElementById("attForm").innerHTML = html;
     }
 
@@ -152,13 +156,11 @@
       const form = document.getElementById("attForm");
       const selects = form.querySelectorAll("select");
       const attendance = {};
-      selects.forEach(sel => {
-        attendance[sel.name] = sel.value;
-      });
+      selects.forEach(sel => attendance[sel.name] = sel.value);
 
       const date = document.getElementById("attDate").value;
       const cls = document.getElementById("attClass").value;
-      const token = prompt("🔐 Enter your GitHub PAT to save attendance:");
+      const token = prompt("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");
 
       const url = "https://api.github.com/repos/Echoesofthe21stcentury/sjvm-schools/contents/attendance.json";
       const headers = {
@@ -166,36 +168,44 @@
         Accept: "application/vnd.github.v3+json"
       };
 
+      let data = {};
+      let sha = null;
+
       try {
         const res = await fetch(url, { headers });
         const file = await res.json();
-        const sha = file.sha;
-        const content = atob(file.content);
-        let data = JSON.parse(content);
+        if (file && file.content) {
+          data = JSON.parse(atob(file.content));
+          sha = file.sha;
+        }
+      } catch (err) {
+        console.warn("📁 attendance.json not found. Creating new.");
+      }
 
-        if (!data[date]) data[date] = {};
-        if (!data[date][cls]) data[date][cls] = {};
-        if (!data[date][cls][branch]) data[date][cls][branch] = {};
+      if (!data[date]) data[date] = {};
+      if (!data[date][cls]) data[date][cls] = {};
+      if (!data[date][cls][branch]) data[date][cls][branch] = {};
+      data[date][cls][branch] = attendance;
 
-        data[date][cls][branch] = attendance;
+      const updatedContent = btoa(JSON.stringify(data, null, 2));
+      const payload = {
+        message: `📅 Attendance for ${cls} ${branch} on ${date}`,
+        content: updatedContent
+      };
+      if (sha) payload.sha = sha;
 
-        const updatedContent = btoa(JSON.stringify(data, null, 2));
-
+      try {
         const commit = await fetch(url, {
           method: "PUT",
           headers,
-          body: JSON.stringify({
-            message: `📅 Attendance added for ${cls} (${branch}) on ${date}`,
-            content: updatedContent,
-            sha
-          })
+          body: JSON.stringify(payload)
         });
 
         if (commit.ok) {
           alert("✅ Attendance submitted successfully!");
           document.getElementById("attForm").innerHTML = "";
         } else {
-          alert("❌ Failed to commit to GitHub.");
+          throw new Error("Commit failed");
         }
       } catch (err) {
         alert("❌ Error: " + err.message);
@@ -203,24 +213,19 @@
     }
 
     function loadHomeworkForm() {
-      let classOptions = `
-        <option>PKG</option><option>LKG</option><option>UKG</option>
-        <option>Class 1</option><option>Class 2</option><option>Class 3</option>
-        <option>Class 4</option><option>Class 5</option><option>Class 6</option>
-        <option>Class 7</option><option>Class 8</option><option>Class 9</option><option>Class 10</option>`;
-
       document.getElementById("dashboardContent").innerHTML = `
-        <h2>📝 Upload Homework</h2>
-        <label>Select Class:</label>
-        <select id="hwClass">${classOptions}</select>
-        <label>Subject:</label>
-        <input type="text" id="hwSubject" />
-        <label>Date:</label>
-        <input type="date" id="hwDate" value="${new Date().toISOString().split('T')[0]}" />
-        <label>Description:</label>
-        <textarea id="hwDesc" rows="4"></textarea>
-        <button onclick="submitHomework()">Upload Homework</button>
-        <p id="hwMsg"></p>
+        <h2>📚 Upload Homework</h2>
+        <label>Class:</label>
+        <select id="hwClass">
+          <option value="">-- Select Class --</option>
+          ${["PKG","LKG","UKG","Class 1","Class 2","Class 3","Class 4","Class 5","Class 6","Class 7","Class 8","Class 9","Class 10"]
+            .map(cls => `<option value="${cls}">${cls}</option>`).join("")}
+        </select>
+        <label>Subject:</label><input type="text" id="hwSubject">
+        <label>Date:</label><input type="date" id="hwDate" value="${new Date().toISOString().split('T')[0]}">
+        <label>Description:</label><textarea id="hwDesc"></textarea>
+        <button onclick="submitHomework()">📝 Submit Homework</button>
+        <p id="hwMsg" style="color:green;"></p>
       `;
     }
 
@@ -230,52 +235,80 @@
       const date = document.getElementById("hwDate").value;
       const desc = document.getElementById("hwDesc").value.trim();
       const token = prompt("🔐 Enter your GitHub PAT to save homework:");
+      const homeworkURL = "https://api.github.com/repos/Echoesofthe21stcentury/sjvm-schools/contents/homework.json";
 
-      if (!cls || !subject || !desc || !branch || !date) {
+      if (!cls || !subject || !desc || !date) {
         document.getElementById("hwMsg").textContent = "⚠️ Please fill all fields.";
         return;
       }
 
-      const url = "https://api.github.com/repos/Echoesofthe21stcentury/sjvm-schools/contents/homework.json";
       const headers = {
         Authorization: `token ${token}`,
         Accept: "application/vnd.github.v3+json"
       };
 
+      let data = {};
+      let sha = null;
+
       try {
-        const res = await fetch(url, { headers });
+        const res = await fetch(homeworkURL, { headers });
         const file = await res.json();
-        const sha = file.sha;
-        const content = atob(file.content);
-        let data = JSON.parse(content);
+        if (file && file.content) {
+          data = JSON.parse(atob(file.content));
+          sha = file.sha;
+        }
+      } catch (err) {
+        console.warn("📁 homework.json not found. Creating new.");
+      }
 
-        if (!data[cls]) data[cls] = {};
-        if (!data[cls][branch]) data[cls][branch] = [];
+      if (!data[cls]) data[cls] = {};
+      if (!data[cls][branch]) data[cls][branch] = [];
 
-        data[cls][branch].push({
-          subject, date, description: desc
-        });
+      data[cls][branch].push({ subject, date, description: desc });
 
-        const updatedContent = btoa(JSON.stringify(data, null, 2));
+      const updatedContent = btoa(JSON.stringify(data, null, 2));
+      const payload = {
+        message: `📚 Homework for ${cls} ${branch} on ${date}`,
+        content: updatedContent
+      };
+      if (sha) payload.sha = sha;
 
-        const commit = await fetch(url, {
+      try {
+        const commit = await fetch(homeworkURL, {
           method: "PUT",
           headers,
-          body: JSON.stringify({
-            message: `📝 Homework added for ${cls} (${branch}) on ${date}`,
-            content: updatedContent,
-            sha
-          })
+          body: JSON.stringify(payload)
         });
 
         if (commit.ok) {
-          document.getElementById("hwMsg").textContent = "✅ Homework uploaded successfully.";
+          document.getElementById("hwMsg").textContent = "✅ Homework uploaded successfully!";
         } else {
-          document.getElementById("hwMsg").textContent = "❌ Failed to upload homework.";
+          throw new Error("Commit failed");
         }
-
       } catch (err) {
         document.getElementById("hwMsg").textContent = "❌ Error: " + err.message;
+      }
+    }
+
+    async function viewCirculars() {
+      try {
+        const res = await fetch(circularsURL);
+        const data = await res.json();
+        const circulars = data?.[branch] || [];
+
+        if (circulars.length === 0) {
+          document.getElementById("dashboardContent").innerHTML = "<p>No circulars available for this branch.</p>";
+          return;
+        }
+
+        let html = `<h2>📢 Circulars – ${branch}</h2><ul>`;
+        circulars.forEach(c => {
+          html += `<li><strong>${c.date}</strong>: ${c.message}</li>`;
+        });
+        html += `</ul>`;
+        document.getElementById("dashboardContent").innerHTML = html;
+      } catch (err) {
+        document.getElementById("dashboardContent").innerHTML = `<p>❌ Error loading circulars.</p>`;
       }
     }
   </script>
