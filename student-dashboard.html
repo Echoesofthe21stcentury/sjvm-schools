@@ -11,27 +11,40 @@
       background: #f4f8fc;
       margin: 0;
     }
+
     header {
       background-color: #003366;
       color: white;
       padding: 20px;
       text-align: center;
+      position: relative;
     }
+
+    .user-info {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-weight: bold;
+    }
+
     nav {
       background-color: #0059b3;
       display: flex;
       justify-content: center;
       flex-wrap: wrap;
     }
+
     nav a {
       color: white;
       padding: 14px 20px;
       text-decoration: none;
       font-weight: bold;
     }
+
     nav a:hover {
       background-color: #003366;
     }
+
     .container {
       max-width: 900px;
       margin: 30px auto;
@@ -40,29 +53,36 @@
       border-radius: 10px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
+
     .info {
       margin-bottom: 20px;
     }
+
     h3 {
       color: #003366;
     }
+
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 15px;
     }
+
     th, td {
       border: 1px solid #ccc;
       padding: 10px;
     }
+
     th {
       background-color: #003366;
       color: white;
     }
+
     .logout {
       text-align: center;
       margin: 30px;
     }
+
     .logout button {
       padding: 10px 20px;
       background-color: #b30000;
@@ -71,8 +91,35 @@
       border-radius: 6px;
       cursor: pointer;
     }
+
     .logout button:hover {
       background-color: #800000;
+    }
+
+    /* Blast Animation */
+    .welcome-popup {
+      position: fixed;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 0 30px rgba(0,0,0,0.2);
+      padding: 20px 30px;
+      text-align: center;
+      z-index: 1000;
+      animation: blast 1s ease-in-out;
+    }
+
+    @keyframes blast {
+      0% {
+        transform: scale(0.2) translate(-50%, -50%);
+        opacity: 0;
+      }
+      100% {
+        transform: scale(1) translate(-50%, -50%);
+        opacity: 1;
+      }
     }
   </style>
 </head>
@@ -80,6 +127,7 @@
 
   <header>
     <h1>🎓 SJVM Student Dashboard</h1>
+    <div class="user-info" id="topUserInfo"></div>
   </header>
 
   <nav>
@@ -91,11 +139,16 @@
   </nav>
 
   <div class="container" id="dashboardContent">
-    <p>Welcome, loading your profile...</p>
+    <p>Loading profile...</p>
   </div>
 
   <div class="logout">
     <button onclick="logout()">Logout</button>
+  </div>
+
+  <!-- Welcome Popup -->
+  <div class="welcome-popup" id="welcomePopup" style="display: none;">
+    🎉 Welcome to SJVM Student Portal, <span id="studentNamePopup"></span>!
   </div>
 
   <script>
@@ -110,25 +163,36 @@
     const studentClass = localStorage.getItem("studentClass");
     const branch = localStorage.getItem("branch");
 
-    if (role !== "Student" || !userid || !studentClass || !branch) {
-      document.getElementById("dashboardContent").innerHTML = "<p style='color:red'>❌ Access Denied. Please login as Student.</p>";
-    }
-
     async function showProfile() {
       try {
         const res = await fetch(usersURL);
         const data = await res.json();
         const student = data.Student?.[studentClass]?.[userid];
 
-        document.getElementById("dashboardContent").innerHTML = student ? `
-          <div class="info">
-            <h3>👤 Profile</h3>
-            <p><strong>User ID:</strong> ${userid}</p>
-            <p><strong>Name:</strong> ${student.name}</p>
-            <p><strong>Class:</strong> ${student.class}</p>
-            <p><strong>Branch:</strong> ${branch}</p>
-          </div>
-        ` : `<p style="color:red">Student not found.</p>`;
+        if (student) {
+          document.getElementById("dashboardContent").innerHTML = `
+            <div class="info">
+              <h3>👤 Profile</h3>
+              <p><strong>User ID:</strong> ${userid}</p>
+              <p><strong>Name:</strong> ${student.name}</p>
+              <p><strong>Class:</strong> ${student.class}</p>
+              <p><strong>Branch:</strong> ${branch}</p>
+            </div>
+          `;
+
+          // Show name top-right
+          document.getElementById("topUserInfo").innerText = `👋 Hello, ${student.name}`;
+
+          // Show welcome popup
+          document.getElementById("studentNamePopup").innerText = student.name;
+          document.getElementById("welcomePopup").style.display = "block";
+          setTimeout(() => {
+            document.getElementById("welcomePopup").style.display = "none";
+          }, 3000);
+        } else {
+          document.getElementById("dashboardContent").innerHTML = "<p style='color:red'>Student not found.</p>";
+        }
+
       } catch {
         document.getElementById("dashboardContent").innerHTML = "<p>Error loading profile.</p>";
       }
