@@ -1,0 +1,48 @@
+async function loginUser() {
+  const role = document.getElementById("role").value;
+  const userid = document.getElementById("userid").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const studentClass = document.getElementById("studentClass")?.value;
+  const branch = document.getElementById("branch")?.value;
+  const errorMsg = document.getElementById("errorMsg");
+
+  if (!role || !userid || !password ||
+      (role === "Student" && (!studentClass || !branch)) ||
+      ((role === "Teacher" || role === "Admin") && !branch)) {
+    errorMsg.textContent = "Please fill in all required fields.";
+    return;
+  }
+
+  try {
+    const res = await fetch(usersURL);
+    const data = await res.json();
+    let user;
+
+    if (role === "Student") {
+      user = data.Student?.[studentClass]?.[userid];
+    } else if (role === "Teacher" || role === "Admin") {
+      user = data[role]?.[branch]?.[userid];
+    } else {
+      user = data[role]?.[userid]; // Principal / Chairman
+    }
+
+    if (user && user.password === password) {
+      localStorage.setItem("userid", userid);
+      localStorage.setItem("role", role);
+      localStorage.setItem("username", user.name);
+      if (role === "Student") {
+        localStorage.setItem("studentClass", studentClass);
+      }
+      if (["Student", "Teacher", "Admin"].includes(role)) {
+        localStorage.setItem("branch", branch);
+      }
+
+      window.location.href = role.toLowerCase() + "-dashboard.html";
+    } else {
+      errorMsg.textContent = "❌ Invalid credentials. Please try again.";
+    }
+
+  } catch (e) {
+    errorMsg.textContent = "❌ Failed to load user data.";
+  }
+}
