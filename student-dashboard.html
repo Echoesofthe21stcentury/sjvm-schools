@@ -2,119 +2,96 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Student Dashboard | SJVM</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script src="auth-check.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
       background: #f4f8fc;
       margin: 0;
-      padding: 0;
     }
-
     header {
       background-color: #003366;
       color: white;
       padding: 20px;
       text-align: center;
     }
-
     nav {
       background-color: #0059b3;
       display: flex;
       justify-content: center;
       flex-wrap: wrap;
     }
-
     nav a {
       color: white;
       padding: 14px 20px;
       text-decoration: none;
       font-weight: bold;
     }
-
     nav a:hover {
       background-color: #003366;
     }
-
     .container {
-      padding: 30px;
       max-width: 900px;
-      margin: auto;
+      margin: 30px auto;
       background: white;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      margin-top: 30px;
+      padding: 30px;
       border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-
     .info {
       margin-bottom: 20px;
     }
-
-    .info h3 {
+    h3 {
       color: #003366;
-      margin-bottom: 10px;
     }
-
-    .info p {
-      margin: 5px 0;
-    }
-
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 10px;
+      margin-top: 15px;
     }
-
-    table, th, td {
+    th, td {
       border: 1px solid #ccc;
+      padding: 10px;
     }
-
     th {
       background-color: #003366;
       color: white;
     }
-
-    th, td {
-      padding: 10px;
-      text-align: left;
-    }
-
     .logout {
       text-align: center;
-      margin-top: 30px;
+      margin: 30px;
     }
-
     .logout button {
+      padding: 10px 20px;
       background-color: #b30000;
       color: white;
-      padding: 10px 20px;
       border: none;
-      border-radius: 5px;
+      border-radius: 6px;
       cursor: pointer;
     }
-
     .logout button:hover {
       background-color: #800000;
     }
   </style>
 </head>
 <body>
+
   <header>
     <h1>🎓 SJVM Student Dashboard</h1>
   </header>
 
   <nav>
-    <a href="#" onclick="showHome()">Home</a>
     <a href="#" onclick="showProfile()">Profile</a>
     <a href="#" onclick="showPayments()">Payments</a>
     <a href="#" onclick="showAttendance()">Attendance</a>
     <a href="#" onclick="showHomework()">Homework</a>
+    <a href="#" onclick="showCirculars()">Circulars</a>
   </nav>
 
   <div class="container" id="dashboardContent">
-    <!-- Dynamic content here -->
+    <p>Welcome, loading your profile...</p>
   </div>
 
   <div class="logout">
@@ -125,48 +102,25 @@
     const usersURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/users.json";
     const feesURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/fees.json";
     const attendanceURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/attendance.json";
-    const homeworkURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/homeworks.json";
+    const homeworkURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/homework.json";
+    const circularsURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/circulars.json";
 
     const role = localStorage.getItem("role");
     const userid = localStorage.getItem("userid");
     const studentClass = localStorage.getItem("studentClass");
     const branch = localStorage.getItem("branch");
-    const username = localStorage.getItem("username");
 
-    if (role !== "Student") {
-      alert("Access denied.");
-      window.location.href = "userlogin.html";
-    }
-
-    function logout() {
-      localStorage.clear();
-      window.location.href = "userlogin.html";
-    }
-
-    function showHome() {
-      document.getElementById("dashboardContent").innerHTML = `
-        <div class="info">
-          <h3>🏠 Welcome to SJVM ${role} Portal</h3>
-          <p><strong>User ID:</strong> ${userid}</p>
-          <p><strong>Name:</strong> ${username}</p>
-          <p><strong>Class:</strong> ${studentClass}</p>
-          <p><strong>Branch:</strong> ${branch}</p>
-        </div>
-      `;
+    if (role !== "Student" || !userid || !studentClass || !branch) {
+      document.getElementById("dashboardContent").innerHTML = "<p style='color:red'>❌ Access Denied. Please login as Student.</p>";
     }
 
     async function showProfile() {
       try {
         const res = await fetch(usersURL);
         const data = await res.json();
-        const student = data["Student"]?.[studentClass]?.[userid];
+        const student = data.Student?.[studentClass]?.[userid];
 
-        if (!student) {
-          document.getElementById("dashboardContent").innerHTML = "<p style='color:red'>Student data not found.</p>";
-          return;
-        }
-
-        document.getElementById("dashboardContent").innerHTML = `
+        document.getElementById("dashboardContent").innerHTML = student ? `
           <div class="info">
             <h3>👤 Profile</h3>
             <p><strong>User ID:</strong> ${userid}</p>
@@ -174,17 +128,17 @@
             <p><strong>Class:</strong> ${student.class}</p>
             <p><strong>Branch:</strong> ${branch}</p>
           </div>
-        `;
+        ` : `<p style="color:red">Student not found.</p>`;
       } catch {
-        document.getElementById("dashboardContent").innerHTML = "<p style='color:red'>Failed to load student data.</p>";
+        document.getElementById("dashboardContent").innerHTML = "<p>Error loading profile.</p>";
       }
     }
 
     async function showPayments() {
       try {
         const res = await fetch(feesURL);
-        const feesData = await res.json();
-        const fee = feesData?.[studentClass]?.[userid] || "No fees assigned.";
+        const data = await res.json();
+        const fee = data?.[studentClass]?.[userid] || "No fees assigned.";
 
         document.getElementById("dashboardContent").innerHTML = `
           <div class="info">
@@ -193,7 +147,7 @@
           </div>
         `;
       } catch {
-        document.getElementById("dashboardContent").innerHTML = "<p>Error loading fee data.</p>";
+        document.getElementById("dashboardContent").innerHTML = "<p>Error loading payment info.</p>";
       }
     }
 
@@ -202,37 +156,31 @@
         const res = await fetch(attendanceURL);
         const data = await res.json();
 
-        let totalPresent = 0;
-        let totalAbsent = 0;
-        let tableRows = "";
+        let present = 0, absent = 0, rows = "";
 
         for (let date in data) {
-          const record = data[date]?.[studentClass]?.[branch]?.[userid];
-          if (record) {
-            if (record === "Present") totalPresent++;
-            else if (record === "Absent") totalAbsent++;
-            tableRows += `<tr><td>${date}</td><td>${record}</td></tr>`;
+          const status = data[date]?.[studentClass]?.[branch]?.[userid];
+          if (status) {
+            status === "Present" ? present++ : absent++;
+            rows += `<tr><td>${date}</td><td>${status}</td></tr>`;
           }
         }
 
-        const total = totalPresent + totalAbsent;
-        const percentage = total ? ((totalPresent / total) * 100).toFixed(1) : 0;
+        const total = present + absent;
+        const percent = total ? ((present / total) * 100).toFixed(1) : 0;
 
         document.getElementById("dashboardContent").innerHTML = `
           <div class="info">
             <h3>📊 Attendance Summary</h3>
-            <p><strong>Present:</strong> ${totalPresent}</p>
-            <p><strong>Absent:</strong> ${totalAbsent}</p>
-            <p><strong>Attendance %:</strong> ${percentage}%</p>
-            <h4>📅 Daily Attendance:</h4>
-            <table>
-              <tr><th>Date</th><th>Status</th></tr>
-              ${tableRows || `<tr><td colspan="2">No records found.</td></tr>`}
-            </table>
+            <p><strong>Present:</strong> ${present}</p>
+            <p><strong>Absent:</strong> ${absent}</p>
+            <p><strong>Attendance %:</strong> ${percent}%</p>
+            <h4>📅 Records</h4>
+            <table><tr><th>Date</th><th>Status</th></tr>${rows}</table>
           </div>
         `;
       } catch {
-        document.getElementById("dashboardContent").innerHTML = "<p>Error loading attendance data.</p>";
+        document.getElementById("dashboardContent").innerHTML = "<p>Error loading attendance.</p>";
       }
     }
 
@@ -240,39 +188,55 @@
       try {
         const res = await fetch(homeworkURL);
         const data = await res.json();
+        const list = data?.[studentClass]?.[branch] || [];
 
-        const homeworks = data?.[studentClass]?.[branch];
-
-        if (!homeworks || homeworks.length === 0) {
-          document.getElementById("dashboardContent").innerHTML = `
-            <div class="info"><h3>📚 Homework</h3><p>No homework assigned yet.</p></div>`;
+        if (list.length === 0) {
+          document.getElementById("dashboardContent").innerHTML = "<p>No homework assigned yet.</p>";
           return;
         }
 
-        let rows = homeworks.map(hw => `
-          <tr>
-            <td>${hw.date}</td>
-            <td>${hw.title}</td>
-            <td>${hw.description}</td>
-          </tr>`).join("");
-
+        const items = list.map(hw => `<li><strong>${hw.date}</strong> – ${hw.subject}: ${hw.description}</li>`).join("");
         document.getElementById("dashboardContent").innerHTML = `
           <div class="info">
-            <h3>📚 Homework for ${studentClass} – ${branch}</h3>
-            <table>
-              <tr><th>Date</th><th>Title</th><th>Description</th></tr>
-              ${rows}
-            </table>
+            <h3>📚 Homework</h3>
+            <ul>${items}</ul>
           </div>
         `;
       } catch {
-        document.getElementById("dashboardContent").innerHTML = `
-          <div class="info"><h3>Homework</h3><p style="color:red;">Error loading homework data.</p></div>`;
+        document.getElementById("dashboardContent").innerHTML = "<p>Error loading homework.</p>";
       }
     }
 
-    // On page load show home
-    window.onload = showHome;
+    async function showCirculars() {
+      try {
+        const res = await fetch(circularsURL);
+        const data = await res.json();
+        const list = data?.[branch] || [];
+
+        if (list.length === 0) {
+          document.getElementById("dashboardContent").innerHTML = "<p>No circulars available.</p>";
+          return;
+        }
+
+        const items = list.map(c => `<li><strong>${c.date}</strong>: ${c.message}</li>`).join("");
+        document.getElementById("dashboardContent").innerHTML = `
+          <div class="info">
+            <h3>📢 Circulars</h3>
+            <ul>${items}</ul>
+          </div>
+        `;
+      } catch {
+        document.getElementById("dashboardContent").innerHTML = "<p>Error loading circulars.</p>";
+      }
+    }
+
+    function logout() {
+      localStorage.clear();
+      window.location.href = "userlogin.html";
+    }
+
+    window.onload = showProfile;
   </script>
+
 </body>
 </html>
