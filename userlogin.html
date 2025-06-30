@@ -58,37 +58,42 @@
       color: crimson;
       margin-top: 10px;
     }
-
-    #extraFields {
-      display: none;
-    }
   </style>
 </head>
 <body>
 
-  <h2>🔐 SJVM Multi-Role Login</h2>
+  <h2>🔐 SJVM User Login</h2>
 
   <div class="login-box">
     <label for="role">Select Role</label>
-    <select id="role" onchange="toggleFields()">
+    <select id="role">
       <option value="">-- Select Role --</option>
       <option value="Student">Student</option>
       <option value="Teacher">Teacher</option>
-      <option value="Coordinator">Coordinator</option>
       <option value="Principal">Principal</option>
       <option value="Admin">Admin</option>
       <option value="Chairman">Chairman</option>
+      <option value="Coordinator">Coordinator</option>
     </select>
 
-    <div id="extraFields">
-      <label for="branch">Branch</label>
-      <select id="branch">
-        <option value="Bandikodigenahalli">Bandikodigenahalli</option>
-        <option value="Atturu Layout">Atturu Layout</option>
+    <div id="classContainer" style="display:none;">
+      <label for="studentClass">Select Class</label>
+      <select id="studentClass">
+        <option value="">-- Select Class --</option>
+        <option value="PKG">PKG</option>
+        <option value="LKG">LKG</option>
+        <option value="UKG">UKG</option>
+        <option value="Class 1">Class 1</option>
+        <option value="Class 2">Class 2</option>
+        <option value="Class 3">Class 3</option>
+        <option value="Class 4">Class 4</option>
+        <option value="Class 5">Class 5</option>
+        <option value="Class 6">Class 6</option>
+        <option value="Class 7">Class 7</option>
+        <option value="Class 8">Class 8</option>
+        <option value="Class 9">Class 9</option>
+        <option value="Class 10">Class 10</option>
       </select>
-
-      <label for="studentClass">Class (only for Students)</label>
-      <input type="text" id="studentClass" placeholder="e.g. Class 5" />
     </div>
 
     <label for="userid">User ID</label>
@@ -102,28 +107,35 @@
   </div>
 
   <script>
-    const usersURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/users.json";
-
-    window.onload = function () {
-      const role = localStorage.getItem("role");
-      const userid = localStorage.getItem("userid");
-      if (role && userid) {
-        window.location.href = `${role.toLowerCase()}-dashboard.html`;
-      }
-    };
-
-    function toggleFields() {
+    document.getElementById("role").addEventListener("change", () => {
       const role = document.getElementById("role").value;
-      document.getElementById("extraFields").style.display = 
-        (role === "Student" || role === "Teacher" || role === "Coordinator") ? "block" : "none";
+      document.getElementById("classContainer").style.display = (role === "Student") ? "block" : "none";
+    });
+
+    function getURLParams() {
+      const params = new URLSearchParams(window.location.search);
+      const role = params.get("role");
+      const userid = params.get("userid");
+      const studentClass = params.get("class");
+
+      if (role) {
+        document.getElementById("role").value = role;
+        if (role === "Student") {
+          document.getElementById("classContainer").style.display = "block";
+        }
+      }
+
+      if (userid) document.getElementById("userid").value = userid;
+      if (studentClass) document.getElementById("studentClass").value = studentClass;
     }
 
-    async function loginUser() {
+    window.onload = getURLParams;
+
+    function loginUser() {
       const role = document.getElementById("role").value;
       const userid = document.getElementById("userid").value.trim();
       const password = document.getElementById("password").value.trim();
-      const branch = document.getElementById("branch").value;
-      const studentClass = document.getElementById("studentClass").value.trim();
+      const studentClass = document.getElementById("studentClass")?.value || "";
       const errorMsg = document.getElementById("errorMsg");
 
       if (!role || !userid || !password) {
@@ -131,37 +143,31 @@
         return;
       }
 
-      try {
-        const res = await fetch(usersURL);
-        const data = await res.json();
+      const users = JSON.parse(localStorage.getItem("users")) || {};
 
-        let user;
-
-        if (role === "Student") {
-          if (!studentClass) {
-            errorMsg.textContent = "Please enter the class.";
-            return;
-          }
-          user = data[role]?.[studentClass]?.[userid];
-        } else if (role === "Teacher" || role === "Coordinator") {
-          user = data[role]?.[branch]?.[userid];
-        } else {
-          user = data[role]?.[userid];
-        }
+      if (users[role]) {
+        const user =
+          role === "Student"
+            ? users[role]?.[studentClass]?.[userid]
+            : users[role]?.[userid];
 
         if (user && user.password === password) {
-          localStorage.setItem("role", role);
           localStorage.setItem("userid", userid);
-          localStorage.setItem("branch", branch);
-          if (role === "Student") localStorage.setItem("studentClass", studentClass);
-          window.location.href = `${role.toLowerCase()}-dashboard.html`;
-        } else {
-          errorMsg.textContent = "Invalid credentials.";
+          localStorage.setItem("role", role);
+          localStorage.setItem("username", user.name);
+          if (role === "Student") {
+            localStorage.setItem("studentClass", studentClass);
+          }
+
+          window.location.href = role.toLowerCase() + "-dashboard.html";
+          return;
         }
-      } catch (err) {
-        errorMsg.textContent = "Failed to connect to user data.";
       }
+
+      errorMsg.textContent =
+        "Invalid credentials. Please contact Admin or fill contact form.";
     }
   </script>
+
 </body>
 </html>
