@@ -55,9 +55,11 @@
       background-color: #003366;
       color: white;
     }
-    select, button {
+    select, input, textarea, button {
       padding: 8px;
       margin-top: 10px;
+      width: 100%;
+      max-width: 100%;
     }
     .logout {
       text-align: center;
@@ -83,7 +85,7 @@
 
   <nav>
     <a href="#" onclick="loadAttendanceForm()">Mark Attendance</a>
-    <a href="#">Upload Homework (Next)</a>
+    <a href="#" onclick="loadHomeworkForm()">Upload Homework</a>
   </nav>
 
   <div class="container" id="dashboardContent">
@@ -124,7 +126,7 @@
       const cls = document.getElementById("attClass").value;
       const res = await fetch(usersURL);
       const data = await res.json();
-      const students = data["Student"]?.[cls];
+      const students = data["Student"]?.[cls]?.[branch] || {};
       let html = `<h3>Class: ${cls} | Branch: ${branch}</h3><table><tr><th>Student ID</th><th>Name</th><th>Status</th></tr>`;
 
       for (let id in students) {
@@ -197,6 +199,83 @@
         }
       } catch (err) {
         alert("❌ Error: " + err.message);
+      }
+    }
+
+    function loadHomeworkForm() {
+      let classOptions = `
+        <option>PKG</option><option>LKG</option><option>UKG</option>
+        <option>Class 1</option><option>Class 2</option><option>Class 3</option>
+        <option>Class 4</option><option>Class 5</option><option>Class 6</option>
+        <option>Class 7</option><option>Class 8</option><option>Class 9</option><option>Class 10</option>`;
+
+      document.getElementById("dashboardContent").innerHTML = `
+        <h2>📝 Upload Homework</h2>
+        <label>Select Class:</label>
+        <select id="hwClass">${classOptions}</select>
+        <label>Subject:</label>
+        <input type="text" id="hwSubject" />
+        <label>Date:</label>
+        <input type="date" id="hwDate" value="${new Date().toISOString().split('T')[0]}" />
+        <label>Description:</label>
+        <textarea id="hwDesc" rows="4"></textarea>
+        <button onclick="submitHomework()">Upload Homework</button>
+        <p id="hwMsg"></p>
+      `;
+    }
+
+    async function submitHomework() {
+      const cls = document.getElementById("hwClass").value;
+      const subject = document.getElementById("hwSubject").value.trim();
+      const date = document.getElementById("hwDate").value;
+      const desc = document.getElementById("hwDesc").value.trim();
+      const token = prompt("🔐 Enter your GitHub PAT to save homework:");
+
+      if (!cls || !subject || !desc || !branch || !date) {
+        document.getElementById("hwMsg").textContent = "⚠️ Please fill all fields.";
+        return;
+      }
+
+      const url = "https://api.github.com/repos/Echoesofthe21stcentury/sjvm-schools/contents/homework.json";
+      const headers = {
+        Authorization: `token ${token}`,
+        Accept: "application/vnd.github.v3+json"
+      };
+
+      try {
+        const res = await fetch(url, { headers });
+        const file = await res.json();
+        const sha = file.sha;
+        const content = atob(file.content);
+        let data = JSON.parse(content);
+
+        if (!data[cls]) data[cls] = {};
+        if (!data[cls][branch]) data[cls][branch] = [];
+
+        data[cls][branch].push({
+          subject, date, description: desc
+        });
+
+        const updatedContent = btoa(JSON.stringify(data, null, 2));
+
+        const commit = await fetch(url, {
+          method: "PUT",
+          headers,
+          body: JSON.stringify({
+            message: `📝 Homework added for ${cls} (${branch}) on ${date}`,
+            content: updatedContent,
+            sha
+          })
+        });
+
+        if (commit.ok) {
+          document.getElementById("hwMsg").textContent = "✅ Homework uploaded successfully.";
+        } else {
+          document.getElementById("hwMsg").textContent = "❌ Failed to upload homework.";
+        }
+
+      } catch (err) {
+        document.getElementById("hwMsg").textContent = "❌ Error: " + err.message;
       }
     }
   </script>
