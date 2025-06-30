@@ -13,12 +13,10 @@
       align-items: center;
       padding: 60px 20px;
     }
-
     h2 {
       color: #003366;
       margin-bottom: 20px;
     }
-
     .login-box {
       background: white;
       padding: 30px;
@@ -27,13 +25,11 @@
       width: 100%;
       max-width: 400px;
     }
-
     label {
       font-weight: bold;
       display: block;
       margin-top: 15px;
     }
-
     input, select {
       width: 100%;
       padding: 10px;
@@ -41,7 +37,6 @@
       border: 1px solid #ccc;
       border-radius: 6px;
     }
-
     button {
       margin-top: 20px;
       width: 100%;
@@ -53,7 +48,6 @@
       font-size: 16px;
       cursor: pointer;
     }
-
     .error {
       color: crimson;
       margin-top: 10px;
@@ -66,17 +60,17 @@
 
   <div class="login-box">
     <label for="role">Select Role</label>
-    <select id="role">
+    <select id="role" onchange="toggleClassField()">
       <option value="">-- Select Role --</option>
       <option value="Student">Student</option>
       <option value="Teacher">Teacher</option>
+      <option value="Coordinator">Coordinator</option>
       <option value="Principal">Principal</option>
       <option value="Admin">Admin</option>
       <option value="Chairman">Chairman</option>
-      <option value="Coordinator">Coordinator</option>
     </select>
 
-    <div id="classContainer" style="display:none;">
+    <div id="classContainer" style="display: none;">
       <label for="studentClass">Select Class</label>
       <select id="studentClass">
         <option value="">-- Select Class --</option>
@@ -107,10 +101,12 @@
   </div>
 
   <script>
-    document.getElementById("role").addEventListener("change", () => {
+    const usersURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/users.json";
+
+    function toggleClassField() {
       const role = document.getElementById("role").value;
-      document.getElementById("classContainer").style.display = (role === "Student") ? "block" : "none";
-    });
+      document.getElementById("classContainer").style.display = role === "Student" ? "block" : "none";
+    }
 
     function getURLParams() {
       const params = new URLSearchParams(window.location.search);
@@ -118,38 +114,39 @@
       const userid = params.get("userid");
       const studentClass = params.get("class");
 
-      if (role) {
-        document.getElementById("role").value = role;
-        if (role === "Student") {
-          document.getElementById("classContainer").style.display = "block";
-        }
-      }
-
+      if (role) document.getElementById("role").value = role;
       if (userid) document.getElementById("userid").value = userid;
-      if (studentClass) document.getElementById("studentClass").value = studentClass;
+
+      if (role === "Student") {
+        document.getElementById("classContainer").style.display = "block";
+        if (studentClass) document.getElementById("studentClass").value = studentClass;
+      }
     }
 
     window.onload = getURLParams;
 
-    function loginUser() {
+    async function loginUser() {
       const role = document.getElementById("role").value;
       const userid = document.getElementById("userid").value.trim();
       const password = document.getElementById("password").value.trim();
-      const studentClass = document.getElementById("studentClass")?.value || "";
+      const studentClass = document.getElementById("studentClass")?.value;
       const errorMsg = document.getElementById("errorMsg");
 
-      if (!role || !userid || !password) {
-        errorMsg.textContent = "Please fill in all fields.";
+      if (!role || !userid || !password || (role === "Student" && !studentClass)) {
+        errorMsg.textContent = "Please fill in all required fields.";
         return;
       }
 
-      const users = JSON.parse(localStorage.getItem("users")) || {};
+      try {
+        const res = await fetch(usersURL);
+        const data = await res.json();
 
-      if (users[role]) {
-        const user =
-          role === "Student"
-            ? users[role]?.[studentClass]?.[userid]
-            : users[role]?.[userid];
+        let user;
+        if (role === "Student") {
+          user = data.Student?.[studentClass]?.[userid];
+        } else {
+          user = data[role]?.[userid];
+        }
 
         if (user && user.password === password) {
           localStorage.setItem("userid", userid);
@@ -158,16 +155,15 @@
           if (role === "Student") {
             localStorage.setItem("studentClass", studentClass);
           }
-
           window.location.href = role.toLowerCase() + "-dashboard.html";
-          return;
+        } else {
+          errorMsg.textContent = "❌ Invalid credentials. Please try again.";
         }
-      }
 
-      errorMsg.textContent =
-        "Invalid credentials. Please contact Admin or fill contact form.";
+      } catch (e) {
+        errorMsg.textContent = "❌ Failed to load user data.";
+      }
     }
   </script>
-
 </body>
 </html>
