@@ -1,0 +1,62 @@
+async function submitAttendance(e) {
+  e.preventDefault();
+  const form = document.getElementById("attForm");
+  const selects = form.querySelectorAll("select");
+  const attendance = {};
+  selects.forEach(sel => {
+    attendance[sel.name] = sel.value;
+  });
+
+  const date = document.getElementById("attDate").value;
+  const cls = document.getElementById("attClass").value;
+  const token = prompt("🔐 Enter your GitHub PAT to save attendance:");
+  const url = "https://api.github.com/repos/Echoesofthe21stcentury/sjvm-schools/contents/attendance.json";
+  const headers = {
+    Authorization: `token ${token}`,
+    Accept: "application/vnd.github.v3+json"
+  };
+
+  let data = {};
+  let sha = null;
+
+  try {
+    const res = await fetch(url, { headers });
+    const file = await res.json();
+
+    if (file && file.content) {
+      data = JSON.parse(atob(file.content));
+      sha = file.sha;
+    }
+  } catch (err) {
+    console.warn("📁 attendance.json not found. Creating new.");
+  }
+
+  if (!data[date]) data[date] = {};
+  if (!data[date][cls]) data[date][cls] = {};
+  if (!data[date][cls][branch]) data[date][cls][branch] = {};
+  data[date][cls][branch] = attendance;
+
+  const updatedContent = btoa(JSON.stringify(data, null, 2));
+  const payload = {
+    message: `📅 Attendance for ${cls} ${branch} on ${date}`,
+    content: updatedContent
+  };
+  if (sha) payload.sha = sha;
+
+  try {
+    const commit = await fetch(url, {
+      method: "PUT",
+      headers,
+      body: JSON.stringify(payload)
+    });
+
+    if (commit.ok) {
+      alert("✅ Attendance submitted successfully!");
+      document.getElementById("attForm").innerHTML = "";
+    } else {
+      throw new Error("Commit failed");
+    }
+  } catch (err) {
+    alert("❌ Error: " + err.message);
+  }
+}
