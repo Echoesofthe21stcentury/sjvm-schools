@@ -1,5 +1,14 @@
 {
-  "Student": {},
+  "Student": {
+    "Class 4": {
+      "SBK-401": {
+        "name": "Meghana C",
+        "password": "student123",
+        "class": "Class 4",
+        "branch": "Bandikodigenahalli"
+      }
+    }
+  },
   "Teacher": {},
   "Coordinator": {},
   "Admin": {},
