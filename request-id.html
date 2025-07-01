@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Request ID & Password | SJVM</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #e6f2ff;
+      margin: 0;
+      padding: 40px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h2 {
+      color: #003366;
+    }
+
+    form {
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      max-width: 500px;
+      width: 100%;
+    }
+
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 15px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 12px;
+      background-color: #003366;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #002244;
+    }
+
+    .note {
+      font-size: 14px;
+      color: #666;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>📝 Request User ID & Password</h2>
+
+  <form action="https://formsubmit.co/your-email@example.com" method="POST">
+    <!-- Replace above with your real email -->
+
+    <input type="hidden" name="_captcha" value="false" />
+    <input type="hidden" name="_subject" value="New ID/Password Request - SJVM" />
+    <input type="hidden" name="_template" value="table" />
+
+    <label for="name">Full Name</label>
+    <input type="text" name="Full Name" id="name" required />
+
+    <label for="role">Role</label>
+    <select name="Role" id="role" required onchange="toggleStudentFields()">
+      <option value="">-- Select Role --</option>
+      <option value="Student">Student</option>
+      <option value="Teacher">Teacher</option>
+      <option value="Coordinator">Coordinator</option>
+    </select>
+
+    <div id="studentFields" style="display: none;">
+      <label for="class">Class</label>
+      <select name="Class" id="class">
+        <option value="">-- Select Class --</option>
+        <option value="PKG">PKG</option>
+        <option value="LKG">LKG</option>
+        <option value="UKG">UKG</option>
+        <option value="Class 1">Class 1</option>
+        <option value="Class 2">Class 2</option>
+        <option value="Class 3">Class 3</option>
+        <option value="Class 4">Class 4</option>
+        <option value="Class 5">Class 5</option>
+        <option value="Class 6">Class 6</option>
+        <option value="Class 7">Class 7</option>
+        <option value="Class 8">Class 8</option>
+        <option value="Class 9">Class 9</option>
+        <option value="Class 10">Class 10</option>
+      </select>
+    </div>
+
+    <label for="branch">Branch</label>
+    <select name="Branch" id="branch" required>
+      <option value="">-- Select Branch --</option>
+      <option value="Bandikodigenahalli">Bandikodigenahalli</option>
+      <option value="Atturu Layout">Atturu Layout</option>
+    </select>
+
+    <label for="email">Email Address</label>
+    <input type="email" name="Email" id="email" required />
+
+    <label for="phone">Mobile Number</label>
+    <input type="text" name="Phone" id="phone" required />
+
+    <label for="message">Why do you need access? (Optional)</label>
+    <textarea name="Message" id="message" rows="4"></textarea>
+
+    <button type="submit">Submit Request</button>
+
+    <div class="note">
+      📩 Your request will be sent to SJVM Administration. You'll receive your ID & Password via email once approved.
+    </div>
+  </form>
+
+  <script>
+    function toggleStudentFields() {
+      const role = document.getElementById("role").value;
+      document.getElementById("studentFields").style.display = role === "Student" ? "block" : "none";
+    }
+  </script>
+
+</body>
+</html>
