@@ -3,6 +3,11 @@
   "Teacher": {},
   "Coordinator": {},
   "Admin": {},
-  "Principal": {},
+  "Principal": {
+    "PR-001": {
+      "name": "Dr. Sandarshini B.K",
+      "password": "head123"
+    }
+  },
   "Chairman": {}
 }
