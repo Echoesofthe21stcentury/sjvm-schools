@@ -9,7 +9,14 @@
       }
     }
   },
-  "Teacher": {},
+  "Teacher": {
+    "Bandikodigenahalli": {
+      "TBK-001": {
+        "name": "Gayathri",
+        "password": "29082004"
+      }
+    }
+  },
   "Coordinator": {},
   "Admin": {},
   "Principal": {
