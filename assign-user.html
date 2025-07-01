@@ -2,36 +2,32 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Assign User – SJVM</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Assign User | SJVM</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f4f8fc;
+      background: #f0f8ff;
       margin: 0;
-      padding: 20px;
+      padding: 30px;
     }
-
     h1 {
       text-align: center;
       color: #003366;
     }
-
-    form {
-      max-width: 600px;
+    .form-box {
+      max-width: 500px;
+      margin: 0 auto;
       background: white;
-      margin: auto;
-      padding: 30px;
+      padding: 25px;
       border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      box-shadow: 0 0 10px #ccc;
     }
-
     label {
-      font-weight: bold;
       display: block;
       margin-top: 15px;
+      font-weight: bold;
     }
-
     input, select {
       width: 100%;
       padding: 10px;
@@ -39,43 +35,38 @@
       border-radius: 6px;
       border: 1px solid #ccc;
     }
-
     button {
       margin-top: 20px;
-      background-color: #0059b3;
-      color: white;
       padding: 12px;
+      background: #003366;
+      color: white;
       border: none;
+      width: 100%;
       border-radius: 6px;
       cursor: pointer;
     }
-
     button:hover {
-      background-color: #003366;
+      background: #002244;
     }
-
-    .status {
-      margin-top: 15px;
-      font-weight: bold;
+    .info {
+      margin-top: 20px;
       color: green;
       text-align: center;
     }
-
     .error {
+      margin-top: 20px;
       color: red;
+      text-align: center;
     }
   </style>
 </head>
 <body>
 
-<h1>🆔 Assign New User – SJVM</h1>
+<h1>👤 Assign New User – SJVM</h1>
 
-<form id="assignForm">
-  <label>Authorization Code</label>
-  <input type="password" id="authCode" placeholder="Enter access code" required />
-
-  <label>Select Role</label>
-  <select id="role" required>
+<div class="form-box">
+  <label for="role">Select Role:</label>
+  <select id="role" onchange="toggleFields()">
     <option value="">-- Select Role --</option>
     <option value="Student">Student</option>
     <option value="Teacher">Teacher</option>
@@ -85,144 +76,140 @@
     <option value="Chairman">Chairman</option>
   </select>
 
-  <div id="branchContainer">
-    <label>Select Branch</label>
+  <div id="classBranchFields" style="display: none;">
+    <label for="branch">Branch:</label>
     <select id="branch">
       <option value="">-- Select Branch --</option>
       <option value="Bandikodigenahalli">Bandikodigenahalli</option>
       <option value="Atturu Layout">Atturu Layout</option>
     </select>
+
+    <div id="classField" style="display: none;">
+      <label for="class">Class:</label>
+      <select id="class">
+        <option value="">-- Select Class --</option>
+        <option value="PKG">PKG</option>
+        <option value="LKG">LKG</option>
+        <option value="UKG">UKG</option>
+        <option value="Class 1">Class 1</option>
+        <option value="Class 2">Class 2</option>
+        <option value="Class 3">Class 3</option>
+        <option value="Class 4">Class 4</option>
+        <option value="Class 5">Class 5</option>
+        <option value="Class 6">Class 6</option>
+        <option value="Class 7">Class 7</option>
+        <option value="Class 8">Class 8</option>
+        <option value="Class 9">Class 9</option>
+        <option value="Class 10">Class 10</option>
+      </select>
+    </div>
   </div>
 
-  <div id="classContainer" style="display: none;">
-    <label>Select Class</label>
-    <select id="class">
-      <option value="">-- Select Class --</option>
-      <option value="PKG">PKG</option>
-      <option value="LKG">LKG</option>
-      <option value="UKG">UKG</option>
-      <option value="Class 1">Class 1</option>
-      <option value="Class 2">Class 2</option>
-      <option value="Class 3">Class 3</option>
-      <option value="Class 4">Class 4</option>
-      <option value="Class 5">Class 5</option>
-      <option value="Class 6">Class 6</option>
-      <option value="Class 7">Class 7</option>
-      <option value="Class 8">Class 8</option>
-      <option value="Class 9">Class 9</option>
-      <option value="Class 10">Class 10</option>
-    </select>
-  </div>
+  <label for="userid">User ID:</label>
+  <input type="text" id="userid" placeholder="e.g. SBK-501" />
 
-  <label>User ID</label>
-  <input type="text" id="userid" placeholder="e.g. STU-001" required />
+  <label for="name">Full Name:</label>
+  <input type="text" id="name" placeholder="Student or Staff Full Name" />
 
-  <label>Full Name</label>
-  <input type="text" id="name" required />
+  <label for="password">Password:</label>
+  <input type="text" id="password" placeholder="Password" />
 
-  <label>Password</label>
-  <input type="text" id="password" required />
+  <label for="token">GitHub PAT:</label>
+  <input type="password" id="token" placeholder="Enter your GitHub PAT" />
 
-  <label>Your GitHub PAT (hidden)</label>
-  <input type="password" id="pat" placeholder="GitHub Personal Access Token" required />
+  <button onclick="assignUser()">➕ Assign User</button>
 
-  <button type="submit">✅ Assign User</button>
-
-  <div class="status" id="statusMessage"></div>
-</form>
+  <div id="result" class="info"></div>
+  <div id="error" class="error"></div>
+</div>
 
 <script>
-const form = document.getElementById("assignForm");
-const classContainer = document.getElementById("classContainer");
-const branchContainer = document.getElementById("branchContainer");
+  const usersURL = "https://api.github.com/repos/Echoesofthe21stcentury/sjvm-schools/contents/users.json";
 
-document.getElementById("role").addEventListener("change", function() {
-  const role = this.value;
-  classContainer.style.display = role === "Student" ? "block" : "none";
-  branchContainer.style.display = (role === "Student" || role === "Teacher" || role === "Coordinator") ? "block" : "none";
-});
+  function toggleFields() {
+    const role = document.getElementById("role").value;
+    const showBranch = ["Student", "Teacher", "Coordinator"].includes(role);
+    const showClass = role === "Student";
 
-form.onsubmit = async (e) => {
-  e.preventDefault();
-
-  const code = document.getElementById("authCode").value;
-  if (code !== "2011") {
-    document.getElementById("statusMessage").textContent = "❌ Invalid access code.";
-    document.getElementById("statusMessage").className = "status error";
-    return;
+    document.getElementById("classBranchFields").style.display = showBranch ? "block" : "none";
+    document.getElementById("classField").style.display = showClass ? "block" : "none";
   }
 
-  const role = document.getElementById("role").value;
-  const branch = document.getElementById("branch").value;
-  const className = document.getElementById("class").value;
-  const userid = document.getElementById("userid").value.trim();
-  const name = document.getElementById("name").value.trim();
-  const password = document.getElementById("password").value.trim();
-  const pat = document.getElementById("pat").value.trim();
-  const status = document.getElementById("statusMessage");
+  async function assignUser() {
+    const role = document.getElementById("role").value;
+    const userid = document.getElementById("userid").value.trim();
+    const name = document.getElementById("name").value.trim();
+    const password = document.getElementById("password").value.trim();
+    const branch = document.getElementById("branch")?.value;
+    const cls = document.getElementById("class")?.value;
+    const token = document.getElementById("token").value.trim();
 
-  if (!role || !userid || !name || !password || !pat) {
-    status.textContent = "❌ Please fill all required fields.";
-    status.className = "status error";
-    return;
-  }
+    const resultBox = document.getElementById("result");
+    const errorBox = document.getElementById("error");
+    resultBox.textContent = "";
+    errorBox.textContent = "";
 
-  const url = "https://api.github.com/repos/Echoesofthe21stcentury/sjvm-schools/contents/users.json";
+    if (!role || !userid || !name || !password || !token ||
+       (["Student", "Teacher", "Coordinator"].includes(role) && !branch) ||
+       (role === "Student" && !cls)) {
+      errorBox.textContent = "❌ Please fill all required fields.";
+      return;
+    }
 
-  try {
-    const res = await fetch(url, {
-      headers: {
-        Authorization: `token ${pat}`,
-        Accept: "application/vnd.github.v3+json"
+    try {
+      const res = await fetch(usersURL, {
+        headers: { Authorization: `token ${token}` }
+      });
+
+      const file = await res.json();
+      const sha = file.sha;
+      const content = atob(file.content);
+      const data = JSON.parse(content);
+
+      if (!data[role]) data[role] = {};
+
+      if (role === "Student") {
+        if (!data[role][cls]) data[role][cls] = {};
+        data[role][cls][userid] = { name, password, class: cls, branch };
+      } else if (["Teacher", "Coordinator"].includes(role)) {
+        if (!data[role][branch]) data[role][branch] = {};
+        data[role][branch][userid] = { name, password, branch };
+      } else {
+        data[role][userid] = { name, password };
       }
-    });
 
-    const file = await res.json();
-    const sha = file.sha;
-    const raw = atob(file.content);
-    const data = JSON.parse(raw);
+      const updatedContent = btoa(JSON.stringify(data, null, 2));
 
-    if (role === "Student") {
-      if (!data.Student) data.Student = {};
-      if (!data.Student[className]) data.Student[className] = {};
-      data.Student[className][userid] = { name, password, class: className, branch };
-    } else if (["Teacher", "Coordinator"].includes(role)) {
-      if (!data[role]) data[role] = {};
-      if (!data[role][branch]) data[role][branch] = {};
-      data[role][branch][userid] = { name, password, branch };
-    } else {
-      if (!data[role]) data[role] = {};
-      data[role][userid] = { name, password };
+      const upload = await fetch(usersURL, {
+        method: "PUT",
+        headers: {
+          Authorization: `token ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          message: `👤 Assigned ${userid} to ${role}`,
+          content: updatedContent,
+          sha
+        })
+      });
+
+      if (upload.ok) {
+        resultBox.textContent = `✅ User ${userid} assigned successfully!`;
+        document.querySelector("form")?.reset();
+      } else {
+        errorBox.textContent = "❌ Upload failed.";
+      }
+    } catch (err) {
+      errorBox.textContent = "❌ Error: " + err.message;
     }
-
-    const updatedContent = btoa(JSON.stringify(data, null, 2));
-    const commit = await fetch(url, {
-      method: "PUT",
-      headers: {
-        Authorization: `token ${pat}`,
-        Accept: "application/vnd.github.v3+json"
-      },
-      body: JSON.stringify({
-        message: `🔐 Assigned ${role} user ${userid}`,
-        content: updatedContent,
-        sha
-      })
-    });
-
-    if (commit.ok) {
-      status.textContent = `✅ ${role} user ${userid} assigned successfully.`;
-      status.className = "status";
-      form.reset();
-      classContainer.style.display = "none";
-    } else {
-      throw new Error("Failed to commit to GitHub");
-    }
-
-  } catch (err) {
-    status.textContent = "❌ Error uploading: " + err.message;
-    status.className = "status error";
   }
-};
+
+  // Prevent direct access if not logged in
+  const role = localStorage.getItem("role");
+  if (!["Principal", "Admin", "Chairman"].includes(role)) {
+    alert("Access denied. Please login.");
+    window.location.href = "userlogin.html";
+  }
 </script>
 
 </body>
