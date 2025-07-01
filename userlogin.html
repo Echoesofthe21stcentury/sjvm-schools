@@ -65,8 +65,8 @@
     <option value="Student">Student</option>
     <option value="Teacher">Teacher</option>
     <option value="Coordinator">Coordinator</option>
-    <option value="Principal">Principal</option>
     <option value="Admin">Admin</option>
+    <option value="Principal">Principal</option>
     <option value="Chairman">Chairman</option>
   </select>
 
@@ -110,64 +110,64 @@
 </div>
 
 <script>
-  const usersURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/users.json";
+const usersURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/users.json";
 
-  function toggleFields() {
-    const role = document.getElementById("role").value;
-    document.getElementById("classContainer").style.display = role === "Student" ? "block" : "none";
-    document.getElementById("branchContainer").style.display = ["Student", "Teacher", "Admin"].includes(role) ? "block" : "none";
+function toggleFields() {
+  const role = document.getElementById("role").value;
+  const branchContainer = document.getElementById("branchContainer");
+  const classContainer = document.getElementById("classContainer");
+
+  branchContainer.style.display = (role === "Student" || role === "Teacher" || role === "Admin") ? "block" : "none";
+  classContainer.style.display = (role === "Student") ? "block" : "none";
+}
+
+async function loginUser() {
+  const role = document.getElementById("role").value;
+  const userid = document.getElementById("userid").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const studentClass = document.getElementById("studentClass")?.value;
+  const branch = document.getElementById("branch")?.value;
+  const errorMsg = document.getElementById("errorMsg");
+
+  if (!role || !userid || !password || 
+      (role === "Student" && (!studentClass || !branch)) ||
+      ((role === "Teacher" || role === "Admin") && !branch)) {
+    errorMsg.textContent = "❌ Please fill in all required fields.";
+    return;
   }
 
-  async function loginUser() {
-    const role = document.getElementById("role").value;
-    const userid = document.getElementById("userid").value.trim();
-    const password = document.getElementById("password").value.trim();
-    const studentClass = document.getElementById("studentClass")?.value;
-    const branch = document.getElementById("branch")?.value;
-    const errorMsg = document.getElementById("errorMsg");
+  try {
+    const res = await fetch(usersURL);
+    const data = await res.json();
 
-    // Validate inputs
-    if (!role || !userid || !password ||
-        (role === "Student" && (!studentClass || !branch)) ||
-        ((role === "Teacher" || role === "Admin") && !branch)) {
-      errorMsg.textContent = "Please fill in all required fields.";
-      return;
+    let user;
+    if (role === "Student") {
+      user = data.Student?.[studentClass]?.[userid];
+    } else if (role === "Teacher" || role === "Admin") {
+      user = data[role]?.[branch]?.[userid];
+    } else {
+      user = data[role]?.[userid];
     }
 
-    try {
-      const res = await fetch(usersURL);
-      const data = await res.json();
-      let user;
-
+    if (user && user.password === password) {
+      localStorage.setItem("userid", userid);
+      localStorage.setItem("role", role);
+      localStorage.setItem("username", user.name);
       if (role === "Student") {
-        user = data.Student?.[studentClass]?.[branch]?.[userid];
-      } else if (role === "Teacher") {
-        user = data.Teacher?.[branch]?.[userid];
-      } else if (role === "Admin") {
-        user = data.Admin?.[branch]?.[userid];
-      } else {
-        user = data[role]?.[userid]; // Principal, Chairman, Coordinator (no branch)
+        localStorage.setItem("studentClass", studentClass);
+        localStorage.setItem("branch", branch);
+      } else if (role === "Teacher" || role === "Admin") {
+        localStorage.setItem("branch", branch);
       }
-
-      if (user && user.password === password) {
-        localStorage.setItem("userid", userid);
-        localStorage.setItem("role", role);
-        localStorage.setItem("username", user.name);
-        if (role === "Student") {
-          localStorage.setItem("studentClass", studentClass);
-        }
-        if (["Student", "Teacher", "Admin"].includes(role)) {
-          localStorage.setItem("branch", branch);
-        }
-        window.location.href = role.toLowerCase() + "-dashboard.html";
-      } else {
-        errorMsg.textContent = "❌ Invalid credentials. Please try again.";
-      }
-
-    } catch {
-      errorMsg.textContent = "❌ Failed to load user data.";
+      window.location.href = `${role.toLowerCase()}-dashboard.html`;
+    } else {
+      errorMsg.textContent = "❌ Invalid credentials. Please try again.";
     }
+
+  } catch (e) {
+    errorMsg.textContent = "❌ Failed to fetch user data.";
   }
+}
 </script>
 
 </body>
