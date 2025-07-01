@@ -56,119 +56,113 @@
 </head>
 <body>
 
-<h2>🔐 SJVM User Login</h2>
+  <h2>🔐 SJVM User Login</h2>
 
-<div class="login-box">
-  <label for="role">Select Role</label>
-  <select id="role" onchange="toggleFields()">
-    <option value="">-- Select Role --</option>
-    <option value="Student">Student</option>
-    <option value="Teacher">Teacher</option>
-    <option value="Coordinator">Coordinator</option>
-    <option value="Admin">Admin</option>
-    <option value="Principal">Principal</option>
-    <option value="Chairman">Chairman</option>
-  </select>
-
-  <div id="branchContainer" style="display: none;">
-    <label for="branch">Select Branch</label>
-    <select id="branch">
-      <option value="">-- Select Branch --</option>
-      <option value="Bandikodigenahalli">Bandikodigenahalli</option>
-      <option value="Atturu Layout">Atturu Layout</option>
+  <div class="login-box">
+    <label for="role">Select Role</label>
+    <select id="role" onchange="toggleFields()">
+      <option value="">-- Select Role --</option>
+      <option value="Student">Student</option>
+      <option value="Teacher">Teacher</option>
+      <option value="Coordinator">Coordinator</option>
+      <option value="Principal">Principal</option>
+      <option value="Admin">Admin</option>
+      <option value="Chairman">Chairman</option>
     </select>
+
+    <div id="branchContainer" style="display: none;">
+      <label for="branch">Select Branch</label>
+      <select id="branch">
+        <option value="">-- Select Branch --</option>
+        <option value="Bandikodigenahalli">Bandikodigenahalli</option>
+        <option value="Atturu Layout">Atturu Layout</option>
+      </select>
+    </div>
+
+    <div id="classContainer" style="display: none;">
+      <label for="studentClass">Select Class</label>
+      <select id="studentClass">
+        <option value="">-- Select Class --</option>
+        <option value="PKG">PKG</option>
+        <option value="LKG">LKG</option>
+        <option value="UKG">UKG</option>
+        <option value="Class 1">Class 1</option>
+        <option value="Class 2">Class 2</option>
+        <option value="Class 3">Class 3</option>
+        <option value="Class 4">Class 4</option>
+        <option value="Class 5">Class 5</option>
+        <option value="Class 6">Class 6</option>
+        <option value="Class 7">Class 7</option>
+        <option value="Class 8">Class 8</option>
+        <option value="Class 9">Class 9</option>
+        <option value="Class 10">Class 10</option>
+      </select>
+    </div>
+
+    <label for="userid">User ID</label>
+    <input type="text" id="userid" placeholder="Enter your user ID" />
+
+    <label for="password">Password</label>
+    <input type="password" id="password" placeholder="Enter your password" />
+
+    <button onclick="loginUser()">Login</button>
+    <div class="error" id="errorMsg"></div>
   </div>
 
-  <div id="classContainer" style="display: none;">
-    <label for="studentClass">Select Class</label>
-    <select id="studentClass">
-      <option value="">-- Select Class --</option>
-      <option value="PKG">PKG</option>
-      <option value="LKG">LKG</option>
-      <option value="UKG">UKG</option>
-      <option value="Class 1">Class 1</option>
-      <option value="Class 2">Class 2</option>
-      <option value="Class 3">Class 3</option>
-      <option value="Class 4">Class 4</option>
-      <option value="Class 5">Class 5</option>
-      <option value="Class 6">Class 6</option>
-      <option value="Class 7">Class 7</option>
-      <option value="Class 8">Class 8</option>
-      <option value="Class 9">Class 9</option>
-      <option value="Class 10">Class 10</option>
-    </select>
-  </div>
+  <script>
+    const usersURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/users.json";
 
-  <label for="userid">User ID</label>
-  <input type="text" id="userid" placeholder="Enter your user ID" />
-
-  <label for="password">Password</label>
-  <input type="password" id="password" placeholder="Enter your password" />
-
-  <button onclick="loginUser()">Login</button>
-  <div class="error" id="errorMsg"></div>
-</div>
-
-<script>
-const usersURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/users.json";
-
-function toggleFields() {
-  const role = document.getElementById("role").value;
-  const branchContainer = document.getElementById("branchContainer");
-  const classContainer = document.getElementById("classContainer");
-
-  branchContainer.style.display = (role === "Student" || role === "Teacher" || role === "Admin") ? "block" : "none";
-  classContainer.style.display = (role === "Student") ? "block" : "none";
-}
-
-async function loginUser() {
-  const role = document.getElementById("role").value;
-  const userid = document.getElementById("userid").value.trim();
-  const password = document.getElementById("password").value.trim();
-  const studentClass = document.getElementById("studentClass")?.value;
-  const branch = document.getElementById("branch")?.value;
-  const errorMsg = document.getElementById("errorMsg");
-
-  if (!role || !userid || !password || 
-      (role === "Student" && (!studentClass || !branch)) ||
-      ((role === "Teacher" || role === "Admin") && !branch)) {
-    errorMsg.textContent = "❌ Please fill in all required fields.";
-    return;
-  }
-
-  try {
-    const res = await fetch(usersURL);
-    const data = await res.json();
-
-    let user;
-    if (role === "Student") {
-      user = data.Student?.[studentClass]?.[userid];
-    } else if (role === "Teacher" || role === "Admin") {
-      user = data[role]?.[branch]?.[userid];
-    } else {
-      user = data[role]?.[userid];
+    function toggleFields() {
+      const role = document.getElementById("role").value;
+      document.getElementById("branchContainer").style.display = 
+        (role === "Student" || role === "Teacher" || role === "Admin") ? "block" : "none";
+      document.getElementById("classContainer").style.display = 
+        (role === "Student") ? "block" : "none";
     }
 
-    if (user && user.password === password) {
-      localStorage.setItem("userid", userid);
-      localStorage.setItem("role", role);
-      localStorage.setItem("username", user.name);
-      if (role === "Student") {
-        localStorage.setItem("studentClass", studentClass);
-        localStorage.setItem("branch", branch);
-      } else if (role === "Teacher" || role === "Admin") {
-        localStorage.setItem("branch", branch);
+    async function loginUser() {
+      const role = document.getElementById("role").value;
+      const userid = document.getElementById("userid").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const studentClass = document.getElementById("studentClass")?.value;
+      const branch = document.getElementById("branch")?.value;
+      const errorMsg = document.getElementById("errorMsg");
+
+      if (!role || !userid || !password ||
+        (role === "Student" && (!studentClass || !branch)) ||
+        ((role === "Teacher" || role === "Admin") && !branch)) {
+        errorMsg.textContent = "❌ Please fill in all required fields.";
+        return;
       }
-      window.location.href = `${role.toLowerCase()}-dashboard.html`;
-    } else {
-      errorMsg.textContent = "❌ Invalid credentials. Please try again.";
-    }
 
-  } catch (e) {
-    errorMsg.textContent = "❌ Failed to fetch user data.";
-  }
-}
-</script>
+      try {
+        const res = await fetch(usersURL);
+        const data = await res.json();
+        let user;
+
+        if (role === "Student") {
+          user = data.Student?.[studentClass]?.[userid];
+        } else if (role === "Teacher" || role === "Admin") {
+          user = data[role]?.[branch]?.[userid];
+        } else {
+          user = data[role]?.[userid];
+        }
+
+        if (user && user.password === password) {
+          localStorage.setItem("userid", userid);
+          localStorage.setItem("role", role);
+          localStorage.setItem("username", user.name);
+          if (role === "Student") localStorage.setItem("studentClass", studentClass);
+          if (branch) localStorage.setItem("branch", branch);
+          window.location.href = role.toLowerCase() + "-dashboard.html";
+        } else {
+          errorMsg.textContent = "❌ Invalid credentials.";
+        }
+      } catch {
+        errorMsg.textContent = "❌ Failed to load user data.";
+      }
+    }
+  </script>
 
 </body>
 </html>
