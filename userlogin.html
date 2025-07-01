@@ -48,6 +48,20 @@
       font-size: 16px;
       cursor: pointer;
     }
+    .extra-buttons {
+      margin-top: 20px;
+      text-align: center;
+    }
+    .extra-buttons button {
+      background-color: #0059b3;
+      margin: 10px 0;
+    }
+    .extra-buttons a {
+      display: block;
+      margin-top: 10px;
+      color: #003366;
+      text-decoration: underline;
+    }
     .error {
       color: crimson;
       margin-top: 10px;
@@ -107,6 +121,11 @@
 
     <button onclick="loginUser()">Login</button>
     <div class="error" id="errorMsg"></div>
+
+    <div class="extra-buttons">
+      <button onclick="loginViaQR()">📷 Login via QR</button>
+      <a href="request-id.html">📝 Request User ID & Password</a>
+    </div>
   </div>
 
   <script>
@@ -114,11 +133,31 @@
 
     function toggleFields() {
       const role = document.getElementById("role").value;
-      document.getElementById("branchContainer").style.display = 
-        (role === "Student" || role === "Teacher" || role === "Admin") ? "block" : "none";
-      document.getElementById("classContainer").style.display = 
-        (role === "Student") ? "block" : "none";
+      document.getElementById("branchContainer").style.display = (role === "Student" || role === "Teacher" || role === "Admin") ? "block" : "none";
+      document.getElementById("classContainer").style.display = role === "Student" ? "block" : "none";
     }
+
+    window.onload = () => {
+      const params = new URLSearchParams(window.location.search);
+      const role = params.get("role");
+      const userid = params.get("userid");
+      const studentClass = params.get("class");
+      const branch = params.get("branch");
+
+      if (role) {
+        document.getElementById("role").value = role;
+        toggleFields();
+      }
+      if (userid) document.getElementById("userid").value = userid;
+      if (branch) {
+        document.getElementById("branchContainer").style.display = "block";
+        document.getElementById("branch").value = branch;
+      }
+      if (studentClass) {
+        document.getElementById("classContainer").style.display = "block";
+        document.getElementById("studentClass").value = studentClass;
+      }
+    };
 
     async function loginUser() {
       const role = document.getElementById("role").value;
@@ -128,9 +167,7 @@
       const branch = document.getElementById("branch")?.value;
       const errorMsg = document.getElementById("errorMsg");
 
-      if (!role || !userid || !password ||
-        (role === "Student" && (!studentClass || !branch)) ||
-        ((role === "Teacher" || role === "Admin") && !branch)) {
+      if (!role || !userid || !password || (role === "Student" && (!studentClass || !branch)) || ((role === "Teacher" || role === "Admin") && !branch)) {
         errorMsg.textContent = "❌ Please fill in all required fields.";
         return;
       }
@@ -138,8 +175,8 @@
       try {
         const res = await fetch(usersURL);
         const data = await res.json();
-        let user;
 
+        let user;
         if (role === "Student") {
           user = data.Student?.[studentClass]?.[userid];
         } else if (role === "Teacher" || role === "Admin") {
@@ -152,17 +189,22 @@
           localStorage.setItem("userid", userid);
           localStorage.setItem("role", role);
           localStorage.setItem("username", user.name);
-          if (role === "Student") localStorage.setItem("studentClass", studentClass);
           if (branch) localStorage.setItem("branch", branch);
+          if (studentClass) localStorage.setItem("studentClass", studentClass);
           window.location.href = role.toLowerCase() + "-dashboard.html";
         } else {
-          errorMsg.textContent = "❌ Invalid credentials.";
+          errorMsg.textContent = "❌ Invalid credentials. Please try again.";
         }
-      } catch {
+
+      } catch (e) {
         errorMsg.textContent = "❌ Failed to load user data.";
       }
     }
-  </script>
 
+    function loginViaQR() {
+      alert("Coming soon: Login via QR Code!");
+      // Future: Add QR Scanner redirect logic here
+    }
+  </script>
 </body>
 </html>
