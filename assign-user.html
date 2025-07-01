@@ -2,26 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Assign User | SJVM</title>
+  <title>Assign Users – SJVM</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f0f8ff;
-      margin: 0;
+      background: #f4f8fc;
       padding: 30px;
     }
     h1 {
-      text-align: center;
       color: #003366;
-    }
-    .form-box {
-      max-width: 500px;
-      margin: 0 auto;
-      background: white;
-      padding: 25px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px #ccc;
     }
     label {
       display: block;
@@ -30,41 +20,30 @@
     }
     input, select {
       width: 100%;
+      max-width: 400px;
       padding: 10px;
       margin-top: 5px;
-      border-radius: 6px;
       border: 1px solid #ccc;
+      border-radius: 6px;
     }
     button {
       margin-top: 20px;
-      padding: 12px;
-      background: #003366;
+      background: #0059b3;
       color: white;
+      padding: 10px 20px;
       border: none;
-      width: 100%;
       border-radius: 6px;
       cursor: pointer;
     }
     button:hover {
-      background: #002244;
-    }
-    .info {
-      margin-top: 20px;
-      color: green;
-      text-align: center;
-    }
-    .error {
-      margin-top: 20px;
-      color: red;
-      text-align: center;
+      background: #003366;
     }
   </style>
 </head>
 <body>
 
-<h1>👤 Assign New User – SJVM</h1>
+  <h1>👤 Assign New User – SJVM</h1>
 
-<div class="form-box">
   <label for="role">Select Role:</label>
   <select id="role" onchange="toggleFields()">
     <option value="">-- Select Role --</option>
@@ -76,141 +55,116 @@
     <option value="Chairman">Chairman</option>
   </select>
 
-  <div id="classBranchFields" style="display: none;">
-    <label for="branch">Branch:</label>
+  <div id="branchDiv" style="display:none;">
+    <label for="branch">Select Branch:</label>
     <select id="branch">
       <option value="">-- Select Branch --</option>
       <option value="Bandikodigenahalli">Bandikodigenahalli</option>
       <option value="Atturu Layout">Atturu Layout</option>
     </select>
+  </div>
 
-    <div id="classField" style="display: none;">
-      <label for="class">Class:</label>
-      <select id="class">
-        <option value="">-- Select Class --</option>
-        <option value="PKG">PKG</option>
-        <option value="LKG">LKG</option>
-        <option value="UKG">UKG</option>
-        <option value="Class 1">Class 1</option>
-        <option value="Class 2">Class 2</option>
-        <option value="Class 3">Class 3</option>
-        <option value="Class 4">Class 4</option>
-        <option value="Class 5">Class 5</option>
-        <option value="Class 6">Class 6</option>
-        <option value="Class 7">Class 7</option>
-        <option value="Class 8">Class 8</option>
-        <option value="Class 9">Class 9</option>
-        <option value="Class 10">Class 10</option>
-      </select>
-    </div>
+  <div id="classDiv" style="display:none;">
+    <label for="studentClass">Select Class:</label>
+    <select id="studentClass">
+      <option value="">-- Select Class --</option>
+      <option>PKG</option><option>LKG</option><option>UKG</option>
+      <option>Class 1</option><option>Class 2</option><option>Class 3</option>
+      <option>Class 4</option><option>Class 5</option><option>Class 6</option>
+      <option>Class 7</option><option>Class 8</option><option>Class 9</option>
+      <option>Class 10</option>
+    </select>
   </div>
 
   <label for="userid">User ID:</label>
-  <input type="text" id="userid" placeholder="e.g. SBK-501" />
+  <input type="text" id="userid" placeholder="e.g., STU-001" />
 
   <label for="name">Full Name:</label>
-  <input type="text" id="name" placeholder="Student or Staff Full Name" />
+  <input type="text" id="name" />
 
   <label for="password">Password:</label>
-  <input type="text" id="password" placeholder="Password" />
-
-  <label for="token">GitHub PAT:</label>
-  <input type="password" id="token" placeholder="Enter your GitHub PAT" />
+  <input type="text" id="password" />
 
   <button onclick="assignUser()">➕ Assign User</button>
 
-  <div id="result" class="info"></div>
-  <div id="error" class="error"></div>
-</div>
-
-<script>
-  const usersURL = "https://api.github.com/repos/Echoesofthe21stcentury/sjvm-schools/contents/users.json";
-
-  function toggleFields() {
-    const role = document.getElementById("role").value;
-    const showBranch = ["Student", "Teacher", "Coordinator"].includes(role);
-    const showClass = role === "Student";
-
-    document.getElementById("classBranchFields").style.display = showBranch ? "block" : "none";
-    document.getElementById("classField").style.display = showClass ? "block" : "none";
-  }
-
-  async function assignUser() {
-    const role = document.getElementById("role").value;
-    const userid = document.getElementById("userid").value.trim();
-    const name = document.getElementById("name").value.trim();
-    const password = document.getElementById("password").value.trim();
-    const branch = document.getElementById("branch")?.value;
-    const cls = document.getElementById("class")?.value;
-    const token = document.getElementById("token").value.trim();
-
-    const resultBox = document.getElementById("result");
-    const errorBox = document.getElementById("error");
-    resultBox.textContent = "";
-    errorBox.textContent = "";
-
-    if (!role || !userid || !name || !password || !token ||
-       (["Student", "Teacher", "Coordinator"].includes(role) && !branch) ||
-       (role === "Student" && !cls)) {
-      errorBox.textContent = "❌ Please fill all required fields.";
-      return;
+  <script>
+    function toggleFields() {
+      const role = document.getElementById("role").value;
+      document.getElementById("branchDiv").style.display = (role === "Student" || role === "Teacher" || role === "Coordinator" || role === "Admin") ? "block" : "none";
+      document.getElementById("classDiv").style.display = (role === "Student") ? "block" : "none";
     }
 
-    try {
-      const res = await fetch(usersURL, {
-        headers: { Authorization: `token ${token}` }
-      });
+    async function assignUser() {
+      const role = document.getElementById("role").value;
+      const userid = document.getElementById("userid").value.trim();
+      const name = document.getElementById("name").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const studentClass = document.getElementById("studentClass")?.value;
+      const branch = document.getElementById("branch")?.value;
 
-      const file = await res.json();
-      const sha = file.sha;
-      const content = atob(file.content);
-      const data = JSON.parse(content);
-
-      if (!data[role]) data[role] = {};
-
-      if (role === "Student") {
-        if (!data[role][cls]) data[role][cls] = {};
-        data[role][cls][userid] = { name, password, class: cls, branch };
-      } else if (["Teacher", "Coordinator"].includes(role)) {
-        if (!data[role][branch]) data[role][branch] = {};
-        data[role][branch][userid] = { name, password, branch };
-      } else {
-        data[role][userid] = { name, password };
+      if (!role || !userid || !name || !password || (role === "Student" && (!studentClass || !branch)) || 
+         ((role === "Teacher" || role === "Coordinator" || role === "Admin") && !branch)) {
+        alert("❌ Please fill in all required fields.");
+        return;
       }
 
-      const updatedContent = btoa(JSON.stringify(data, null, 2));
+      const token = prompt("🔐 Enter your GitHub PAT:");
+      if (!token) return;
 
-      const upload = await fetch(usersURL, {
-        method: "PUT",
-        headers: {
-          Authorization: `token ${token}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          message: `👤 Assigned ${userid} to ${role}`,
-          content: updatedContent,
-          sha
-        })
-      });
+      const url = "https://api.github.com/repos/Echoesofthe21stcentury/sjvm-schools/contents/users.json";
+      const headers = {
+        Authorization: `token ${token}`,
+        Accept: "application/vnd.github.v3+json"
+      };
 
-      if (upload.ok) {
-        resultBox.textContent = `✅ User ${userid} assigned successfully!`;
-        document.querySelector("form")?.reset();
-      } else {
-        errorBox.textContent = "❌ Upload failed.";
+      try {
+        const res = await fetch(url, { headers });
+        const file = await res.json();
+
+        const sha = file.sha;
+        const rawContent = atob(file.content.replace(/\n/g, ''));
+        const data = JSON.parse(rawContent);
+
+        // Update logic based on role
+        if (role === "Student") {
+          if (!data.Student) data.Student = {};
+          if (!data.Student[studentClass]) data.Student[studentClass] = {};
+          data.Student[studentClass][userid] = { name, password, class: studentClass, branch };
+        } else if (["Teacher", "Coordinator", "Admin"].includes(role)) {
+          if (!data[role]) data[role] = {};
+          if (!data[role][branch]) data[role][branch] = {};
+          data[role][branch][userid] = { name, password };
+        } else {
+          if (!data[role]) data[role] = {};
+          data[role][userid] = { name, password };
+        }
+
+        const updatedContent = btoa(JSON.stringify(data, null, 2));
+
+        const pushRes = await fetch(url, {
+          method: "PUT",
+          headers,
+          body: JSON.stringify({
+            message: `👤 Assigned new ${role} – ${userid}`,
+            content: updatedContent,
+            sha
+          })
+        });
+
+        if (pushRes.ok) {
+          alert("✅ User assigned and saved successfully!");
+          window.location.reload();
+        } else {
+          const errText = await pushRes.text();
+          alert("❌ Upload failed.\n" + errText);
+        }
+
+      } catch (err) {
+        console.error(err);
+        alert("❌ Error uploading: " + err.message);
       }
-    } catch (err) {
-      errorBox.textContent = "❌ Error: " + err.message;
     }
-  }
-
-  // Prevent direct access if not logged in
-  const role = localStorage.getItem("role");
-  if (!["Principal", "Admin", "Chairman"].includes(role)) {
-    alert("Access denied. Please login.");
-    window.location.href = "userlogin.html";
-  }
-</script>
+  </script>
 
 </body>
 </html>
