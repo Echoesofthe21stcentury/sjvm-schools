@@ -10,119 +10,119 @@
       font-family: Arial, sans-serif;
       background: #f4f8fc;
       margin: 0;
-      padding: 0;
     }
-
     header {
       background-color: #003366;
       color: white;
       padding: 20px;
       text-align: center;
     }
-
     nav {
       background-color: #0059b3;
       display: flex;
       justify-content: center;
       flex-wrap: wrap;
     }
-
     nav a {
       color: white;
       padding: 14px 20px;
       text-decoration: none;
       font-weight: bold;
     }
-
     nav a:hover {
       background-color: #003366;
     }
-
     .container {
-      padding: 30px;
-      max-width: 900px;
-      margin: auto;
+      max-width: 1000px;
+      margin: 30px auto;
       background: white;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      margin-top: 30px;
+      padding: 30px;
       border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-
-    select, input, button {
-      padding: 10px;
-      margin: 10px 5px;
+    h2 {
+      color: #003366;
     }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
-
-    table, th, td {
-      border: 1px solid #ccc;
-    }
-
-    th {
-      background-color: #003366;
-      color: white;
-    }
-
-    th, td {
-      padding: 10px;
-      text-align: left;
-    }
-
     .logout {
       text-align: center;
-      margin-top: 30px;
+      margin: 30px;
     }
-
     .logout button {
+      padding: 10px 20px;
       background-color: #b30000;
       color: white;
-      padding: 10px 20px;
       border: none;
-      border-radius: 5px;
+      border-radius: 6px;
       cursor: pointer;
     }
-
     .logout button:hover {
       background-color: #800000;
+    }
+    .popup {
+      position: fixed;
+      top: 20%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 30px;
+      border: 2px solid #003366;
+      border-radius: 12px;
+      z-index: 999;
+      box-shadow: 0 0 20px rgba(0,0,0,0.3);
+      display: none;
+      text-align: center;
+      animation: popupBlast 0.8s ease-out;
+    }
+    @keyframes popupBlast {
+      0% { transform: scale(0.5) translate(-50%, -50%); opacity: 0; }
+      100% { transform: scale(1) translate(-50%, -50%); opacity: 1; }
     }
   </style>
 </head>
 <body>
+
   <header>
-    <h1>🏫 Principal Dashboard – SJVM Schools</h1>
+    <h1>🏫 SJVM Principal Dashboard</h1>
+    <p id="welcomeName"></p>
   </header>
 
   <nav>
-    <a href="#" onclick="showHome()">Home</a>
-    <a href="#" onclick="loadAttendance()">View Attendance</a>
-    <a href="assign-users.html">Assign Users</a>
-    <a href="promote-students.html">Promote / Remove Students</a>
-    <a href="view-profiles.html">View All Profiles</a>
+    <a href="#" onclick="viewAttendance()">📊 View Attendance</a>
+    <a href="assign-user.html">🆔 Assign Users</a>
+    <a href="promote-student.html">🎓 Promote/Remove Students</a>
+    <a href="assign-fees.html">💰 Assign Fees</a>
+    <a href="view-users.html">📂 View All Users</a>
   </nav>
 
   <div class="container" id="dashboardContent">
-    <!-- Dynamic content -->
+    <h2>Welcome to SJVM Principal Portal</h2>
+    <p>Select an option from the menu to begin managing the school portal efficiently.</p>
   </div>
 
   <div class="logout">
-    <button onclick="logout()">Logout</button>
+    <button onclick="logout()">🚪 Logout</button>
+  </div>
+
+  <div class="popup" id="welcomePopup">
+    <h2>🎉 Welcome, Principal!</h2>
+    <p>You're now in control of SJVM administration 👑</p>
   </div>
 
   <script>
-    const attendanceURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/attendance.json";
-
+    const username = localStorage.getItem("username") || "Principal";
     const role = localStorage.getItem("role");
-    const username = localStorage.getItem("username");
-    const userid = localStorage.getItem("userid");
 
     if (role !== "Principal") {
-      alert("Access denied.");
+      alert("❌ Access Denied. Please login as Principal.");
       window.location.href = "userlogin.html";
+    }
+
+    document.getElementById("welcomeName").innerText = `Welcome Dr. ${username}`;
+
+    window.onload = () => {
+      const popup = document.getElementById("welcomePopup");
+      popup.style.display = "block";
+      setTimeout(() => popup.style.display = "none", 3000);
     }
 
     function logout() {
@@ -130,68 +130,45 @@
       window.location.href = "userlogin.html";
     }
 
-    function showHome() {
-      document.getElementById("dashboardContent").innerHTML = `
-        <div class="info">
-          <h3>🏠 Welcome to SJVM ${role} Portal</h3>
-          <p><strong>User ID:</strong> ${userid}</p>
-          <p><strong>Name:</strong> ${username}</p>
-        </div>
-      `;
-    }
-
-    async function loadAttendance() {
+    async function viewAttendance() {
       const date = prompt("📅 Enter date (YYYY-MM-DD):");
       if (!date) return;
 
       try {
-        const res = await fetch(attendanceURL);
+        const res = await fetch("https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/attendance.json");
         const data = await res.json();
-
         const records = data[date];
+
         if (!records) {
-          document.getElementById("dashboardContent").innerHTML = `<p style='color:red'>No attendance found for ${date}</p>`;
+          document.getElementById("dashboardContent").innerHTML = `<p style='color:red'>No attendance data for ${date}</p>`;
           return;
         }
 
-        let content = `<h3>📅 Attendance for ${date}</h3>`;
-
+        let html = `<h2>📊 Attendance for ${date}</h2>`;
         for (let cls in records) {
           for (let branch in records[cls]) {
             const students = records[cls][branch];
-            let presentCount = 0;
-            let absentCount = 0;
-            let rows = "";
+            let present = 0, absent = 0, rows = "";
 
             for (let sid in students) {
               const status = students[sid];
-              if (status === "Present") presentCount++;
-              else absentCount++;
-
+              if (status === "Present") present++; else absent++;
               rows += `<tr><td>${sid}</td><td>${status}</td></tr>`;
             }
 
-            content += `
-              <h4>Class: ${cls} | Branch: ${branch}</h4>
-              <p>Total: ${presentCount + absentCount}, Present: ${presentCount}, Absent: ${absentCount}</p>
-              <table>
-                <tr><th>Student ID</th><th>Status</th></tr>
-                ${rows}
-              </table>
-              <br>
+            html += `
+              <h3>Class: ${cls} | Branch: ${branch}</h3>
+              <p>Present: ${present}, Absent: ${absent}</p>
+              <table><tr><th>Student ID</th><th>Status</th></tr>${rows}</table>
             `;
           }
         }
-
-        document.getElementById("dashboardContent").innerHTML = content;
-
+        document.getElementById("dashboardContent").innerHTML = html;
       } catch {
         document.getElementById("dashboardContent").innerHTML = `<p style='color:red'>Error loading attendance data.</p>`;
       }
     }
-
-    // Load welcome screen on page load
-    window.onload = showHome;
   </script>
+
 </body>
 </html>
