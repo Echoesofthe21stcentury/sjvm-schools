@@ -2,30 +2,38 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Assign Users – SJVM</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <title>Assign User – SJVM</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     body {
       font-family: Arial, sans-serif;
       background: #f4f8fc;
+      margin: 0;
       padding: 20px;
     }
 
-    h1, h2 {
-      color: #003366;
+    h1 {
       text-align: center;
+      color: #003366;
+    }
+
+    form {
+      max-width: 600px;
+      background: white;
+      margin: auto;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
 
     label {
+      font-weight: bold;
       display: block;
       margin-top: 15px;
-      font-weight: bold;
     }
 
     input, select {
       width: 100%;
-      max-width: 400px;
       padding: 10px;
       margin-top: 5px;
       border-radius: 6px;
@@ -34,64 +42,40 @@
 
     button {
       margin-top: 20px;
-      background: #0059b3;
+      background-color: #0059b3;
       color: white;
-      padding: 10px 20px;
+      padding: 12px;
       border: none;
       border-radius: 6px;
       cursor: pointer;
     }
 
     button:hover {
-      background: #003366;
+      background-color: #003366;
     }
 
-    textarea {
-      margin-top: 20px;
-      width: 100%;
-      height: 300px;
-      padding: 10px;
-      font-family: monospace;
-      font-size: 14px;
-    }
-
-    .qr-container {
+    .status {
+      margin-top: 15px;
+      font-weight: bold;
+      color: green;
       text-align: center;
-      margin-top: 20px;
     }
 
-    .qr-container #qrcode {
-      margin-bottom: 10px;
+    .error {
+      color: red;
     }
   </style>
-
-  <script>
-    // Access security
-    const role = localStorage.getItem("role");
-    const userid = localStorage.getItem("userid");
-    const allowed = ["Principal", "Admin", "Chairman"];
-    if (!userid || !allowed.includes(role)) {
-      alert("Access Denied.");
-      window.location.href = "userlogin.html";
-    } else {
-      if (!sessionStorage.getItem("access_granted")) {
-        const code = prompt("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");
-        if (code !== "2011") {
-          alert("Incorrect code. Access denied.");
-          window.location.href = "userlogin.html";
-        } else {
-          sessionStorage.setItem("access_granted", "true");
-        }
-      }
-    }
-  </script>
 </head>
 <body>
 
-  <h1>👤 Assign New User</h1>
+<h1>🆔 Assign New User – SJVM</h1>
 
-  <label for="role">Select Role:</label>
-  <select id="role" onchange="toggleClassDropdown()">
+<form id="assignForm">
+  <label>Authorization Code</label>
+  <input type="password" id="authCode" placeholder="Enter access code" required />
+
+  <label>Select Role</label>
+  <select id="role" required>
     <option value="">-- Select Role --</option>
     <option value="Student">Student</option>
     <option value="Teacher">Teacher</option>
@@ -101,8 +85,17 @@
     <option value="Chairman">Chairman</option>
   </select>
 
-  <div id="classBlock" style="display:none;">
-    <label for="class">Select Class (Students only):</label>
+  <div id="branchContainer">
+    <label>Select Branch</label>
+    <select id="branch">
+      <option value="">-- Select Branch --</option>
+      <option value="Bandikodigenahalli">Bandikodigenahalli</option>
+      <option value="Atturu Layout">Atturu Layout</option>
+    </select>
+  </div>
+
+  <div id="classContainer" style="display: none;">
+    <label>Select Class</label>
     <select id="class">
       <option value="">-- Select Class --</option>
       <option value="PKG">PKG</option>
@@ -121,126 +114,116 @@
     </select>
   </div>
 
-  <label for="branch">Branch:</label>
-  <select id="branch">
-    <option value="">-- Select Branch --</option>
-    <option value="Bandikodigenahalli">Bandikodigenahalli</option>
-    <option value="Atturu Layout">Atturu Layout</option>
-  </select>
+  <label>User ID</label>
+  <input type="text" id="userid" placeholder="e.g. STU-001" required />
 
-  <label for="userid">User ID:</label>
-  <input type="text" id="userid" placeholder="e.g. STU-001" />
+  <label>Full Name</label>
+  <input type="text" id="name" required />
 
-  <label for="name">Full Name:</label>
-  <input type="text" id="name" />
+  <label>Password</label>
+  <input type="text" id="password" required />
 
-  <label for="password">Password:</label>
-  <input type="text" id="password" />
+  <label>Your GitHub PAT (hidden)</label>
+  <input type="password" id="pat" placeholder="GitHub Personal Access Token" required />
 
-  <button onclick="addUser()">➕ Add User & Upload</button>
+  <button type="submit">✅ Assign User</button>
 
-  <h2>📁 Preview users.json + QR Login Link</h2>
-  <textarea id="jsonOutput" readonly></textarea>
+  <div class="status" id="statusMessage"></div>
+</form>
 
-  <div class="qr-container">
-    <div id="qrcode"></div>
-    <button onclick="window.print()">🖨 Print QR</button>
-  </div>
+<script>
+const form = document.getElementById("assignForm");
+const classContainer = document.getElementById("classContainer");
+const branchContainer = document.getElementById("branchContainer");
 
-  <script>
-    let users = {};
+document.getElementById("role").addEventListener("change", function() {
+  const role = this.value;
+  classContainer.style.display = role === "Student" ? "block" : "none";
+  branchContainer.style.display = (role === "Student" || role === "Teacher" || role === "Coordinator") ? "block" : "none";
+});
 
-    function toggleClassDropdown() {
-      const role = document.getElementById("role").value;
-      document.getElementById("classBlock").style.display = role === "Student" ? "block" : "none";
+form.onsubmit = async (e) => {
+  e.preventDefault();
+
+  const code = document.getElementById("authCode").value;
+  if (code !== "2011") {
+    document.getElementById("statusMessage").textContent = "❌ Invalid access code.";
+    document.getElementById("statusMessage").className = "status error";
+    return;
+  }
+
+  const role = document.getElementById("role").value;
+  const branch = document.getElementById("branch").value;
+  const className = document.getElementById("class").value;
+  const userid = document.getElementById("userid").value.trim();
+  const name = document.getElementById("name").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const pat = document.getElementById("pat").value.trim();
+  const status = document.getElementById("statusMessage");
+
+  if (!role || !userid || !name || !password || !pat) {
+    status.textContent = "❌ Please fill all required fields.";
+    status.className = "status error";
+    return;
+  }
+
+  const url = "https://api.github.com/repos/Echoesofthe21stcentury/sjvm-schools/contents/users.json";
+
+  try {
+    const res = await fetch(url, {
+      headers: {
+        Authorization: `token ${pat}`,
+        Accept: "application/vnd.github.v3+json"
+      }
+    });
+
+    const file = await res.json();
+    const sha = file.sha;
+    const raw = atob(file.content);
+    const data = JSON.parse(raw);
+
+    if (role === "Student") {
+      if (!data.Student) data.Student = {};
+      if (!data.Student[className]) data.Student[className] = {};
+      data.Student[className][userid] = { name, password, class: className, branch };
+    } else if (["Teacher", "Coordinator"].includes(role)) {
+      if (!data[role]) data[role] = {};
+      if (!data[role][branch]) data[role][branch] = {};
+      data[role][branch][userid] = { name, password, branch };
+    } else {
+      if (!data[role]) data[role] = {};
+      data[role][userid] = { name, password };
     }
 
-    async function getFileSHA(token) {
-      const res = await fetch("https://api.github.com/repos/Echoesofthe21stcentury/sjvm-schools/contents/users.json", {
-        headers: {
-          Authorization: `token ${token}`,
-          Accept: "application/vnd.github.v3+json"
-        }
-      });
-      const data = await res.json();
-      return data.sha;
+    const updatedContent = btoa(JSON.stringify(data, null, 2));
+    const commit = await fetch(url, {
+      method: "PUT",
+      headers: {
+        Authorization: `token ${pat}`,
+        Accept: "application/vnd.github.v3+json"
+      },
+      body: JSON.stringify({
+        message: `🔐 Assigned ${role} user ${userid}`,
+        content: updatedContent,
+        sha
+      })
+    });
+
+    if (commit.ok) {
+      status.textContent = `✅ ${role} user ${userid} assigned successfully.`;
+      status.className = "status";
+      form.reset();
+      classContainer.style.display = "none";
+    } else {
+      throw new Error("Failed to commit to GitHub");
     }
 
-    async function uploadUsersJSON(token) {
-      const sha = await getFileSHA(token);
-      const content = btoa(unescape(encodeURIComponent(JSON.stringify(users, null, 2))));
-      const body = {
-        message: "👤 Added user to users.json",
-        content,
-        sha,
-        branch: "main"
-      };
-
-      const res = await fetch("https://api.github.com/repos/Echoesofthe21stcentury/sjvm-schools/contents/users.json", {
-        method: "PUT",
-        headers: {
-          Authorization: `token ${token}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(body)
-      });
-
-      if (!res.ok) throw new Error("Upload failed.");
-    }
-
-    async function addUser() {
-      const role = document.getElementById("role").value;
-      const userid = document.getElementById("userid").value.trim();
-      const name = document.getElementById("name").value.trim();
-      const password = document.getElementById("password").value.trim();
-      const userClass = document.getElementById("class").value;
-      const branch = document.getElementById("branch").value;
-
-      if (!role || !userid || !name || !password || !branch) {
-        alert("Fill all fields.");
-        return;
-      }
-
-      if (role === "Student" && !userClass) {
-        alert("Student class required.");
-        return;
-      }
-
-      if (!users[role]) users[role] = {};
-
-      if (role === "Student") {
-        if (!users[role][userClass]) users[role][userClass] = {};
-        users[role][userClass][userid] = { name, password, class: userClass, branch };
-      } else {
-        users[role][userid] = { name, password, branch };
-      }
-
-      const token = prompt("🔑 Enter your GitHub Personal Access Token:");
-      if (!token) return alert("Token required.");
-
-      try {
-        await uploadUsersJSON(token);
-        const qrLink = `https://sjvmschools.org/userlogin.html?role=${role}&userid=${userid}${role === "Student" ? `&class=${encodeURIComponent(userClass)}` : ""}`;
-        document.getElementById("jsonOutput").value = JSON.stringify(users, null, 2) + `\n\n🔗 QR Login Link:\n${qrLink}`;
-
-        // Show QR
-        document.getElementById("qrcode").innerHTML = "";
-        new QRCode(document.getElementById("qrcode"), {
-          text: qrLink,
-          width: 200,
-          height: 200
-        });
-
-        alert("✅ User uploaded & QR generated.");
-      } catch (e) {
-        alert("❌ Error uploading: " + e.message);
-      }
-
-      document.getElementById("userid").value = "";
-      document.getElementById("name").value = "";
-      document.getElementById("password").value = "";
-    }
-  </script>
+  } catch (err) {
+    status.textContent = "❌ Error uploading: " + err.message;
+    status.className = "status error";
+  }
+};
+</script>
 
 </body>
 </html>
