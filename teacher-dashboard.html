@@ -139,7 +139,7 @@
             <td>${id}</td>
             <td>${students[id].name}</td>
             <td>
-              <select name="${id}">
+              <select name="${id}" onchange="updateStatusColor(this)">
                 <option value="Present">Present</option>
                 <option value="Absent">Absent</option>
               </select>
@@ -149,6 +149,21 @@
 
       html += `</table><br><button onclick="submitAttendance(event)">Submit Attendance</button>`;
       document.getElementById("attForm").innerHTML = html;
+
+      setTimeout(() => {
+        document.querySelectorAll("#attForm select").forEach(select => updateStatusColor(select));
+      }, 0);
+    }
+
+    function updateStatusColor(selectEl) {
+      const td = selectEl.parentElement;
+      if (selectEl.value === "Present") {
+        td.style.backgroundColor = "#c6f6c4"; // light green
+      } else if (selectEl.value === "Absent") {
+        td.style.backgroundColor = "#f7c6c7"; // light red
+      } else {
+        td.style.backgroundColor = "";
+      }
     }
 
     async function submitAttendance(e) {
