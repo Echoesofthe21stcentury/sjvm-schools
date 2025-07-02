@@ -9,14 +9,17 @@
     body {
       font-family: 'Segoe UI', sans-serif;
       background: #e6f2ff;
-      padding: 60px 20px;
       display: flex;
       flex-direction: column;
       align-items: center;
+      padding: 60px 20px;
     }
+
     h2 {
       color: #003366;
+      margin-bottom: 20px;
     }
+
     .login-box {
       background: white;
       padding: 30px;
@@ -25,11 +28,13 @@
       width: 100%;
       max-width: 400px;
     }
+
     label {
       font-weight: bold;
       display: block;
       margin-top: 15px;
     }
+
     input, select {
       width: 100%;
       padding: 10px;
@@ -37,6 +42,7 @@
       border: 1px solid #ccc;
       border-radius: 6px;
     }
+
     button {
       margin-top: 20px;
       width: 100%;
@@ -48,29 +54,50 @@
       font-size: 16px;
       cursor: pointer;
     }
+
     .error {
       color: crimson;
       margin-top: 10px;
+      text-align: center;
     }
+
     #qr-reader {
       margin-top: 20px;
       width: 100%;
       max-width: 400px;
       display: none;
     }
-    .qr-controls {
-      display: flex;
-      justify-content: center;
-      margin-top: 10px;
-      gap: 10px;
+
+    .extra-options {
+      margin-top: 30px;
+      text-align: center;
     }
-    .qr-controls button {
+
+    .extra-options a {
+      display: block;
+      margin-top: 10px;
+      color: #003366;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .qr-buttons {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 10px;
+    }
+
+    .qr-buttons button {
       padding: 8px 12px;
       background: #0059b3;
       color: white;
       border: none;
       border-radius: 6px;
       cursor: pointer;
+    }
+
+    .qr-buttons button:hover {
+      background: #003366;
     }
   </style>
 </head>
@@ -129,13 +156,16 @@
     <div class="error" id="errorMsg"></div>
   </div>
 
-  <!-- QR LOGIN -->
-  <div class="qr-controls">
+  <div class="qr-buttons">
     <button onclick="startQRScanner()">📷 Login via QR</button>
     <button onclick="stopQRScanner()">❌ Stop QR</button>
   </div>
 
   <div id="qr-reader"></div>
+
+  <div class="extra-options">
+    <a href="https://formsubmit.co/el/sjvm-request" target="_blank">📨 Don't have an account? Request User ID & Password</a>
+  </div>
 
   <script>
     const usersURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/users.json";
@@ -144,8 +174,26 @@
     function handleRoleChange() {
       const role = document.getElementById("role").value;
       document.getElementById("classContainer").style.display = role === "Student" ? "block" : "none";
-      document.getElementById("branchContainer").style.display = ["Student", "Teacher", "Admin", "Coordinator"].includes(role) ? "block" : "none";
+      document.getElementById("branchContainer").style.display = ["Student", "Teacher", "Coordinator", "Admin"].includes(role) ? "block" : "none";
     }
+
+    function getURLParams() {
+      const params = new URLSearchParams(window.location.search);
+      const role = params.get("role");
+      const userid = params.get("userid");
+      const studentClass = params.get("class");
+      const branch = params.get("branch");
+
+      if (role) {
+        document.getElementById("role").value = role;
+        handleRoleChange();
+      }
+      if (userid) document.getElementById("userid").value = userid;
+      if (studentClass) document.getElementById("studentClass").value = studentClass;
+      if (branch) document.getElementById("branch").value = branch;
+    }
+
+    window.onload = getURLParams;
 
     async function loginUser() {
       const role = document.getElementById("role").value;
@@ -156,7 +204,7 @@
       const errorMsg = document.getElementById("errorMsg");
 
       if (!role || !userid || !password || (role === "Student" && !studentClass) || (["Student","Teacher","Coordinator","Admin"].includes(role) && !branch)) {
-        errorMsg.textContent = "❗ Fill in all required fields.";
+        errorMsg.textContent = "❗ Please fill in all required fields.";
         return;
       }
 
@@ -181,14 +229,13 @@
           if (branch) localStorage.setItem("branch", branch);
           window.location.href = `${role.toLowerCase()}-dashboard.html`;
         } else {
-          errorMsg.textContent = "❌ Invalid credentials.";
+          errorMsg.textContent = "❌ Invalid credentials. Try again.";
         }
       } catch {
-        errorMsg.textContent = "❌ Could not load user data.";
+        errorMsg.textContent = "❌ Error loading user data.";
       }
     }
 
-    // QR Scanner Functions
     async function startQRScanner() {
       const qrRegion = document.getElementById("qr-reader");
       qrRegion.style.display = "block";
@@ -208,33 +255,25 @@
           }
         );
       } catch (err) {
-        alert("❌ Camera access denied.");
+        alert("❌ Camera access denied or unavailable.");
       }
     }
 
     function stopQRScanner() {
       const qrRegion = document.getElementById("qr-reader");
       qrRegion.style.display = "none";
-      if (html5QrCode) {
-        html5QrCode.stop().then(() => html5QrCode.clear());
-      }
+      if (html5QrCode) html5QrCode.stop().then(() => html5QrCode.clear());
     }
 
     function processQR(text) {
-      const parts = text.split("|");
-      if (parts.length < 3) {
-        alert("Invalid QR format.");
-        return;
+      try {
+        const params = new URLSearchParams(text.split('?')[1]);
+        window.location.href = `userlogin.html?${params.toString()}`;
+      } catch {
+        alert("❌ Invalid QR code format.");
       }
-
-      const [role, userid, password, studentClass, branch] = parts;
-      localStorage.setItem("role", role);
-      localStorage.setItem("userid", userid);
-      localStorage.setItem("username", "QR User");
-      if (studentClass) localStorage.setItem("studentClass", studentClass);
-      if (branch) localStorage.setItem("branch", branch);
-      window.location.href = `${role.toLowerCase()}-dashboard.html`;
     }
   </script>
+
 </body>
 </html>
