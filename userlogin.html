@@ -48,20 +48,6 @@
       font-size: 16px;
       cursor: pointer;
     }
-    .extra-buttons {
-      margin-top: 20px;
-      text-align: center;
-    }
-    .extra-buttons button {
-      background-color: #0059b3;
-      margin: 10px 0;
-    }
-    .extra-buttons a {
-      display: block;
-      margin-top: 10px;
-      color: #003366;
-      text-decoration: underline;
-    }
     .error {
       color: crimson;
       margin-top: 10px;
@@ -79,19 +65,10 @@
       <option value="Student">Student</option>
       <option value="Teacher">Teacher</option>
       <option value="Coordinator">Coordinator</option>
-      <option value="Principal">Principal</option>
       <option value="Admin">Admin</option>
+      <option value="Principal">Principal</option>
       <option value="Chairman">Chairman</option>
     </select>
-
-    <div id="branchContainer" style="display: none;">
-      <label for="branch">Select Branch</label>
-      <select id="branch">
-        <option value="">-- Select Branch --</option>
-        <option value="Bandikodigenahalli">Bandikodigenahalli</option>
-        <option value="Atturu Layout">Atturu Layout</option>
-      </select>
-    </div>
 
     <div id="classContainer" style="display: none;">
       <label for="studentClass">Select Class</label>
@@ -113,6 +90,15 @@
       </select>
     </div>
 
+    <div id="branchContainer" style="display: none;">
+      <label for="branch">Select Branch</label>
+      <select id="branch">
+        <option value="">-- Select Branch --</option>
+        <option value="Bandikodigenahalli">Bandikodigenahalli</option>
+        <option value="Atturu Layout">Atturu Layout</option>
+      </select>
+    </div>
+
     <label for="userid">User ID</label>
     <input type="text" id="userid" placeholder="Enter your user ID" />
 
@@ -121,11 +107,6 @@
 
     <button onclick="loginUser()">Login</button>
     <div class="error" id="errorMsg"></div>
-
-    <div class="extra-buttons">
-      <button onclick="loginViaQR()">📷 Login via QR</button>
-      <a href="request-id.html">📝 Request User ID & Password</a>
-    </div>
   </div>
 
   <script>
@@ -133,31 +114,9 @@
 
     function toggleFields() {
       const role = document.getElementById("role").value;
-      document.getElementById("branchContainer").style.display = (role === "Student" || role === "Teacher" || role === "Admin") ? "block" : "none";
       document.getElementById("classContainer").style.display = role === "Student" ? "block" : "none";
+      document.getElementById("branchContainer").style.display = ["Teacher", "Coordinator", "Admin", "Student"].includes(role) ? "block" : "none";
     }
-
-    window.onload = () => {
-      const params = new URLSearchParams(window.location.search);
-      const role = params.get("role");
-      const userid = params.get("userid");
-      const studentClass = params.get("class");
-      const branch = params.get("branch");
-
-      if (role) {
-        document.getElementById("role").value = role;
-        toggleFields();
-      }
-      if (userid) document.getElementById("userid").value = userid;
-      if (branch) {
-        document.getElementById("branchContainer").style.display = "block";
-        document.getElementById("branch").value = branch;
-      }
-      if (studentClass) {
-        document.getElementById("classContainer").style.display = "block";
-        document.getElementById("studentClass").value = studentClass;
-      }
-    };
 
     async function loginUser() {
       const role = document.getElementById("role").value;
@@ -167,8 +126,10 @@
       const branch = document.getElementById("branch")?.value;
       const errorMsg = document.getElementById("errorMsg");
 
-      if (!role || !userid || !password || (role === "Student" && (!studentClass || !branch)) || ((role === "Teacher" || role === "Admin") && !branch)) {
-        errorMsg.textContent = "❌ Please fill in all required fields.";
+      if (!role || !userid || !password || 
+          (role === "Student" && (!studentClass || !branch)) || 
+          (["Teacher", "Coordinator", "Admin"].includes(role) && !branch)) {
+        errorMsg.textContent = "❗ Please fill in all required fields.";
         return;
       }
 
@@ -179,7 +140,7 @@
         let user;
         if (role === "Student") {
           user = data.Student?.[studentClass]?.[userid];
-        } else if (role === "Teacher" || role === "Admin") {
+        } else if (["Teacher", "Coordinator", "Admin"].includes(role)) {
           user = data[role]?.[branch]?.[userid];
         } else {
           user = data[role]?.[userid];
@@ -189,22 +150,21 @@
           localStorage.setItem("userid", userid);
           localStorage.setItem("role", role);
           localStorage.setItem("username", user.name);
-          if (branch) localStorage.setItem("branch", branch);
-          if (studentClass) localStorage.setItem("studentClass", studentClass);
+          if (role === "Student") {
+            localStorage.setItem("studentClass", studentClass);
+          }
+          if (["Student", "Teacher", "Coordinator", "Admin"].includes(role)) {
+            localStorage.setItem("branch", branch);
+          }
           window.location.href = role.toLowerCase() + "-dashboard.html";
         } else {
           errorMsg.textContent = "❌ Invalid credentials. Please try again.";
         }
-
-      } catch (e) {
+      } catch {
         errorMsg.textContent = "❌ Failed to load user data.";
       }
     }
-
-    function loginViaQR() {
-      alert("Coming soon: Login via QR Code!");
-      // Future: Add QR Scanner redirect logic here
-    }
   </script>
+
 </body>
 </html>
