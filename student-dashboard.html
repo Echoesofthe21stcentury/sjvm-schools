@@ -6,145 +6,146 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script src="auth-check.js"></script>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f8fc;
-      margin: 0;
-    }
+    body { font-family: Arial, sans-serif; background: #f4f8fc; margin: 0; }
 
     header {
-      background-color: #003366;
-      color: white;
-      padding: 20px;
-      text-align: center;
+      background-color: #003366; color: white;
+      padding: 20px; text-align: center;
+      position: relative;
+      overflow: hidden;
     }
 
-    nav {
-      background-color: #0059b3;
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-
+    nav { background: #0059b3; display: flex; justify-content: center; flex-wrap: wrap; }
     nav a {
-      color: white;
-      padding: 14px 20px;
-      text-decoration: none;
-      font-weight: bold;
+      color: white; padding: 14px 20px; text-decoration: none; font-weight: bold;
     }
-
-    nav a:hover {
-      background-color: #003366;
-    }
+    nav a:hover { background: #003366; }
 
     .container {
-      max-width: 900px;
-      margin: 30px auto;
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
+      max-width: 900px; margin: 30px auto; background: white;
+      padding: 30px; border-radius: 10px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
+    .info h3 { color: #003366; }
 
-    .info {
-      margin-bottom: 20px;
-    }
-
-    h3 {
-      color: #003366;
-    }
-
-    .logout {
-      text-align: center;
-      margin: 30px;
-    }
-
+    .logout { text-align: center; margin: 30px; }
     .logout button {
-      padding: 10px 20px;
-      background-color: #b30000;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
+      padding: 10px 20px; background: #b30000; color: white;
+      border: none; border-radius: 6px; cursor: pointer;
+    }
+    .logout button:hover { background: #800000; }
+
+    /* 🎉 Animation Styles */
+    @keyframes slideIn {
+      0% { transform: translateX(-100%); opacity: 0; }
+      100% { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes slideOut {
+      0% { transform: translateX(0); opacity: 1; }
+      100% { transform: translateX(100%); opacity: 0; }
     }
 
-    .logout button:hover {
-      background-color: #800000;
+    #welcome {
+      position: absolute;
+      top: -80px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #fff;
+      color: #003366;
+      font-size: 1.2em;
+      font-weight: bold;
+      padding: 15px 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      animation: slideIn 1s forwards, slideOut 1s 3s forwards;
+      display: none;
+      z-index: 999;
     }
   </style>
 </head>
 <body>
 
-  <header>
-    <h1>🎓 SJVM Student Dashboard</h1>
-  </header>
+<header>
+  <h1>🎓 SJVM Student Dashboard</h1>
+  <div id="welcome"></div>
+</header>
 
-  <nav>
-    <a href="#" onclick="showProfile()">Profile</a>
-    <a href="#" onclick="showPayments()">Payments</a>
-    <a href="#" onclick="showAttendance()">Attendance</a>
-    <a href="#" onclick="showHomework()">Homework</a>
-    <a href="#" onclick="showCirculars()">Circulars</a>
-  </nav>
+<nav>
+  <a href="#" onclick="showProfile()">Profile</a>
+  <a href="#" onclick="showPayments()">Payments</a>
+  <a href="#" onclick="showAttendance()">Attendance</a>
+  <a href="#" onclick="showHomework()">Homework</a>
+  <a href="#" onclick="showCirculars()">Circulars</a>
+</nav>
 
-  <div class="container" id="dashboardContent">
-    <p>Welcome, loading your profile...</p>
-  </div>
+<div class="container" id="dashboardContent">
+  <p>Welcome, loading your profile...</p>
+</div>
 
-  <div class="logout">
-    <button onclick="logout()">Logout</button>
-  </div>
+<div class="logout">
+  <button onclick="logout()">Logout</button>
+</div>
 
-  <script>
-    const usersURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/users.json";
-    const feesURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/fees.json";
-    const attendanceURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/attendance.json";
-    const homeworkURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/homework.json";
-    const circularsURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/circulars.json";
+<script>
+  const usersURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/users.json";
+  const feesURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/fees.json";
+  const attendanceURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/attendance.json";
+  const homeworkURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/homework.json";
+  const circularsURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/circulars.json";
 
-    const role = localStorage.getItem("role");
-    const userid = localStorage.getItem("userid");
-    const studentClass = localStorage.getItem("studentClass");
-    const branch = localStorage.getItem("branch");
+  const role = localStorage.getItem("role");
+  const userid = localStorage.getItem("userid");
+  const studentClass = localStorage.getItem("studentClass");
+  const branch = localStorage.getItem("branch");
+  const username = localStorage.getItem("username") || userid;
 
-    if (role !== "Student" || !userid || !studentClass || !branch) {
-      document.getElementById("dashboardContent").innerHTML = "<p style='color:red'>❌ Access Denied. Please login as Student.</p>";
+  if (role !== "Student" || !userid || !studentClass || !branch) {
+    document.getElementById("dashboardContent").innerHTML = "<p style='color:red'>❌ Access Denied. Please login as Student.</p>";
+  }
+
+  // 🎉 Show welcome animation
+  function showWelcome() {
+    const w = document.getElementById("welcome");
+    w.textContent = `🎉 Welcome, ${username}!`;
+    w.style.display = 'block';
+  }
+
+  async function showProfile() {
+    try {
+      const res = await fetch(usersURL);
+      const data = await res.json();
+      const student = data.Student?.[studentClass]?.[userid];
+      document.getElementById("dashboardContent").innerHTML = student ? `
+        <div class="info">
+          <h3>👤 Profile</h3>
+          <p><strong>User ID:</strong> ${userid}</p>
+          <p><strong>Name:</strong> ${student.name}</p>
+          <p><strong>Class:</strong> ${student.class}</p>
+          <p><strong>Branch:</strong> ${branch}</p>
+          <p><strong>Gender:</strong> ${student.gender || '—'}</p>
+          <p><strong>Date of Birth:</strong> ${student.dob || '—'}</p>
+          <p><strong>Father's Name:</strong> ${student.father || '—'}</p>
+          <p><strong>Mother's Name:</strong> ${student.mother || '—'}</p>
+          <p><strong>Address:</strong> ${student.address || '—'}</p>
+          <p><strong>Mobile Number:</strong> ${student.mobile || '—'}</p>
+          <p><strong>Email ID:</strong> ${student.email || '—'}</p>
+        </div>
+      ` : `<p style="color:red">Student not found.</p>`;
+    } catch {
+      document.getElementById("dashboardContent").innerHTML = "<p>Error loading profile.</p>";
     }
+  }
 
-    async function showProfile() {
-      try {
-        const res = await fetch(usersURL);
-        const data = await res.json();
-        const student = data.Student?.[studentClass]?.[userid];
+  function logout() {
+    localStorage.clear();
+    window.location.href = "userlogin.html";
+  }
 
-        document.getElementById("dashboardContent").innerHTML = student ? `
-          <div class="info">
-            <h3>👤 Profile</h3>
-            <p><strong>User ID:</strong> ${userid}</p>
-            <p><strong>Name:</strong> ${student.name}</p>
-            <p><strong>Class:</strong> ${student.class}</p>
-            <p><strong>Branch:</strong> ${branch}</p>
-            <p><strong>Gender:</strong> ${student.gender || '—'}</p>
-            <p><strong>Date of Birth:</strong> ${student.dob || '—'}</p>
-            <p><strong>Father's Name:</strong> ${student.father || '—'}</p>
-            <p><strong>Mother's Name:</strong> ${student.mother || '—'}</p>
-            <p><strong>Address:</strong> ${student.address || '—'}</p>
-            <p><strong>Mobile Number:</strong> ${student.mobile || '—'}</p>
-            <p><strong>Email ID:</strong> ${student.email || '—'}</p>
-          </div>
-        ` : `<p style="color:red">Student not found.</p>`;
-      } catch {
-        document.getElementById("dashboardContent").innerHTML = "<p>Error loading profile.</p>";
-      }
-    }
-
-    function logout() {
-      localStorage.clear();
-      window.location.href = "userlogin.html";
-    }
-
-    window.onload = showProfile;
-  </script>
+  window.onload = () => {
+    showWelcome();
+    showProfile();
+  };
+</script>
 
 </body>
 </html>
