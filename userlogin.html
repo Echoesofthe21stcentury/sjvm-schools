@@ -4,19 +4,18 @@
   <meta charset="UTF-8" />
   <title>SJVM User Login</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <script src="https://unpkg.com/html5-qrcode"></script>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
       background: #e6f2ff;
+      padding: 60px 20px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 60px 20px;
     }
     h2 {
       color: #003366;
-      margin-bottom: 20px;
     }
     .login-box {
       background: white;
@@ -49,178 +48,193 @@
       font-size: 16px;
       cursor: pointer;
     }
-    .extra {
-      margin-top: 15px;
-      text-align: center;
-    }
-    .extra a {
-      text-decoration: none;
-      color: #003366;
-      font-weight: bold;
-    }
     .error {
       color: crimson;
       margin-top: 10px;
     }
-    #qrReader {
-      display: none;
+    #qr-reader {
       margin-top: 20px;
+      width: 100%;
+      max-width: 400px;
+      display: none;
+    }
+    .qr-controls {
+      display: flex;
+      justify-content: center;
+      margin-top: 10px;
+      gap: 10px;
+    }
+    .qr-controls button {
+      padding: 8px 12px;
+      background: #0059b3;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
 
-<h2>🔐 SJVM User Login</h2>
+  <h2>🔐 SJVM User Login</h2>
 
-<div class="login-box">
-  <label for="role">Select Role</label>
-  <select id="role" onchange="toggleFields()">
-    <option value="">-- Select Role --</option>
-    <option value="Student">Student</option>
-    <option value="Teacher">Teacher</option>
-    <option value="Coordinator">Coordinator</option>
-    <option value="Admin">Admin</option>
-    <option value="Principal">Principal</option>
-    <option value="Chairman">Chairman</option>
-  </select>
-
-  <div id="branchContainer" style="display: none;">
-    <label for="branch">Select Branch</label>
-    <select id="branch">
-      <option value="">-- Select Branch --</option>
-      <option value="Bandikodigenahalli">Bandikodigenahalli</option>
-      <option value="Atturu Layout">Atturu Layout</option>
+  <div class="login-box">
+    <label for="role">Select Role</label>
+    <select id="role" onchange="handleRoleChange()">
+      <option value="">-- Select Role --</option>
+      <option value="Student">Student</option>
+      <option value="Teacher">Teacher</option>
+      <option value="Coordinator">Coordinator</option>
+      <option value="Admin">Admin</option>
+      <option value="Principal">Principal</option>
+      <option value="Chairman">Chairman</option>
     </select>
+
+    <div id="branchContainer" style="display:none;">
+      <label for="branch">Select Branch</label>
+      <select id="branch">
+        <option value="">-- Select Branch --</option>
+        <option value="Bandikodigenahalli">Bandikodigenahalli</option>
+        <option value="Atturu Layout">Atturu Layout</option>
+      </select>
+    </div>
+
+    <div id="classContainer" style="display:none;">
+      <label for="studentClass">Select Class</label>
+      <select id="studentClass">
+        <option value="">-- Select Class --</option>
+        <option value="PKG">PKG</option>
+        <option value="LKG">LKG</option>
+        <option value="UKG">UKG</option>
+        <option value="Class 1">Class 1</option>
+        <option value="Class 2">Class 2</option>
+        <option value="Class 3">Class 3</option>
+        <option value="Class 4">Class 4</option>
+        <option value="Class 5">Class 5</option>
+        <option value="Class 6">Class 6</option>
+        <option value="Class 7">Class 7</option>
+        <option value="Class 8">Class 8</option>
+        <option value="Class 9">Class 9</option>
+        <option value="Class 10">Class 10</option>
+      </select>
+    </div>
+
+    <label for="userid">User ID</label>
+    <input type="text" id="userid" placeholder="Enter your user ID" />
+
+    <label for="password">Password</label>
+    <input type="password" id="password" placeholder="Enter your password" />
+
+    <button onclick="loginUser()">Login</button>
+    <div class="error" id="errorMsg"></div>
   </div>
 
-  <div id="classContainer" style="display: none;">
-    <label for="studentClass">Select Class</label>
-    <select id="studentClass">
-      <option value="">-- Select Class --</option>
-      <option>PKG</option>
-      <option>LKG</option>
-      <option>UKG</option>
-      <option>Class 1</option>
-      <option>Class 2</option>
-      <option>Class 3</option>
-      <option>Class 4</option>
-      <option>Class 5</option>
-      <option>Class 6</option>
-      <option>Class 7</option>
-      <option>Class 8</option>
-      <option>Class 9</option>
-      <option>Class 10</option>
-    </select>
+  <!-- QR LOGIN -->
+  <div class="qr-controls">
+    <button onclick="startQRScanner()">📷 Login via QR</button>
+    <button onclick="stopQRScanner()">❌ Stop QR</button>
   </div>
 
-  <label for="userid">User ID</label>
-  <input type="text" id="userid" placeholder="Enter your user ID" />
+  <div id="qr-reader"></div>
 
-  <label for="password">Password</label>
-  <input type="password" id="password" placeholder="Enter your password" />
+  <script>
+    const usersURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/users.json";
+    let html5QrCode;
 
-  <button onclick="loginUser()">Login</button>
-  <div class="error" id="errorMsg"></div>
-
-  <div class="extra">
-    <p><button onclick="startQRScanner()">📷 Login via QR</button></p>
-    <p><a href="request-id.html">📩 Request for User ID</a></p>
-  </div>
-</div>
-
-<div id="qrReader" style="width: 300px;"></div>
-
-<script>
-const usersURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/users.json";
-
-function toggleFields() {
-  const role = document.getElementById("role").value;
-  document.getElementById("classContainer").style.display = role === "Student" ? "block" : "none";
-  document.getElementById("branchContainer").style.display = ["Student", "Teacher", "Coordinator", "Admin"].includes(role) ? "block" : "none";
-}
-
-async function loginUser() {
-  const role = document.getElementById("role").value;
-  const userid = document.getElementById("userid").value.trim();
-  const password = document.getElementById("password").value.trim();
-  const studentClass = document.getElementById("studentClass").value;
-  const branch = document.getElementById("branch").value;
-  const errorMsg = document.getElementById("errorMsg");
-
-  if (!role || !userid || !password || (role === "Student" && !studentClass) || 
-    (["Student", "Teacher", "Coordinator", "Admin"].includes(role) && !branch)) {
-    errorMsg.textContent = "❗ Please fill in all required fields.";
-    return;
-  }
-
-  try {
-    const res = await fetch(usersURL);
-    const data = await res.json();
-
-    let user;
-    if (role === "Student") {
-      user = data.Student?.[studentClass]?.[userid];
-    } else if (["Teacher", "Admin", "Coordinator"].includes(role)) {
-      user = data[role]?.[branch]?.[userid];
-    } else {
-      user = data[role]?.[userid];
+    function handleRoleChange() {
+      const role = document.getElementById("role").value;
+      document.getElementById("classContainer").style.display = role === "Student" ? "block" : "none";
+      document.getElementById("branchContainer").style.display = ["Student", "Teacher", "Admin", "Coordinator"].includes(role) ? "block" : "none";
     }
 
-    if (user && user.password === password) {
-      localStorage.setItem("role", role);
-      localStorage.setItem("userid", userid);
-      localStorage.setItem("username", user.name);
-      if (studentClass) localStorage.setItem("studentClass", studentClass);
-      if (branch) localStorage.setItem("branch", branch);
-      window.location.href = role.toLowerCase() + "-dashboard.html";
-    } else {
-      errorMsg.textContent = "❌ Invalid credentials. Please try again.";
-    }
-  } catch {
-    errorMsg.textContent = "❌ Failed to load user data.";
-  }
-}
+    async function loginUser() {
+      const role = document.getElementById("role").value;
+      const userid = document.getElementById("userid").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const studentClass = document.getElementById("studentClass")?.value;
+      const branch = document.getElementById("branch")?.value;
+      const errorMsg = document.getElementById("errorMsg");
 
-// QR LOGIN FUNCTION
-function startQRScanner() {
-  document.getElementById("qrReader").style.display = "block";
-  const qr = new Html5Qrcode("qrReader");
+      if (!role || !userid || !password || (role === "Student" && !studentClass) || (["Student","Teacher","Coordinator","Admin"].includes(role) && !branch)) {
+        errorMsg.textContent = "❗ Fill in all required fields.";
+        return;
+      }
 
-  qr.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 },
-    async (decodedText) => {
-      qr.stop();
       try {
-        const parsed = JSON.parse(decodedText);
         const res = await fetch(usersURL);
         const data = await res.json();
-
         let user;
-        if (parsed.role === "Student") {
-          user = data.Student?.[parsed.class]?.[parsed.userid];
-        } else if (["Teacher", "Admin", "Coordinator"].includes(parsed.role)) {
-          user = data[parsed.role]?.[parsed.branch]?.[parsed.userid];
+
+        if (role === "Student") {
+          user = data.Student?.[studentClass]?.[userid];
+        } else if (["Teacher", "Admin", "Coordinator"].includes(role)) {
+          user = data[role]?.[branch]?.[userid];
         } else {
-          user = data[parsed.role]?.[parsed.userid];
+          user = data[role]?.[userid];
         }
 
-        if (user && user.password === parsed.password) {
-          localStorage.setItem("role", parsed.role);
-          localStorage.setItem("userid", parsed.userid);
+        if (user && user.password === password) {
+          localStorage.setItem("role", role);
+          localStorage.setItem("userid", userid);
           localStorage.setItem("username", user.name);
-          if (parsed.class) localStorage.setItem("studentClass", parsed.class);
-          if (parsed.branch) localStorage.setItem("branch", parsed.branch);
-          window.location.href = parsed.role.toLowerCase() + "-dashboard.html";
+          if (studentClass) localStorage.setItem("studentClass", studentClass);
+          if (branch) localStorage.setItem("branch", branch);
+          window.location.href = `${role.toLowerCase()}-dashboard.html`;
         } else {
-          alert("❌ Invalid QR login.");
+          errorMsg.textContent = "❌ Invalid credentials.";
         }
       } catch {
-        alert("❌ Error decoding QR.");
+        errorMsg.textContent = "❌ Could not load user data.";
       }
-    },
-    (error) => {}
-  );
-}
-</script>
+    }
 
+    // QR Scanner Functions
+    async function startQRScanner() {
+      const qrRegion = document.getElementById("qr-reader");
+      qrRegion.style.display = "block";
+      html5QrCode = new Html5Qrcode("qr-reader");
+
+      try {
+        const devices = await Html5Qrcode.getCameras();
+        const useBackCam = devices.length > 1 ? confirm("Use back camera?") : false;
+        const cameraId = useBackCam ? devices.find(d => d.label.toLowerCase().includes("back"))?.id || devices[0].id : devices[0].id;
+
+        await html5QrCode.start(
+          cameraId,
+          { fps: 10, qrbox: 250 },
+          (decodedText) => {
+            stopQRScanner();
+            processQR(decodedText);
+          }
+        );
+      } catch (err) {
+        alert("❌ Camera access denied.");
+      }
+    }
+
+    function stopQRScanner() {
+      const qrRegion = document.getElementById("qr-reader");
+      qrRegion.style.display = "none";
+      if (html5QrCode) {
+        html5QrCode.stop().then(() => html5QrCode.clear());
+      }
+    }
+
+    function processQR(text) {
+      const parts = text.split("|");
+      if (parts.length < 3) {
+        alert("Invalid QR format.");
+        return;
+      }
+
+      const [role, userid, password, studentClass, branch] = parts;
+      localStorage.setItem("role", role);
+      localStorage.setItem("userid", userid);
+      localStorage.setItem("username", "QR User");
+      if (studentClass) localStorage.setItem("studentClass", studentClass);
+      if (branch) localStorage.setItem("branch", branch);
+      window.location.href = `${role.toLowerCase()}-dashboard.html`;
+    }
+  </script>
 </body>
 </html>
