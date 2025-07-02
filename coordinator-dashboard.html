@@ -74,10 +74,13 @@
 </head>
 <body>
 
-  <header>
-    <h1>Coordinator Dashboard</h1>
-    <button class="logout" onclick="logout()">Logout</button>
-  </header>
+<header>
+  <h1>🎓 SJVM Co-Ordinator Dashboard</h1>
+  <div style="position: absolute; top: 10px; right: 20px; color: white; font-size: 16px;">
+    👤 <span id="usernameDisplay"></span>
+    <button onclick="logout()" style="background: crimson; color: white; border: none; padding: 5px 10px; border-radius: 5px; margin-left: 10px; cursor: pointer;">Logout</button>
+  </div>
+</header>
 
   <h2>Upload Gallery Photo</h2>
 
@@ -140,7 +143,11 @@
       localStorage.clear();
       window.location.href = "userlogin.html";
     }
-  </script>
-
+    
+    // ✅ Add this at the end of script
+  window.onload = () => {
+    document.getElementById("usernameDisplay").textContent = localStorage.getItem("username") || "User";
+  };
+</script>
 </body>
 </html>
