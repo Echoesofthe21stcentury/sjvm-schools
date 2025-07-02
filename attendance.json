@@ -17,6 +17,12 @@
       "Bandikodigenahalli": {
         "SBK-401": "Present"
       }
+    },
+    "Class 5": {
+      "Bandikodigenahalli": {
+        "SBK-501": "Absent",
+        "SBK-502": "Present"
+      }
     }
   }
 }
