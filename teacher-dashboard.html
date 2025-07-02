@@ -184,12 +184,24 @@
         Accept: "application/vnd.github.v3+json"
       };
 
+      let data = {};
+      let sha = null;
+
       try {
         const res = await fetch(attendanceURL, { headers });
-        const file = await res.json();
-        const sha = file.sha;
-        const content = atob(file.content);
-        let data = JSON.parse(content);
+
+        if (res.status === 200) {
+          const file = await res.json();
+          sha = file.sha;
+
+          try {
+            const content = atob(file.content);
+            data = JSON.parse(content);
+          } catch {
+            alert("❌ Attendance file is corrupted or unreadable.");
+            return;
+          }
+        }
 
         if (!data[date]) data[date] = {};
         if (!data[date][cls]) data[date][cls] = {};
@@ -208,7 +220,7 @@
           body: JSON.stringify({
             message: `📅 Attendance for ${cls} (${branch}) on ${date}`,
             content: updatedContent,
-            sha
+            sha: sha
           })
         });
 
@@ -225,7 +237,6 @@
     }
 
     function showHomeworkForm() {
-      const today = new Date().toISOString().split("T")[0];
       document.getElementById("dashboardContent").innerHTML = `
         <h2>📚 Upload Homework</h2>
         <form id="homeworkForm" onsubmit="submitHomework(event)">
