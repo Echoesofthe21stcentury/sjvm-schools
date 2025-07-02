@@ -1,21 +1,150 @@
-Run actions/deploy-pages@v4
-Fetching artifact metadata for "github-pages" in this workflow run
-Found 1 artifact(s)
-Creating Pages deployment with payload:
-{
-	"artifact_id": 3449638543,
-	"pages_build_version": "bf09be5a878dfd3fa09bce8b449e951c0f699d33",
-	"oidc_token": "***"
-}
-Created deployment for bf09be5a878dfd3fa09bce8b449e951c0f699d33, ID: bf09be5a878dfd3fa09bce8b449e951c0f699d33
-Getting Pages deployment status...
-Current status: deployment_queued
-Getting Pages deployment status...
-Current status: deployment_queued
-Getting Pages deployment status...
-Current status: deployment_queued
-Canceling Pages deployment...
-Error: Canceling Pages deployment failed
-Error: HttpError: Unable to cancel deployment bf09be5a878dfd3fa09bce8b449e951c0f699d33 as it's finished.
-Error: {"message":"Unable to cancel deployment bf09be5a878dfd3fa09bce8b449e951c0f699d33 as it's finished.","documentation_url":"https://docs.github.com/rest/pages/pages#cancel-a-github-pages-deployment","status":"400"}
-Error: The operation was canceled.
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Student Dashboard | SJVM</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="auth-check.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f8fc;
+      margin: 0;
+    }
+
+    header {
+      background-color: #003366;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    nav {
+      background-color: #0059b3;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    nav a {
+      color: white;
+      padding: 14px 20px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    nav a:hover {
+      background-color: #003366;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 30px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .info {
+      margin-bottom: 20px;
+    }
+
+    h3 {
+      color: #003366;
+    }
+
+    .logout {
+      text-align: center;
+      margin: 30px;
+    }
+
+    .logout button {
+      padding: 10px 20px;
+      background-color: #b30000;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .logout button:hover {
+      background-color: #800000;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🎓 SJVM Student Dashboard</h1>
+  </header>
+
+  <nav>
+    <a href="#" onclick="showProfile()">Profile</a>
+    <a href="#" onclick="showPayments()">Payments</a>
+    <a href="#" onclick="showAttendance()">Attendance</a>
+    <a href="#" onclick="showHomework()">Homework</a>
+    <a href="#" onclick="showCirculars()">Circulars</a>
+  </nav>
+
+  <div class="container" id="dashboardContent">
+    <p>Welcome, loading your profile...</p>
+  </div>
+
+  <div class="logout">
+    <button onclick="logout()">Logout</button>
+  </div>
+
+  <script>
+    const usersURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/users.json";
+    const feesURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/fees.json";
+    const attendanceURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/attendance.json";
+    const homeworkURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/homework.json";
+    const circularsURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/circulars.json";
+
+    const role = localStorage.getItem("role");
+    const userid = localStorage.getItem("userid");
+    const studentClass = localStorage.getItem("studentClass");
+    const branch = localStorage.getItem("branch");
+
+    if (role !== "Student" || !userid || !studentClass || !branch) {
+      document.getElementById("dashboardContent").innerHTML = "<p style='color:red'>❌ Access Denied. Please login as Student.</p>";
+    }
+
+    async function showProfile() {
+      try {
+        const res = await fetch(usersURL);
+        const data = await res.json();
+        const student = data.Student?.[studentClass]?.[userid];
+
+        document.getElementById("dashboardContent").innerHTML = student ? `
+          <div class="info">
+            <h3>👤 Profile</h3>
+            <p><strong>User ID:</strong> ${userid}</p>
+            <p><strong>Name:</strong> ${student.name}</p>
+            <p><strong>Class:</strong> ${student.class}</p>
+            <p><strong>Branch:</strong> ${branch}</p>
+            <p><strong>Gender:</strong> ${student.gender || '—'}</p>
+            <p><strong>Date of Birth:</strong> ${student.dob || '—'}</p>
+            <p><strong>Father's Name:</strong> ${student.father || '—'}</p>
+            <p><strong>Mother's Name:</strong> ${student.mother || '—'}</p>
+            <p><strong>Address:</strong> ${student.address || '—'}</p>
+            <p><strong>Mobile Number:</strong> ${student.mobile || '—'}</p>
+            <p><strong>Email ID:</strong> ${student.email || '—'}</p>
+          </div>
+        ` : `<p style="color:red">Student not found.</p>`;
+      } catch {
+        document.getElementById("dashboardContent").innerHTML = "<p>Error loading profile.</p>";
+      }
+    }
+
+    function logout() {
+      localStorage.clear();
+      window.location.href = "userlogin.html";
+    }
+
+    window.onload = showProfile;
+  </script>
+
+</body>
+</html>
