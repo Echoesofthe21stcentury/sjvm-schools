@@ -2,21 +2,21 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Teacher Dashboard | SJVM</title>
+  <title>SJVM Teacher Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script src="auth-check.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
       background: #f4f8fc;
       margin: 0;
-      padding: 0;
     }
     header {
       background-color: #003366;
       color: white;
       padding: 20px;
       text-align: center;
+      position: relative;
     }
     nav {
       background-color: #0059b3;
@@ -38,9 +38,27 @@
       max-width: 900px;
       margin: auto;
       background: white;
+      border-radius: 10px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
       margin-top: 30px;
-      border-radius: 10px;
+    }
+    label, select, textarea, input, button {
+      display: block;
+      width: 100%;
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background-color: #003366;
+      color: white;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #001d3d;
     }
     table {
       width: 100%;
@@ -48,296 +66,219 @@
       margin-top: 20px;
     }
     th, td {
+      padding: 10px;
       border: 1px solid #ccc;
-      padding: 8px;
-      text-align: left;
     }
     th {
       background-color: #003366;
       color: white;
     }
-    select, input, textarea, button {
-      padding: 8px;
-      margin-top: 10px;
-      width: 100%;
-      box-sizing: border-box;
-    }
     .logout {
-      text-align: center;
-      margin-top: 30px;
-    }
-    .logout button {
-      background-color: #b30000;
-      color: white;
-      padding: 10px 20px;
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background-color: crimson;
       border: none;
+      color: white;
+      padding: 8px 15px;
       border-radius: 5px;
       cursor: pointer;
     }
-    .logout button:hover {
-      background-color: #800000;
+    .present {
+      background-color: #d0f0c0;
+    }
+    .absent {
+      background-color: #ffc0cb;
     }
   </style>
 </head>
 <body>
+
   <header>
     <h1>👩‍🏫 SJVM Teacher Dashboard</h1>
+    <div>Welcome, <span id="usernameDisplay">Teacher</span> 👋</div>
+    <button class="logout" onclick="logout()">Logout</button>
   </header>
 
   <nav>
-    <a href="#" onclick="loadAttendanceForm()">Mark Attendance</a>
-    <a href="#" onclick="showHomeworkForm()">Upload Homework</a>
-    <a href="#" onclick="viewCirculars()">View Circulars</a>
+    <a href="#" onclick="loadAttendance()">Mark Attendance</a>
+    <a href="#" onclick="uploadHomework()">Upload Homework</a>
   </nav>
 
   <div class="container" id="dashboardContent">
-    <p>Welcome! Please select an option from the menu above.</p>
-  </div>
-
-  <div class="logout">
-    <button onclick="logout()">Logout</button>
+    <p>Select an option from the menu to get started.</p>
   </div>
 
   <script>
     const usersURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/users.json";
     const attendanceURL = "https://api.github.com/repos/Echoesofthe21stcentury/sjvm-schools/contents/attendance.json";
     const homeworkURL = "https://api.github.com/repos/Echoesofthe21stcentury/sjvm-schools/contents/homework.json";
-    const circularsURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/circulars.json";
+
+    const username = localStorage.getItem("username");
     const branch = localStorage.getItem("branch");
+    const role = localStorage.getItem("role");
+
+    if (role !== "Teacher") {
+      alert("Access Denied");
+      location.href = "userlogin.html";
+    }
+
+    document.getElementById("usernameDisplay").textContent = username;
+
+    // 🎉 Confetti only on first login
+    if (!sessionStorage.getItem("teacherLoggedIn")) {
+      confetti();
+      setTimeout(() => document.querySelector("canvas")?.remove(), 3000);
+      sessionStorage.setItem("teacherLoggedIn", "true");
+    }
 
     function logout() {
       localStorage.clear();
-      window.location.href = "userlogin.html";
+      location.href = "userlogin.html";
     }
 
-    async function loadAttendanceForm() {
+    async function loadAttendance() {
       const res = await fetch(usersURL);
       const data = await res.json();
-      const studentData = data["Student"];
-
-      let classOptions = Object.keys(studentData).map(cls => `<option value="${cls}">${cls}</option>`).join("");
+      const students = data.Student;
+      let classOptions = Object.keys(students).map(cls => `<option value="${cls}">${cls}</option>`).join("");
 
       document.getElementById("dashboardContent").innerHTML = `
-        <h2>📅 Mark Attendance</h2>
-        <label>Date:</label><input type="date" id="attDate" value="${new Date().toISOString().split('T')[0]}">
-        <label>Class:</label><select id="attClass">${classOptions}</select>
-        <button onclick="generateAttendance()">Load Students</button>
+        <h3>📅 Mark Attendance</h3>
+        <label>Select Class:</label>
+        <select id="attClass">${classOptions}</select>
+        <label>Date:</label>
+        <input type="date" id="attDate" value="${new Date().toISOString().split("T")[0]}" />
+        <button onclick="showAttendanceForm()">Load Students</button>
         <form id="attForm"></form>
       `;
     }
 
-    async function generateAttendance() {
+    async function showAttendanceForm() {
       const cls = document.getElementById("attClass").value;
       const res = await fetch(usersURL);
       const data = await res.json();
-      const students = data["Student"]?.[cls];
-      let html = `<h3>Class: ${cls} | Branch: ${branch}</h3><table><tr><th>Student ID</th><th>Name</th><th>Status</th></tr>`;
+      const students = data.Student?.[cls];
+      let formHTML = `<table><tr><th>ID</th><th>Name</th><th>Status</th></tr>`;
 
       for (let id in students) {
-        html += `
-          <tr>
-            <td>${id}</td>
-            <td>${students[id].name}</td>
-            <td>
-              <select name="${id}" onchange="updateStatusColor(this)">
-                <option value="Present">Present</option>
-                <option value="Absent">Absent</option>
-              </select>
-            </td>
-          </tr>`;
+        if (students[id].branch === branch) {
+          formHTML += `
+            <tr>
+              <td>${id}</td>
+              <td>${students[id].name}</td>
+              <td>
+                <select name="${id}" onchange="colorRow(this)">
+                  <option value="Present">Present</option>
+                  <option value="Absent">Absent</option>
+                </select>
+              </td>
+            </tr>
+          `;
+        }
       }
-
-      html += `</table><br><button onclick="submitAttendance(event)">Submit Attendance</button>`;
-      document.getElementById("attForm").innerHTML = html;
-
-      setTimeout(() => {
-        document.querySelectorAll("#attForm select").forEach(select => updateStatusColor(select));
-      }, 0);
+      formHTML += `</table><br><button onclick="submitAttendance(event)">Submit</button>`;
+      document.getElementById("attForm").innerHTML = formHTML;
     }
 
-    function updateStatusColor(selectEl) {
-      const td = selectEl.parentElement;
-      if (selectEl.value === "Present") {
-        td.style.backgroundColor = "#c6f6c4"; // light green
-      } else if (selectEl.value === "Absent") {
-        td.style.backgroundColor = "#f7c6c7"; // light red
-      } else {
-        td.style.backgroundColor = "";
-      }
+    function colorRow(select) {
+      const row = select.closest("tr");
+      row.className = select.value === "Present" ? "present" : "absent";
     }
 
     async function submitAttendance(e) {
       e.preventDefault();
-      const form = document.getElementById("attForm");
-      const selects = form.querySelectorAll("select");
-      const attendance = {};
-      selects.forEach(sel => {
-        attendance[sel.name] = sel.value;
-      });
-
       const date = document.getElementById("attDate").value;
       const cls = document.getElementById("attClass").value;
-      const token = prompt("🔐 Enter your GitHub PAT:");
+      const selects = document.querySelectorAll("#attForm select");
+      const token = prompt("🔐 GitHub PAT:");
 
-      const headers = {
-        Authorization: `token ${token}`,
-        Accept: "application/vnd.github.v3+json"
-      };
+      const res = await fetch(attendanceURL, {
+        headers: { Authorization: `token ${token}` }
+      });
 
-      let data = {};
-      let sha = null;
+      const file = await res.json();
+      const sha = file.sha;
+      const content = JSON.parse(atob(file.content));
 
-      try {
-        const res = await fetch(attendanceURL, { headers });
+      if (!content[date]) content[date] = {};
+      if (!content[date][cls]) content[date][cls] = {};
+      content[date][cls][branch] = {};
 
-        if (res.status === 200) {
-          const file = await res.json();
-          sha = file.sha;
+      selects.forEach(sel => {
+        content[date][cls][branch][sel.name] = sel.value;
+      });
 
-          try {
-            const content = atob(file.content);
-            data = JSON.parse(content);
-          } catch {
-            alert("❌ Attendance file is corrupted or unreadable.");
-            return;
-          }
-        }
+      const updated = btoa(JSON.stringify(content, null, 2));
 
-        if (!data[date]) data[date] = {};
-        if (!data[date][cls]) data[date][cls] = {};
-        if (data[date][cls][branch]) {
-          alert(`⚠️ Attendance already submitted for ${cls} on ${date} (${branch}).`);
-          return;
-        }
+      const commit = await fetch(attendanceURL, {
+        method: "PUT",
+        headers: {
+          Authorization: `token ${token}`,
+          Accept: "application/vnd.github.v3+json"
+        },
+        body: JSON.stringify({
+          message: `✅ Attendance for ${cls} - ${branch} on ${date}`,
+          content: updated,
+          sha
+        })
+      });
 
-        data[date][cls][branch] = attendance;
-
-        const updatedContent = btoa(JSON.stringify(data, null, 2));
-
-        const commit = await fetch(attendanceURL, {
-          method: "PUT",
-          headers,
-          body: JSON.stringify({
-            message: `📅 Attendance for ${cls} (${branch}) on ${date}`,
-            content: updatedContent,
-            sha: sha
-          })
-        });
-
-        if (commit.ok) {
-          alert("✅ Attendance submitted!");
-          document.getElementById("attForm").innerHTML = "";
-        } else {
-          alert("❌ Failed to save attendance.");
-        }
-
-      } catch (err) {
-        alert("❌ Error: " + err.message);
-      }
+      alert(commit.ok ? "✅ Attendance saved!" : "❌ Upload failed.");
     }
 
-    function showHomeworkForm() {
+    function uploadHomework() {
+      const today = new Date().toISOString().split("T")[0];
       document.getElementById("dashboardContent").innerHTML = `
-        <h2>📚 Upload Homework</h2>
-        <form id="homeworkForm" onsubmit="submitHomework(event)">
-          <label>Class:</label>
-          <select id="class">
-            <option value="PKG">PKG</option>
-            <option value="LKG">LKG</option>
-            <option value="UKG">UKG</option>
-            <option value="Class 1">Class 1</option>
-            <option value="Class 2">Class 2</option>
-            <option value="Class 3">Class 3</option>
-            <option value="Class 4">Class 4</option>
-            <option value="Class 5">Class 5</option>
-            <option value="Class 6">Class 6</option>
-            <option value="Class 7">Class 7</option>
-            <option value="Class 8">Class 8</option>
-            <option value="Class 9">Class 9</option>
-            <option value="Class 10">Class 10</option>
-          </select>
-          <label>Subject:</label>
-          <input type="text" id="subject" />
-          <label>Description:</label>
-          <textarea id="description" rows="4"></textarea>
-          <br><button type="submit">Upload</button>
-        </form>
+        <h3>📚 Upload Homework</h3>
+        <label>Class:</label>
+        <select id="hwClass">
+          <option>PKG</option><option>LKG</option><option>UKG</option>
+          ${Array.from({length:10},(_,i)=>`<option>Class ${i+1}</option>`).join("")}
+        </select>
+        <label>Subject:</label>
+        <input type="text" id="subject" />
+        <label>Description:</label>
+        <textarea id="desc"></textarea>
+        <button onclick="submitHomework('${today}')">Upload</button>
       `;
     }
 
-    async function submitHomework(e) {
-      e.preventDefault();
-      const selectedClass = document.getElementById("class").value;
-      const subject = document.getElementById("subject").value.trim();
-      const description = document.getElementById("description").value.trim();
-      const date = new Date().toISOString().split("T")[0];
-      const token = prompt("🔐 Enter your GitHub PAT:");
+    async function submitHomework(date) {
+      const cls = document.getElementById("hwClass").value;
+      const subject = document.getElementById("subject").value;
+      const desc = document.getElementById("desc").value;
+      const token = prompt("🔐 GitHub PAT:");
 
-      if (!selectedClass || !subject || !description) {
-        alert("⚠️ Fill all fields.");
-        return;
-      }
+      const res = await fetch(homeworkURL, {
+        headers: { Authorization: `token ${token}` }
+      });
 
-      const headers = {
-        Authorization: `token ${token}`,
-        Accept: "application/vnd.github.v3+json"
-      };
+      const file = await res.json();
+      const sha = file.sha;
+      const content = JSON.parse(atob(file.content));
 
-      try {
-        const res = await fetch(homeworkURL, { headers });
-        const file = await res.json();
-        const sha = file.sha;
-        const content = atob(file.content);
-        let data = JSON.parse(content);
+      if (!content[cls]) content[cls] = {};
+      if (!content[cls][branch]) content[cls][branch] = [];
 
-        if (!data[selectedClass]) data[selectedClass] = {};
-        if (!data[selectedClass][branch]) data[selectedClass][branch] = [];
+      content[cls][branch].push({ date, subject, description: desc });
 
-        data[selectedClass][branch].push({ date, subject, description });
+      const updated = btoa(JSON.stringify(content, null, 2));
 
-        const updatedContent = btoa(JSON.stringify(data, null, 2));
+      const commit = await fetch(homeworkURL, {
+        method: "PUT",
+        headers: {
+          Authorization: `token ${token}`,
+          Accept: "application/vnd.github.v3+json"
+        },
+        body: JSON.stringify({
+          message: `📚 Homework for ${cls} - ${branch} (${date})`,
+          content: updated,
+          sha
+        })
+      });
 
-        const commit = await fetch(homeworkURL, {
-          method: "PUT",
-          headers,
-          body: JSON.stringify({
-            message: `📝 Homework for ${selectedClass} (${branch})`,
-            content: updatedContent,
-            sha
-          })
-        });
-
-        if (commit.ok) {
-          alert("✅ Homework uploaded!");
-          document.getElementById("homeworkForm").reset();
-        } else {
-          alert("❌ Upload failed.");
-        }
-      } catch (err) {
-        alert("❌ Error: " + err.message);
-      }
-    }
-
-    async function viewCirculars() {
-      try {
-        const res = await fetch(circularsURL);
-        const data = await res.json();
-        const circulars = data?.[branch] || [];
-
-        if (circulars.length === 0) {
-          document.getElementById("dashboardContent").innerHTML = "<p>No circulars available.</p>";
-          return;
-        }
-
-        const list = circulars.map(c => `<li><strong>${c.date}</strong>: ${c.message}</li>`).join("");
-
-        document.getElementById("dashboardContent").innerHTML = `
-          <h3>📢 Circulars for ${branch}</h3>
-          <ul>${list}</ul>
-        `;
-      } catch {
-        document.getElementById("dashboardContent").innerHTML = "<p>Error loading circulars.</p>";
-      }
+      alert(commit.ok ? "✅ Homework uploaded!" : "❌ Upload failed.");
     }
   </script>
 </body>
