@@ -10,15 +10,18 @@
       background: #e6f2ff;
       padding: 20px;
     }
+
     h1 {
       color: #003366;
     }
+
     label {
       display: block;
       margin-top: 10px;
       font-weight: bold;
     }
-    input, select {
+
+    input, select, textarea {
       padding: 10px;
       width: 100%;
       max-width: 400px;
@@ -26,6 +29,7 @@
       border-radius: 6px;
       border: 1px solid #ccc;
     }
+
     button {
       margin-top: 20px;
       padding: 10px 20px;
@@ -35,11 +39,22 @@
       border-radius: 6px;
       cursor: pointer;
     }
+
     button:hover {
       background-color: #003366;
     }
+
     #qr {
       margin-top: 20px;
+    }
+
+    .section {
+      background: white;
+      padding: 20px;
+      margin-top: 30px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      max-width: 600px;
     }
   </style>
 </head>
@@ -47,59 +62,88 @@
 
 <h1>👤 Assign New User</h1>
 
-<label for="role">Select Role:</label>
-<select id="role" onchange="toggleFields()">
-  <option value="">-- Select Role --</option>
-  <option value="Student">Student</option>
-  <option value="Teacher">Teacher</option>
-  <option value="Coordinator">Coordinator</option>
-  <option value="Admin">Admin</option>
-  <option value="Principal">Principal</option>
-  <option value="Chairman">Chairman</option>
-</select>
-
-<div id="classContainer" style="display:none;">
-  <label for="class">Class:</label>
-  <select id="class">
-    <option value="">-- Select Class --</option>
-    <option>PKG</option><option>LKG</option><option>UKG</option>
-    <option>Class 1</option><option>Class 2</option><option>Class 3</option>
-    <option>Class 4</option><option>Class 5</option><option>Class 6</option>
-    <option>Class 7</option><option>Class 8</option><option>Class 9</option><option>Class 10</option>
+<div class="section">
+  <label for="role">Select Role:</label>
+  <select id="role" onchange="toggleFields()">
+    <option value="">-- Select Role --</option>
+    <option value="Student">Student</option>
+    <option value="Teacher">Teacher</option>
+    <option value="Coordinator">Coordinator</option>
+    <option value="Admin">Admin</option>
+    <option value="Principal">Principal</option>
+    <option value="Chairman">Chairman</option>
   </select>
+
+  <div id="classContainer" style="display:none;">
+    <label for="class">Class:</label>
+    <select id="class">
+      <option value="">-- Select Class --</option>
+      <option>PKG</option><option>LKG</option><option>UKG</option>
+      <option>Class 1</option><option>Class 2</option><option>Class 3</option>
+      <option>Class 4</option><option>Class 5</option><option>Class 6</option>
+      <option>Class 7</option><option>Class 8</option><option>Class 9</option><option>Class 10</option>
+    </select>
+  </div>
+
+  <div id="branchContainer" style="display:none;">
+    <label for="branch">Branch:</label>
+    <select id="branch">
+      <option value="">-- Select Branch --</option>
+      <option>Bandikodigenahalli</option>
+      <option>Atturu Layout</option>
+    </select>
+  </div>
+
+  <label>User ID (e.g. STU-001):</label>
+  <input type="text" id="userid">
+
+  <label>Full Name:</label>
+  <input type="text" id="name">
+
+  <label>Password:</label>
+  <input type="text" id="password">
+
+  <div id="studentFields" style="display:none;">
+    <label>Gender:</label>
+    <select id="gender">
+      <option value="">-- Select Gender --</option>
+      <option>Male</option>
+      <option>Female</option>
+      <option>Other</option>
+    </select>
+
+    <label>Date of Birth:</label>
+    <input type="date" id="dob">
+
+    <label>Father's Name:</label>
+    <input type="text" id="father">
+
+    <label>Mother's Name:</label>
+    <input type="text" id="mother">
+
+    <label>Address:</label>
+    <textarea id="address" rows="2"></textarea>
+
+    <label>Mobile Number:</label>
+    <input type="tel" id="mobile">
+
+    <label>Email ID:</label>
+    <input type="email" id="email">
+  </div>
+
+  <button onclick="assignUser()">✅ Assign User</button>
+
+  <div id="qr"></div>
 </div>
-
-<div id="branchContainer" style="display:none;">
-  <label for="branch">Branch:</label>
-  <select id="branch">
-    <option value="">-- Select Branch --</option>
-    <option>Bandikodigenahalli</option>
-    <option>Atturu Layout</option>
-  </select>
-</div>
-
-<label for="userid">User ID (e.g. STU-001):</label>
-<input type="text" id="userid" />
-
-<label for="name">Full Name:</label>
-<input type="text" id="name" />
-
-<label for="password">Password:</label>
-<input type="text" id="password" />
-
-<button onclick="assignUser()">✅ Assign User</button>
-
-<div id="qr"></div>
 
 <script>
-  // === PIN protection ===
+  // ✅ PIN protection for non-dashboard direct access
   const allowedRoles = ["Principal", "Admin", "Chairman"];
-  const role = localStorage.getItem("role");
-
-  if (!allowedRoles.includes(role)) {
+  const roleFromStorage = localStorage.getItem("role");
+  if (!allowedRoles.includes(roleFromStorage)) {
     const pin = prompt("🔒 Enter PIN to access:");
     if (pin !== "2011") {
-      alert("❌ Wrong PIN. Redirecting to login...");
+      alert("❌ Wrong PIN. Redirecting...");
       window.location.href = "userlogin.html";
     }
   }
@@ -108,6 +152,7 @@
     const role = document.getElementById("role").value;
     document.getElementById("classContainer").style.display = (role === "Student") ? "block" : "none";
     document.getElementById("branchContainer").style.display = ["Student", "Teacher", "Coordinator", "Admin"].includes(role) ? "block" : "none";
+    document.getElementById("studentFields").style.display = (role === "Student") ? "block" : "none";
   }
 
   async function assignUser() {
@@ -118,12 +163,14 @@
     const name = document.getElementById("name").value.trim();
     const password = document.getElementById("password").value.trim();
 
-    if (!role || !userid || !name || !password || (role === "Student" && !className) || (["Student", "Teacher", "Coordinator", "Admin"].includes(role) && !branch)) {
-      alert("⚠️ Please fill all required fields.");
+    if (!role || !userid || !name || !password ||
+        (role === "Student" && (!className || !branch)) ||
+        (["Teacher", "Coordinator", "Admin"].includes(role) && !branch)) {
+      alert("⚠️ Fill all required fields.");
       return;
     }
 
-    const token = prompt("🔐 Enter your OTT:");
+    const token = prompt("🔐 Enter your GitHub PAT:");
     const fileURL = "https://api.github.com/repos/Echoesofthe21stcentury/sjvm-schools/contents/users.json";
 
     try {
@@ -142,8 +189,18 @@
       if (!data[role]) data[role] = {};
 
       if (role === "Student") {
+        const studentInfo = {
+          name, password, class: className, branch,
+          gender: document.getElementById("gender").value,
+          dob: document.getElementById("dob").value,
+          father: document.getElementById("father").value,
+          mother: document.getElementById("mother").value,
+          address: document.getElementById("address").value,
+          mobile: document.getElementById("mobile").value,
+          email: document.getElementById("email").value
+        };
         if (!data[role][className]) data[role][className] = {};
-        data[role][className][userid] = { name, password, class: className, branch };
+        data[role][className][userid] = studentInfo;
       } else if (["Teacher", "Coordinator", "Admin"].includes(role)) {
         if (!data[role][branch]) data[role][branch] = {};
         data[role][branch][userid] = { name, password, branch };
@@ -152,7 +209,6 @@
       }
 
       const newContent = btoa(JSON.stringify(data, null, 2));
-
       const upload = await fetch(fileURL, {
         method: "PUT",
         headers: {
@@ -160,14 +216,14 @@
           Accept: "application/vnd.github.v3+json"
         },
         body: JSON.stringify({
-          message: `➕ User assigned: ${userid}`,
+          message: `➕ Added ${userid}`,
           content: newContent,
           sha
         })
       });
 
       if (upload.ok) {
-        alert("✅ User assigned and uploaded to GitHub!");
+        alert("✅ User assigned!");
 
         const loginURL = `https://sjvmschools.org/userlogin.html?role=${role}&userid=${userid}${role === "Student" ? `&class=${className}` : ""}`;
         const qr = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(loginURL)}&size=150x150`;
@@ -179,9 +235,8 @@
           <img src="${qr}" alt="QR Code">
         `;
       } else {
-        alert("❌ Upload failed.");
+        alert("❌ Failed to commit changes.");
       }
-
     } catch (err) {
       alert("❌ Error: " + err.message);
     }
