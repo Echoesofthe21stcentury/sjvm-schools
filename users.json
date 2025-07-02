@@ -25,7 +25,15 @@
       }
     }
   },
-  "Coordinator": {},
+  "Coordinator": {
+    "Bandikodigenahalli": {
+      "CBK-201101": {
+        "name": "Dheeraj P",
+        "password": "coord123",
+        "branch": "Bandikodigenahalli"
+      }
+    }
+  },
   "Admin": {},
   "Principal": {
     "PR-001": {
