@@ -5,57 +5,14 @@
   <title>Assign User – SJVM</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #e6f2ff;
-      padding: 20px;
-    }
-
-    h1 {
-      color: #003366;
-    }
-
-    label {
-      display: block;
-      margin-top: 10px;
-      font-weight: bold;
-    }
-
-    input, select, textarea {
-      padding: 10px;
-      width: 100%;
-      max-width: 400px;
-      margin-top: 5px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-    }
-
-    button {
-      margin-top: 20px;
-      padding: 10px 20px;
-      background: #0059b3;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #003366;
-    }
-
-    #qr {
-      margin-top: 20px;
-    }
-
-    .section {
-      background: white;
-      padding: 20px;
-      margin-top: 30px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      max-width: 600px;
-    }
+    body { font-family: Arial, sans-serif; background: #e6f2ff; padding: 20px; }
+    h1 { color: #003366; }
+    .section { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); max-width: 600px; }
+    label { display: block; margin-top: 10px; font-weight: bold; }
+    input, select, textarea { padding: 10px; width: 100%; max-width: 400px; margin-top: 5px; border-radius: 6px; border: 1px solid #ccc; }
+    button { margin-top: 20px; padding: 10px 20px; background: #0059b3; color: white; border: none; border-radius: 6px; cursor: pointer; }
+    button:hover { background-color: #003366; }
+    #qr { margin-top: 20px; }
   </style>
 </head>
 <body>
@@ -107,9 +64,7 @@
     <label>Gender:</label>
     <select id="gender">
       <option value="">-- Select Gender --</option>
-      <option>Male</option>
-      <option>Female</option>
-      <option>Other</option>
+      <option>Male</option><option>Female</option><option>Other</option>
     </select>
 
     <label>Date of Birth:</label>
@@ -132,16 +87,15 @@
   </div>
 
   <button onclick="assignUser()">✅ Assign User</button>
-
   <div id="qr"></div>
 </div>
 
 <script>
-  // ✅ PIN protection for non-dashboard direct access
+  // PIN protection for secure access
   const allowedRoles = ["Principal", "Admin", "Chairman"];
-  const roleFromStorage = localStorage.getItem("role");
-  if (!allowedRoles.includes(roleFromStorage)) {
-    const pin = prompt("🔒 Enter PIN to access:");
+  const currentRole = localStorage.getItem("role");
+  if (!allowedRoles.includes(currentRole)) {
+    const pin = prompt("🔒 Enter access PIN:");
     if (pin !== "2011") {
       alert("❌ Wrong PIN. Redirecting...");
       window.location.href = "userlogin.html";
@@ -157,40 +111,41 @@
 
   async function assignUser() {
     const role = document.getElementById("role").value;
-    const className = document.getElementById("class")?.value;
+    const cls = document.getElementById("class")?.value;
     const branch = document.getElementById("branch")?.value;
     const userid = document.getElementById("userid").value.trim();
     const name = document.getElementById("name").value.trim();
     const password = document.getElementById("password").value.trim();
 
     if (!role || !userid || !name || !password ||
-        (role === "Student" && (!className || !branch)) ||
+        (role === "Student" && (!cls || !branch)) ||
         (["Teacher", "Coordinator", "Admin"].includes(role) && !branch)) {
       alert("⚠️ Fill all required fields.");
       return;
     }
 
-    const token = prompt("🔐 Enter your GitHub PAT:");
-    const fileURL = "https://api.github.com/repos/Echoesofthe21stcentury/sjvm-schools/contents/users.json";
+    const token = prompt("🔐 Enter GitHub PAT:");
+    const url = "https://api.github.com/repos/Echoesofthe21stcentury/sjvm-schools/contents/users.json";
 
     try {
-      const res = await fetch(fileURL, {
+      const resp = await fetch(url, {
         headers: {
           Authorization: `token ${token}`,
           Accept: "application/vnd.github.v3+json"
         }
       });
-
-      const file = await res.json();
+      const file = await resp.json();
       const sha = file.sha;
       const content = atob(file.content);
-      let data = JSON.parse(content);
+      const data = JSON.parse(content);
 
+      // Initialize the role if missing
       if (!data[role]) data[role] = {};
 
       if (role === "Student") {
-        const studentInfo = {
-          name, password, class: className, branch,
+        if (!data[role][cls]) data[role][cls] = {};
+        data[role][cls][userid] = {
+          name, password, class: cls, branch,
           gender: document.getElementById("gender").value,
           dob: document.getElementById("dob").value,
           father: document.getElementById("father").value,
@@ -199,8 +154,6 @@
           mobile: document.getElementById("mobile").value,
           email: document.getElementById("email").value
         };
-        if (!data[role][className]) data[role][className] = {};
-        data[role][className][userid] = studentInfo;
       } else if (["Teacher", "Coordinator", "Admin"].includes(role)) {
         if (!data[role][branch]) data[role][branch] = {};
         data[role][branch][userid] = { name, password, branch };
@@ -209,7 +162,7 @@
       }
 
       const newContent = btoa(JSON.stringify(data, null, 2));
-      const upload = await fetch(fileURL, {
+      const upload = await fetch(url, {
         method: "PUT",
         headers: {
           Authorization: `token ${token}`,
@@ -224,10 +177,8 @@
 
       if (upload.ok) {
         alert("✅ User assigned!");
-
-        const loginURL = `https://sjvmschools.org/userlogin.html?role=${role}&userid=${userid}${role === "Student" ? `&class=${className}` : ""}`;
+        const loginURL = `https://sjvmschools.org/userlogin.html?role=${role}&userid=${userid}${role === "Student" ? `&class=${cls}` : ""}`;
         const qr = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(loginURL)}&size=150x150`;
-
         document.getElementById("qr").innerHTML = `
           <h3>📎 Login Link:</h3>
           <a href="${loginURL}" target="_blank">${loginURL}</a>
@@ -235,7 +186,7 @@
           <img src="${qr}" alt="QR Code">
         `;
       } else {
-        alert("❌ Failed to commit changes.");
+        alert("❌ Failed to commit.");
       }
     } catch (err) {
       alert("❌ Error: " + err.message);
