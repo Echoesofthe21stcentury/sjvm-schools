@@ -13,7 +13,14 @@
         "name": "Kushal M",
         "password": "student123",
         "class": "Class 5",
-        "branch": "Bandikodigenahalli"
+        "branch": "Bandikodigenahalli",
+        "gender": "Male",
+        "dob": "2014-05-05",
+        "father": "Muniraju N",
+        "mother": "Aruna Kumari",
+        "address": "Bagaluru Colony",
+        "mobile": "0000000000",
+        "email": "aruna@gmail.com"
       }
     }
   },
