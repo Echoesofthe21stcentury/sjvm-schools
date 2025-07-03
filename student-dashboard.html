@@ -35,7 +35,6 @@
     }
     .logout button:hover { background: #800000; }
 
-    /* 🎉 Animation Styles */
     @keyframes slideIn {
       0% { transform: translateX(-100%); opacity: 0; }
       100% { transform: translateX(0); opacity: 1; }
@@ -60,6 +59,21 @@
       animation: slideIn 1s forwards, slideOut 1s 3s forwards;
       display: none;
       z-index: 999;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table, th, td {
+      border: 1px solid #ccc;
+    }
+    th, td {
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background-color: #e0ebff;
     }
   </style>
 </head>
@@ -103,7 +117,6 @@
     document.getElementById("dashboardContent").innerHTML = "<p style='color:red'>❌ Access Denied. Please login as Student.</p>";
   }
 
-  // 🎉 Show welcome animation
   function showWelcome() {
     const w = document.getElementById("welcome");
     w.textContent = `🎉 Welcome, ${username}!`;
@@ -134,6 +147,83 @@
     } catch {
       document.getElementById("dashboardContent").innerHTML = "<p>Error loading profile.</p>";
     }
+  }
+
+  async function showHomework() {
+    try {
+      const res = await fetch(homeworkURL);
+      const data = await res.json();
+      const classHomework = data[studentClass];
+      if (classHomework && classHomework.length > 0) {
+        const hwList = classHomework.map(hw => `
+          <li><strong>📚 ${hw.subject}</strong>: ${hw.task} <br><em>Due: ${hw.dueDate}</em></li>
+        `).join("");
+        document.getElementById("dashboardContent").innerHTML = `
+          <h3>📘 Homework for ${studentClass}</h3>
+          <ul>${hwList}</ul>
+        `;
+      } else {
+        document.getElementById("dashboardContent").innerHTML = "<p>No homework found for your class.</p>";
+      }
+    } catch {
+      document.getElementById("dashboardContent").innerHTML = "<p>Error loading homework.</p>";
+    }
+  }
+
+  async function showAttendance() {
+    try {
+      const res = await fetch(attendanceURL);
+      const data = await res.json();
+      const studentAttendance = data[studentClass]?.[userid];
+      if (studentAttendance) {
+        const records = studentAttendance.map((rec, i) => `
+          <tr>
+            <td>${i + 1}</td>
+            <td>${rec.date}</td>
+            <td>${rec.status}</td>
+          </tr>
+        `).join("");
+        document.getElementById("dashboardContent").innerHTML = `
+          <h3>📝 Attendance</h3>
+          <table>
+            <tr><th>#</th><th>Date</th><th>Status</th></tr>
+            ${records}
+          </table>
+        `;
+      } else {
+        document.getElementById("dashboardContent").innerHTML = "<p>No attendance records found.</p>";
+      }
+    } catch {
+      document.getElementById("dashboardContent").innerHTML = "<p>Error loading attendance.</p>";
+    }
+  }
+
+  async function showCirculars() {
+    try {
+      const res = await fetch(circularsURL);
+      const data = await res.json();
+      if (data && data.length > 0) {
+        const list = data.map(circ => `
+          <li>
+            <strong>📌 ${circ.title}</strong><br>
+            <small>${circ.date}</small><br>
+            ${circ.content}
+          </li>
+        `).join("");
+        document.getElementById("dashboardContent").innerHTML = `
+          <h3>📢 School Circulars</h3>
+          <ul>${list}</ul>
+        `;
+      } else {
+        document.getElementById("dashboardContent").innerHTML = "<p>No circulars available.</p>";
+      }
+    } catch {
+      document.getElementById("dashboardContent").innerHTML = "<p>Error loading circulars.</p>";
+    }
+  }
+
+  function showPayments() {
+    document.getElementById("dashboardContent").innerHTML = "<p>💰 Payment section is coming soon!</p>";
   }
 
   function logout() {
