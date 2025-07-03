@@ -60,6 +60,9 @@
   <label>Password:</label>
   <input type="text" id="password">
 
+  <label>Upload Photo:</label>
+  <input type="file" id="photo" accept="image/*">
+
   <div id="studentFields" style="display:none;">
     <label>Gender:</label>
     <select id="gender">
@@ -91,7 +94,6 @@
 </div>
 
 <script>
-  // PIN protection for secure access
   const allowedRoles = ["Principal", "Admin", "Chairman"];
   const currentRole = localStorage.getItem("role");
   if (!allowedRoles.includes(currentRole)) {
@@ -109,6 +111,15 @@
     document.getElementById("studentFields").style.display = (role === "Student") ? "block" : "none";
   }
 
+  function toBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = error => reject(error);
+    });
+  }
+
   async function assignUser() {
     const role = document.getElementById("role").value;
     const cls = document.getElementById("class")?.value;
@@ -122,6 +133,14 @@
         (["Teacher", "Coordinator", "Admin"].includes(role) && !branch)) {
       alert("⚠️ Fill all required fields.");
       return;
+    }
+
+    // Handle photo upload
+    const photoInput = document.getElementById("photo");
+    let photoBase64 = "";
+    if (photoInput.files.length > 0) {
+      const file = photoInput.files[0];
+      photoBase64 = await toBase64(file);
     }
 
     const token = prompt("🔐 Enter GitHub PAT:");
@@ -139,7 +158,6 @@
       const content = atob(file.content);
       const data = JSON.parse(content);
 
-      // Initialize the role if missing
       if (!data[role]) data[role] = {};
 
       if (role === "Student") {
@@ -152,13 +170,14 @@
           mother: document.getElementById("mother").value,
           address: document.getElementById("address").value,
           mobile: document.getElementById("mobile").value,
-          email: document.getElementById("email").value
+          email: document.getElementById("email").value,
+          photo: photoBase64
         };
       } else if (["Teacher", "Coordinator", "Admin"].includes(role)) {
         if (!data[role][branch]) data[role][branch] = {};
-        data[role][branch][userid] = { name, password, branch };
+        data[role][branch][userid] = { name, password, branch, photo: photoBase64 };
       } else {
-        data[role][userid] = { name, password };
+        data[role][userid] = { name, password, photo: photoBase64 };
       }
 
       const newContent = btoa(JSON.stringify(data, null, 2));
