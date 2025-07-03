@@ -35,6 +35,22 @@
         "mobile": "0000000000",
         "email": "aruna@gmail.com"
       }
+    },
+    "Class 1": {
+      "SBK-101": {
+        "name": "Anvith",
+        "password": "Anvi@123",
+        "class": "Class 1",
+        "branch": "Bandikodigenahalli",
+        "gender": "Male",
+        "dob": "2009-06-18",
+        "father": "XYZ",
+        "mother": "123",
+        "address": "#18, Bagaluru Colony, Bagaluru, Near Govt.Hospital Bagaluru Colony\nBagaluru Post, Jala Hobli, Yelahanka Taluk, Bangalore North, Bangalore",
+        "mobile": "08880107003",
+        "email": "echoesofthe21stcentury@gmail.com",
+        "photo": ""
+      }
     }
   },
   "Teacher": {
