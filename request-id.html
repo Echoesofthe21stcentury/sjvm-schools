@@ -17,6 +17,7 @@
 
     h2 {
       color: #003366;
+      text-align: center;
     }
 
     form {
@@ -40,6 +41,7 @@
       margin-top: 5px;
       border-radius: 6px;
       border: 1px solid #ccc;
+      box-sizing: border-box;
     }
 
     button {
@@ -62,6 +64,7 @@
       font-size: 14px;
       color: #666;
       margin-top: 10px;
+      text-align: center;
     }
   </style>
 </head>
@@ -75,6 +78,7 @@
     <input type="hidden" name="_captcha" value="false" />
     <input type="hidden" name="_subject" value="New ID/Password Request - SJVM" />
     <input type="hidden" name="_template" value="table" />
+    <input type="text" name="_honey" style="display:none" />
 
     <label for="name">Full Name</label>
     <input type="text" name="Full Name" id="name" required />
@@ -118,7 +122,7 @@
     <input type="email" name="Email" id="email" required />
 
     <label for="phone">Mobile Number</label>
-    <input type="text" name="Phone" id="phone" required />
+    <input type="tel" name="Phone" id="phone" pattern="[0-9]{10}" maxlength="10" required />
 
     <label for="message">Why do you need access? (Optional)</label>
     <textarea name="Message" id="message" rows="4"></textarea>
@@ -126,14 +130,15 @@
     <button type="submit">Submit Request</button>
 
     <div class="note">
-      📩 Your request will be sent to SJVM Administration. You'll receive your ID & Password via email once approved.
+      📩 Your request will be sent to SJVM Administration. You will receive your ID & Password via email once approved.
     </div>
   </form>
 
   <script>
     function toggleStudentFields() {
       const role = document.getElementById("role").value;
-      document.getElementById("studentFields").style.display = role === "Student" ? "block" : "none";
+      const studentFields = document.getElementById("studentFields");
+      studentFields.style.display = (role === "Student") ? "block" : "none";
     }
   </script>
 
