@@ -72,8 +72,7 @@
 
   <h2>📝 Request User ID & Password</h2>
 
-  <form action="https://formsubmit.co/infosjvm@gmail.com" method="POST">
-    <!-- Redirect after successful submit -->
+  <form action="https://formsubmit.co/infosjvm@gmail.com" method="POST" enctype="multipart/form-data">
     <input type="hidden" name="_next" value="https://sjvmschools.org/thankyou.html" />
     <input type="hidden" name="_captcha" value="false" />
     <input type="hidden" name="_subject" value="New ID/Password Request - SJVM" />
@@ -126,6 +125,10 @@
 
     <label for="message">Why do you need access? (Optional)</label>
     <textarea name="Message" id="message" rows="4"></textarea>
+
+    <!-- ✅ New Photo Upload Field -->
+    <label for="photo">Upload Student Photo</label>
+    <input type="file" name="Student Photo" id="photo" accept="image/*" required />
 
     <button type="submit">Submit Request</button>
 
