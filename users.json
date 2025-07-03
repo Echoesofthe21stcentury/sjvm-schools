@@ -61,7 +61,15 @@
       }
     }
   },
-  "Admin": {},
+  "Admin": {
+    "Atturu Layout": {
+      "AD-002": {
+        "name": "Suma M R",
+        "password": "Suma@20",
+        "branch": "Atturu Layout"
+      }
+    }
+  },
   "Principal": {
     "PR-001": {
       "name": "Dr. Sandarshini B.K",
