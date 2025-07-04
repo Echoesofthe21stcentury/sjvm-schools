@@ -6,22 +6,65 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script src="auth-check.js"></script>
   <style>
-    body { font-family: Arial, sans-serif; background: #f4f8fc; margin: 0; padding: 0; }
-    header { background-color: #003366; color: white; padding: 20px; text-align: center; position: relative; }
-    nav { background-color: #0059b3; display: flex; justify-content: center; flex-wrap: wrap; }
-    nav a { color: white; padding: 14px 20px; text-decoration: none; font-weight: bold; }
-    nav a:hover { background-color: #003366; }
-    .container { padding: 30px; max-width: 900px; margin: auto; background: white; box-shadow: 0 0 10px rgba(0,0,0,0.1); margin-top: 30px; border-radius: 10px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-    th { background-color: #003366; color: white; }
-    select.present { background-color: #d4edda; }
-    select.absent { background-color: #f8d7da; }
-    input, textarea, select, button { width: 100%; padding: 10px; margin-top: 10px; border-radius: 6px; border: 1px solid #ccc; }
-    .logout { text-align: center; margin-top: 30px; }
-    .logout button { background-color: #b30000; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
-    .logout button:hover { background-color: #800000; }
-    #confetti { position: fixed; width: 100%; height: 100%; pointer-events: none; top: 0; left: 0; z-index: 9999; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f8fc;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #003366;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      position: relative;
+    }
+    nav {
+      background-color: #0059b3;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    nav a {
+      color: white;
+      padding: 14px 20px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    nav a:hover {
+      background-color: #003366;
+    }
+    .container {
+      padding: 30px;
+      max-width: 900px;
+      margin: auto;
+      background: white;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      margin-top: 30px;
+      border-radius: 10px;
+    }
+    input, select, textarea, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    .logout {
+      text-align: center;
+      margin-top: 30px;
+    }
+    .logout button {
+      background-color: #b30000;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .logout button:hover {
+      background-color: #800000;
+    }
   </style>
 </head>
 <body>
@@ -40,7 +83,6 @@
   <a href="#" onclick="uploadResult()">➕ Add Result</a>
 </nav>
 
-<div id="confetti"></div>
 <div class="container" id="dashboardContent">
   <p>Welcome, Teacher! Select an option from the menu.</p>
 </div>
@@ -51,8 +93,7 @@
 
 <script>
   const usersURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/users.json";
-  const homeworkURL = "https://api.github.com/repos/Echoesofthe21stcentury/sjvm-schools/contents/homework.json";
-  const attendanceURL = "https://api.github.com/repos/Echoesofthe21stcentury/sjvm-schools/contents/attendance.json";
+  const resultUploadURL = "https://api.github.com/repos/Echoesofthe21stcentury/sjvm-schools/contents/results/";
   const branch = localStorage.getItem("branch");
   const username = localStorage.getItem("username");
 
@@ -63,190 +104,27 @@
     window.location.href = "userlogin.html";
   }
 
-  if (!localStorage.getItem("confettiShown")) {
-    const confetti = document.createElement("div");
-    confetti.innerHTML = "🎉 Welcome " + username;
-    confetti.style.cssText = "position:fixed;top:30%;left:50%;transform:translateX(-50%);font-size:2rem;background:#fff;padding:20px;border-radius:10px;box-shadow:0 0 10px rgba(0,0,0,0.2);z-index:9999;";
-    document.body.appendChild(confetti);
-    setTimeout(() => { confetti.remove(); }, 3000);
-    localStorage.setItem("confettiShown", true);
-  }
-
   function logout() {
     localStorage.clear();
     window.location.href = "userlogin.html";
   }
 
-  // ========== Attendance =============
-
-  async function loadAttendanceForm() {
-    const res = await fetch(usersURL);
-    const data = await res.json();
-    const studentData = data["Student"];
-    let classOptions = Object.keys(studentData).map(cls => `<option value="${cls}">${cls}</option>`).join("");
-
-    document.getElementById("dashboardContent").innerHTML = `
-      <h2>📅 Mark Attendance</h2>
-      <label>Select Date:</label><input type="date" id="attDate" value="${new Date().toISOString().split('T')[0]}"><br>
-      <label>Select Class:</label>
-      <select id="attClass">${classOptions}</select>
-      <button onclick="generateAttendance()">Load Students</button>
-      <form id="attForm"></form>
-    `;
-  }
-
-  async function generateAttendance() {
-    const cls = document.getElementById("attClass").value;
-    const res = await fetch(usersURL);
-    const data = await res.json();
-    const students = data["Student"]?.[cls];
-    let html = `<h3>Class: ${cls} | Branch: ${branch}</h3><table><tr><th>Student ID</th><th>Name</th><th>Status</th></tr>`;
-
-    for (let id in students) {
-      if (students[id].branch === branch) {
-        html += `
-          <tr>
-            <td>${id}</td>
-            <td>${students[id].name}</td>
-            <td>
-              <select name="${id}" onchange="this.className = this.value === 'Present' ? 'present' : 'absent'">
-                <option value="Present" class="present">Present</option>
-                <option value="Absent" class="absent">Absent</option>
-              </select>
-            </td>
-          </tr>`;
-      }
-    }
-
-    html += `</table><br><button onclick="submitAttendance(event)">Submit Attendance</button>`;
-    document.getElementById("attForm").innerHTML = html;
-  }
-
-  async function submitAttendance(e) {
-    e.preventDefault();
-    const form = document.getElementById("attForm");
-    const selects = form.querySelectorAll("select");
-    const attendance = {};
-    selects.forEach(sel => {
-      attendance[sel.name] = sel.value;
-    });
-
-    const date = document.getElementById("attDate").value;
-    const cls = document.getElementById("attClass").value;
-    const token = prompt("🔐 Enter GitHub PAT to save attendance:");
-
-    try {
-      const res = await fetch(attendanceURL, {
-        headers: { Authorization: `token ${token}`, Accept: "application/vnd.github.v3+json" }
-      });
-      const file = await res.json();
-      const sha = file.sha;
-      const content = atob(file.content);
-      let data = JSON.parse(content);
-
-      if (!data[date]) data[date] = {};
-      if (!data[date][cls]) data[date][cls] = {};
-      if (!data[date][cls][branch]) data[date][cls][branch] = {};
-
-      if (Object.keys(data[date][cls][branch]).length) {
-        alert("⚠️ Attendance already marked for this class & branch.");
-        return;
-      }
-
-      data[date][cls][branch] = attendance;
-      const newContent = btoa(JSON.stringify(data, null, 2));
-
-      const upload = await fetch(attendanceURL, {
-        method: "PUT",
-        headers: { Authorization: `token ${token}`, Accept: "application/vnd.github.v3+json" },
-        body: JSON.stringify({
-          message: `📝 Attendance for ${cls} (${branch}) on ${date}`,
-          content: newContent,
-          sha
-        })
-      });
-
-      if (upload.ok) {
-        alert("✅ Attendance saved successfully!");
-        form.innerHTML = "";
-      } else {
-        alert("❌ GitHub upload failed.");
-      }
-    } catch (err) {
-      alert("❌ Error: " + err.message);
-    }
-  }
-
-  // ========== Homework =============
-
-  async function uploadHomework() {
-    const today = new Date().toISOString().split("T")[0];
-    document.getElementById("dashboardContent").innerHTML = `
-      <h2>📚 Upload Homework</h2>
-      <label>Select Class:</label>
-      <select id="homeClass">
-        ${["PKG","LKG","UKG", ...Array.from({length:10},(_,i)=>`Class ${i+1}`)].map(c => `<option>${c}</option>`).join("")}
-      </select>
-      <label>Subject:</label>
-      <input type="text" id="subject">
-      <label>Homework Description:</label>
-      <textarea id="desc"></textarea>
-      <button onclick="submitHomework()">Upload</button>
-    `;
-  }
-
-  async function submitHomework() {
-    const cls = document.getElementById("homeClass").value;
-    const subject = document.getElementById("subject").value.trim();
-    const desc = document.getElementById("desc").value.trim();
-    const token = prompt("🔐 Enter GitHub PAT to save homework:");
-    const date = new Date().toISOString().split("T")[0];
-
-    try {
-      const res = await fetch(homeworkURL, {
-        headers: { Authorization: `token ${token}`, Accept: "application/vnd.github.v3+json" }
-      });
-      const file = await res.json();
-      const sha = file.sha;
-      const content = atob(file.content);
-      let data = JSON.parse(content);
-
-      if (!data[cls]) data[cls] = {};
-      if (!data[cls][branch]) data[cls][branch] = [];
-
-      data[cls][branch].push({ date, subject, description: desc });
-      const newContent = btoa(JSON.stringify(data, null, 2));
-
-      const upload = await fetch(homeworkURL, {
-        method: "PUT",
-        headers: { Authorization: `token ${token}`, Accept: "application/vnd.github.v3+json" },
-        body: JSON.stringify({
-          message: `📚 Homework for ${cls} (${branch}) on ${date}`,
-          content: newContent,
-          sha
-        })
-      });
-
-      if (upload.ok) {
-        alert("✅ Homework uploaded!");
-        uploadHomework();
-      } else {
-        alert("❌ Upload failed.");
-      }
-    } catch (err) {
-      alert("❌ Error: " + err.message);
-    }
-  }
-
-  // ========== Result =============
-
   async function uploadResult() {
+    const res = await fetch(usersURL);
+    const data = await res.json();
+    const studentsByClass = data["Student"] || {};
+
+    let classOptions = Object.keys(studentsByClass).filter(cls => /^\d+$/.test(cls));
+    let classSelect = `<select id="resultClass" onchange="loadStudentDropdown(this.value)">
+      <option value="">-- Select Class --</option>
+      ${classOptions.map(cls => `<option value="${cls}">Class ${cls}</option>`).join("")}
+    </select>`;
+
     document.getElementById("dashboardContent").innerHTML = `
       <h2>➕ Add Result</h2>
       <label>Select Class:</label>
-      <select id="resultClass">
-        ${Array.from({ length: 10 }, (_, i) => `<option value="${i+1}">Class ${i+1}</option>`).join("")}
-      </select>
+      ${classSelect}<br>
+
       <label>Exam Type:</label>
       <select id="examType">
         <option value="FA1">Formative Assessment-1</option>
@@ -255,67 +133,105 @@
         <option value="FA3">Formative Assessment-3</option>
         <option value="FA4">Formative Assessment-4</option>
         <option value="SA2">Summative Assessment-2</option>
-      </select>
-      <label>Student ID:</label>
-      <input type="text" id="studentId">
+      </select><br>
+
+      <label>Select Student:</label>
+      <select id="studentIdSelect"><option value="">-- Select Class First --</option></select><br>
+
       <h4>Enter Marks:</h4>
-      ${["Kannada", "English", "Hindi", "Mathematics", "EVS", "Science", "Social Science"].map(sub => `${sub}: <input type="number" id="${sub}"><br>`).join("")}
+      ${["Kannada", "English", "Hindi", "Mathematics", "EVS", "Science", "Social Science"]
+        .map(sub => `${sub}: <input type="number" id="${sub}" required><br>`)
+        .join("")}
+
       <br>
       <button onclick="submitResult()">Upload Result</button>
       <p id="resultStatus"></p>
     `;
+
+    // Attach student data to global
+    window.studentsByClass = studentsByClass;
+  }
+
+  function loadStudentDropdown(selectedClass) {
+    const dropdown = document.getElementById("studentIdSelect");
+    dropdown.innerHTML = "";
+
+    if (!window.studentsByClass || !window.studentsByClass[selectedClass]) {
+      dropdown.innerHTML = "<option>No students found</option>";
+      return;
+    }
+
+    const students = window.studentsByClass[selectedClass];
+    for (let id in students) {
+      if (students[id].branch === branch) {
+        dropdown.innerHTML += `<option value="${id}">${students[id].name} (${id})</option>`;
+      }
+    }
   }
 
   async function submitResult() {
-    const studentId = document.getElementById("studentId").value.trim();
+    const studentId = document.getElementById("studentIdSelect").value;
     const className = document.getElementById("resultClass").value;
     const examType = document.getElementById("examType").value;
     const token = prompt("🔐 Enter GitHub PAT to upload result:");
 
+    if (!studentId || !className || !examType) {
+      alert("❗ All fields are required.");
+      return;
+    }
+
     const subjects = ["Kannada", "English", "Hindi", "Mathematics", "EVS", "Science", "Social Science"];
     const marks = {};
     for (let sub of subjects) {
-      marks[sub] = parseInt(document.getElementById(sub).value);
-    }
-
-    try {
-      const res = await fetch(usersURL);
-      const data = await res.json();
-      const studentData = data["Student"][className]?.[studentId];
-      if (!studentData || studentData.branch !== branch) {
-        alert("❌ Invalid student or not from this branch");
+      const val = parseInt(document.getElementById(sub).value);
+      if (isNaN(val)) {
+        alert(`❌ Please enter valid marks for ${sub}`);
         return;
       }
+      marks[sub] = val;
+    }
 
-      const jsonData = {
-        student_id: studentId,
-        student_name: studentData.name,
-        class: className,
-        exam_type: examType,
-        marks
-      };
+    const jsonData = {
+      student_id: studentId,
+      class: className,
+      exam_type: examType,
+      marks
+    };
 
-      const content = btoa(JSON.stringify(jsonData, null, 2));
-      const fileName = `results/${examType}_${studentId}.json`;
-      const resultURL = `https://api.github.com/repos/Echoesofthe21stcentury/sjvm-schools/contents/${fileName}`;
+    const content = btoa(JSON.stringify(jsonData, null, 2));
+    const fileName = `${examType}_${studentId}.json`;
+    const url = resultUploadURL + fileName;
 
-      const upload = await fetch(resultURL, {
+    try {
+      const checkRes = await fetch(url, {
+        method: "GET",
+        headers: { Authorization: `token ${token}` }
+      });
+
+      let sha = null;
+      if (checkRes.ok) {
+        const existing = await checkRes.json();
+        sha = existing.sha;
+      }
+
+      const upload = await fetch(url, {
         method: "PUT",
         headers: { Authorization: `token ${token}` },
         body: JSON.stringify({
-          message: `➕ Add result for ${studentId} (${examType})`,
-          content
+          message: `➕ Add/Update result for ${studentId} (${examType})`,
+          content,
+          ...(sha && { sha })
         })
       });
 
       if (upload.ok) {
-        document.getElementById("resultStatus").innerText = "✅ Result uploaded!";
+        document.getElementById("resultStatus").innerText = "✅ Result uploaded successfully!";
       } else {
         const err = await upload.json();
         document.getElementById("resultStatus").innerText = "❌ Error: " + err.message;
       }
     } catch (err) {
-      document.getElementById("resultStatus").innerText = "❌ Failed: " + err.message;
+      document.getElementById("resultStatus").innerText = "❌ Upload failed: " + err.message;
     }
   }
 </script>
