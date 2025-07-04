@@ -6,94 +6,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script src="auth-check.js"></script>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f8fc;
-      margin: 0;
-      padding: 0;
-    }
-    header {
-      background-color: #003366;
-      color: white;
-      padding: 20px;
-      text-align: center;
-      position: relative;
-    }
-    nav {
-      background-color: #0059b3;
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-    nav a {
-      color: white;
-      padding: 14px 20px;
-      text-decoration: none;
-      font-weight: bold;
-    }
-    nav a:hover {
-      background-color: #003366;
-    }
-    .container {
-      padding: 30px;
-      max-width: 900px;
-      margin: auto;
-      background: white;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      margin-top: 30px;
-      border-radius: 10px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 8px;
-      text-align: left;
-    }
-    th {
-      background-color: #003366;
-      color: white;
-    }
-    select.present {
-      background-color: #d4edda;
-    }
-    select.absent {
-      background-color: #f8d7da;
-    }
-    input, textarea, select, button {
-      width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-    }
-    .logout {
-      text-align: center;
-      margin-top: 30px;
-    }
-    .logout button {
-      background-color: #b30000;
-      color: white;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    .logout button:hover {
-      background-color: #800000;
-    }
-    #confetti {
-      position: fixed;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      top: 0;
-      left: 0;
-      z-index: 9999;
-    }
+    body { font-family: Arial, sans-serif; background: #f4f8fc; margin: 0; padding: 0; }
+    header { background-color: #003366; color: white; padding: 20px; text-align: center; position: relative; }
+    nav { background-color: #0059b3; display: flex; justify-content: center; flex-wrap: wrap; }
+    nav a { color: white; padding: 14px 20px; text-decoration: none; font-weight: bold; }
+    nav a:hover { background-color: #003366; }
+    .container { padding: 30px; max-width: 900px; margin: auto; background: white; box-shadow: 0 0 10px rgba(0,0,0,0.1); margin-top: 30px; border-radius: 10px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background-color: #003366; color: white; }
+    select.present { background-color: #d4edda; }
+    select.absent { background-color: #f8d7da; }
+    input, textarea, select, button { width: 100%; padding: 10px; margin-top: 10px; border-radius: 6px; border: 1px solid #ccc; }
+    .logout { text-align: center; margin-top: 30px; }
+    .logout button { background-color: #b30000; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
+    .logout button:hover { background-color: #800000; }
+    #confetti { position: fixed; width: 100%; height: 100%; pointer-events: none; top: 0; left: 0; z-index: 9999; }
   </style>
 </head>
 <body>
@@ -109,6 +37,7 @@
 <nav>
   <a href="#" onclick="loadAttendanceForm()">📅 Mark Attendance</a>
   <a href="#" onclick="uploadHomework()">📚 Upload Homework</a>
+  <a href="#" onclick="uploadResult()">➕ Add Result</a>
 </nav>
 
 <div id="confetti"></div>
@@ -134,15 +63,12 @@
     window.location.href = "userlogin.html";
   }
 
-  // One-time confetti
   if (!localStorage.getItem("confettiShown")) {
     const confetti = document.createElement("div");
     confetti.innerHTML = "🎉 Welcome " + username;
     confetti.style.cssText = "position:fixed;top:30%;left:50%;transform:translateX(-50%);font-size:2rem;background:#fff;padding:20px;border-radius:10px;box-shadow:0 0 10px rgba(0,0,0,0.2);z-index:9999;";
     document.body.appendChild(confetti);
-    setTimeout(() => {
-      confetti.remove();
-    }, 3000);
+    setTimeout(() => { confetti.remove(); }, 3000);
     localStorage.setItem("confettiShown", true);
   }
 
@@ -150,6 +76,8 @@
     localStorage.clear();
     window.location.href = "userlogin.html";
   }
+
+  // ========== Attendance =============
 
   async function loadAttendanceForm() {
     const res = await fetch(usersURL);
@@ -249,16 +177,15 @@
     }
   }
 
+  // ========== Homework =============
+
   async function uploadHomework() {
     const today = new Date().toISOString().split("T")[0];
     document.getElementById("dashboardContent").innerHTML = `
       <h2>📚 Upload Homework</h2>
       <label>Select Class:</label>
       <select id="homeClass">
-        <option>PKG</option><option>LKG</option><option>UKG</option>
-        <option>Class 1</option><option>Class 2</option><option>Class 3</option>
-        <option>Class 4</option><option>Class 5</option><option>Class 6</option>
-        <option>Class 7</option><option>Class 8</option><option>Class 9</option><option>Class 10</option>
+        ${["PKG","LKG","UKG", ...Array.from({length:10},(_,i)=>`Class ${i+1}`)].map(c => `<option>${c}</option>`).join("")}
       </select>
       <label>Subject:</label>
       <input type="text" id="subject">
@@ -288,7 +215,6 @@
       if (!data[cls][branch]) data[cls][branch] = [];
 
       data[cls][branch].push({ date, subject, description: desc });
-
       const newContent = btoa(JSON.stringify(data, null, 2));
 
       const upload = await fetch(homeworkURL, {
@@ -311,6 +237,88 @@
       alert("❌ Error: " + err.message);
     }
   }
+
+  // ========== Result =============
+
+  async function uploadResult() {
+    document.getElementById("dashboardContent").innerHTML = `
+      <h2>➕ Add Result</h2>
+      <label>Select Class:</label>
+      <select id="resultClass">
+        ${Array.from({ length: 10 }, (_, i) => `<option value="${i+1}">Class ${i+1}</option>`).join("")}
+      </select>
+      <label>Exam Type:</label>
+      <select id="examType">
+        <option value="FA1">Formative Assessment-1</option>
+        <option value="FA2">Formative Assessment-2</option>
+        <option value="SA1">Summative Assessment-1</option>
+        <option value="FA3">Formative Assessment-3</option>
+        <option value="FA4">Formative Assessment-4</option>
+        <option value="SA2">Summative Assessment-2</option>
+      </select>
+      <label>Student ID:</label>
+      <input type="text" id="studentId">
+      <h4>Enter Marks:</h4>
+      ${["Kannada", "English", "Hindi", "Mathematics", "EVS", "Science", "Social Science"].map(sub => `${sub}: <input type="number" id="${sub}"><br>`).join("")}
+      <br>
+      <button onclick="submitResult()">Upload Result</button>
+      <p id="resultStatus"></p>
+    `;
+  }
+
+  async function submitResult() {
+    const studentId = document.getElementById("studentId").value.trim();
+    const className = document.getElementById("resultClass").value;
+    const examType = document.getElementById("examType").value;
+    const token = prompt("🔐 Enter GitHub PAT to upload result:");
+
+    const subjects = ["Kannada", "English", "Hindi", "Mathematics", "EVS", "Science", "Social Science"];
+    const marks = {};
+    for (let sub of subjects) {
+      marks[sub] = parseInt(document.getElementById(sub).value);
+    }
+
+    try {
+      const res = await fetch(usersURL);
+      const data = await res.json();
+      const studentData = data["Student"][className]?.[studentId];
+      if (!studentData || studentData.branch !== branch) {
+        alert("❌ Invalid student or not from this branch");
+        return;
+      }
+
+      const jsonData = {
+        student_id: studentId,
+        student_name: studentData.name,
+        class: className,
+        exam_type: examType,
+        marks
+      };
+
+      const content = btoa(JSON.stringify(jsonData, null, 2));
+      const fileName = `results/${examType}_${studentId}.json`;
+      const resultURL = `https://api.github.com/repos/Echoesofthe21stcentury/sjvm-schools/contents/${fileName}`;
+
+      const upload = await fetch(resultURL, {
+        method: "PUT",
+        headers: { Authorization: `token ${token}` },
+        body: JSON.stringify({
+          message: `➕ Add result for ${studentId} (${examType})`,
+          content
+        })
+      });
+
+      if (upload.ok) {
+        document.getElementById("resultStatus").innerText = "✅ Result uploaded!";
+      } else {
+        const err = await upload.json();
+        document.getElementById("resultStatus").innerText = "❌ Error: " + err.message;
+      }
+    } catch (err) {
+      document.getElementById("resultStatus").innerText = "❌ Failed: " + err.message;
+    }
+  }
 </script>
+
 </body>
 </html>
