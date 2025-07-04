@@ -7,74 +7,22 @@
   <script src="auth-check.js"></script>
   <style>
     body { font-family: Arial, sans-serif; background: #f4f8fc; margin: 0; }
-
-    header {
-      background-color: #003366; color: white;
-      padding: 20px; text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-
+    header { background-color: #003366; color: white; padding: 20px; text-align: center; position: relative; overflow: hidden; }
     nav { background: #0059b3; display: flex; justify-content: center; flex-wrap: wrap; }
-    nav a {
-      color: white; padding: 14px 20px; text-decoration: none; font-weight: bold;
-    }
+    nav a { color: white; padding: 14px 20px; text-decoration: none; font-weight: bold; }
     nav a:hover { background: #003366; }
-
-    .container {
-      max-width: 900px; margin: 30px auto; background: white;
-      padding: 30px; border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    .info h3 { color: #003366; }
-
+    .container { max-width: 900px; margin: 30px auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
     .logout { text-align: center; margin: 30px; }
-    .logout button {
-      padding: 10px 20px; background: #b30000; color: white;
-      border: none; border-radius: 6px; cursor: pointer;
-    }
+    .logout button { padding: 10px 20px; background: #b30000; color: white; border: none; border-radius: 6px; cursor: pointer; }
     .logout button:hover { background: #800000; }
-
-    @keyframes slideIn {
-      0% { transform: translateX(-100%); opacity: 0; }
-      100% { transform: translateX(0); opacity: 1; }
-    }
-    @keyframes slideOut {
-      0% { transform: translateX(0); opacity: 1; }
-      100% { transform: translateX(100%); opacity: 0; }
-    }
-
-    #welcome {
-      position: absolute;
-      top: -80px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #fff;
-      color: #003366;
-      font-size: 1.2em;
-      font-weight: bold;
-      padding: 15px 30px;
-      border-radius: 8px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-      animation: slideIn 1s forwards, slideOut 1s 3s forwards;
-      display: none;
-      z-index: 999;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-    table, th, td {
-      border: 1px solid #ccc;
-    }
-    th, td {
-      padding: 8px;
-      text-align: center;
-    }
-    th {
-      background-color: #e0ebff;
-    }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { padding: 10px; border: 1px solid #ccc; text-align: center; }
+    th { background-color: #e0ebff; }
+    #resultSection h4 { text-align: center; margin-bottom: 10px; }
+    select, button { padding: 10px; margin-top: 10px; border-radius: 6px; border: 1px solid #ccc; }
+    #welcome { position: absolute; top: -80px; left: 50%; transform: translateX(-50%); background: #fff; color: #003366; font-size: 1.2em; font-weight: bold; padding: 15px 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); animation: slideIn 1s forwards, slideOut 1s 3s forwards; display: none; z-index: 999; }
+    @keyframes slideIn { 0% { transform: translateX(-100%); opacity: 0; } 100% { transform: translateX(0); opacity: 1; } }
+    @keyframes slideOut { 0% { transform: translateX(0); opacity: 1; } 100% { transform: translateX(100%); opacity: 0; } }
   </style>
 </head>
 <body>
@@ -90,6 +38,7 @@
   <a href="#" onclick="showAttendance()">Attendance</a>
   <a href="#" onclick="showHomework()">Homework</a>
   <a href="#" onclick="showCirculars()">Circulars</a>
+  <a href="#" onclick="viewResults()">View Result</a>
 </nav>
 
 <div class="container" id="dashboardContent">
@@ -102,9 +51,8 @@
 
 <script>
   const usersURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/users.json";
-  const feesURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/fees.json";
-  const attendanceURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/attendance.json";
   const homeworkURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/homework.json";
+  const attendanceURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/attendance.json";
   const circularsURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/circulars.json";
 
   const role = localStorage.getItem("role");
@@ -115,6 +63,11 @@
 
   if (role !== "Student" || !userid || !studentClass || !branch) {
     document.getElementById("dashboardContent").innerHTML = "<p style='color:red'>❌ Access Denied. Please login as Student.</p>";
+  }
+
+  function logout() {
+    localStorage.clear();
+    window.location.href = "userlogin.html";
   }
 
   function showWelcome() {
@@ -149,6 +102,31 @@
     }
   }
 
+  function showPayments() {
+    document.getElementById("dashboardContent").innerHTML = "<p>💰 Payment section is coming soon!</p>";
+  }
+
+  async function showAttendance() {
+    try {
+      const res = await fetch(attendanceURL);
+      const data = await res.json();
+      const studentAttendance = data[studentClass]?.[userid];
+      if (studentAttendance) {
+        const records = studentAttendance.map((rec, i) => `
+          <tr><td>${i + 1}</td><td>${rec.date}</td><td>${rec.status}</td></tr>
+        `).join("");
+        document.getElementById("dashboardContent").innerHTML = `
+          <h3>📝 Attendance</h3>
+          <table><tr><th>#</th><th>Date</th><th>Status</th></tr>${records}</table>
+        `;
+      } else {
+        document.getElementById("dashboardContent").innerHTML = "<p>No attendance records found.</p>";
+      }
+    } catch {
+      document.getElementById("dashboardContent").innerHTML = "<p>Error loading attendance.</p>";
+    }
+  }
+
   async function showHomework() {
     try {
       const res = await fetch(homeworkURL);
@@ -159,8 +137,7 @@
           <li><strong>📚 ${hw.subject}</strong>: ${hw.task} <br><em>Due: ${hw.dueDate}</em></li>
         `).join("");
         document.getElementById("dashboardContent").innerHTML = `
-          <h3>📘 Homework for ${studentClass}</h3>
-          <ul>${hwList}</ul>
+          <h3>📘 Homework for ${studentClass}</h3><ul>${hwList}</ul>
         `;
       } else {
         document.getElementById("dashboardContent").innerHTML = "<p>No homework found for your class.</p>";
@@ -170,49 +147,16 @@
     }
   }
 
-  async function showAttendance() {
-    try {
-      const res = await fetch(attendanceURL);
-      const data = await res.json();
-      const studentAttendance = data[studentClass]?.[userid];
-      if (studentAttendance) {
-        const records = studentAttendance.map((rec, i) => `
-          <tr>
-            <td>${i + 1}</td>
-            <td>${rec.date}</td>
-            <td>${rec.status}</td>
-          </tr>
-        `).join("");
-        document.getElementById("dashboardContent").innerHTML = `
-          <h3>📝 Attendance</h3>
-          <table>
-            <tr><th>#</th><th>Date</th><th>Status</th></tr>
-            ${records}
-          </table>
-        `;
-      } else {
-        document.getElementById("dashboardContent").innerHTML = "<p>No attendance records found.</p>";
-      }
-    } catch {
-      document.getElementById("dashboardContent").innerHTML = "<p>Error loading attendance.</p>";
-    }
-  }
-
   async function showCirculars() {
     try {
       const res = await fetch(circularsURL);
       const data = await res.json();
       if (data && data.length > 0) {
         const list = data.map(circ => `
-          <li>
-            <strong>📌 ${circ.title}</strong><br>
-            <small>${circ.date}</small><br>
-            ${circ.content}
-          </li>
+          <li><strong>📌 ${circ.title}</strong><br><small>${circ.date}</small><br>${circ.content}</li>
         `).join("");
         document.getElementById("dashboardContent").innerHTML = `
-          <h3>📢 School Circulars</h3>
-          <ul>${list}</ul>
+          <h3>📢 School Circulars</h3><ul>${list}</ul>
         `;
       } else {
         document.getElementById("dashboardContent").innerHTML = "<p>No circulars available.</p>";
@@ -222,13 +166,74 @@
     }
   }
 
-  function showPayments() {
-    document.getElementById("dashboardContent").innerHTML = "<p>💰 Payment section is coming soon!</p>";
+  function viewResults() {
+    const examOptions = ["FA1", "FA2", "SA1", "FA3", "FA4", "SA2"];
+    const selectBox = `
+      <label>Select Exam Type:</label>
+      <select id="examSelect">
+        <option value="">-- Choose Exam --</option>
+        ${examOptions.map(e => `<option value="${e}">${e}</option>`).join("")}
+      </select><br><br>
+      <button onclick="fetchResult()">🔍 View My Result</button>
+      <div id="resultOutput" style="margin-top:20px;"></div>
+    `;
+    document.getElementById("dashboardContent").innerHTML = `
+      <h3>📊 View Examination Results</h3>${selectBox}
+    `;
   }
 
-  function logout() {
-    localStorage.clear();
-    window.location.href = "userlogin.html";
+  async function fetchResult() {
+    const exam = document.getElementById("examSelect").value;
+    const output = document.getElementById("resultOutput");
+    if (!exam) {
+      output.innerHTML = `<p style="color:red">❗ Please select an exam.</p>`;
+      return;
+    }
+    const url = `https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/results/${exam}_${userid}.json`;
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error("Result not found");
+      const data = await res.json();
+      const marks = data.marks || {};
+      let total = 0, maxMarks = 0;
+      const rows = Object.keys(marks).map(sub => {
+        const score = Number(marks[sub]);
+        total += score;
+        maxMarks += 100;
+        return `<tr><td>${sub}</td><td>${score}</td></tr>`;
+      }).join("");
+      const percentage = ((total / maxMarks) * 100).toFixed(2);
+      output.innerHTML = `
+        <div id="resultSection">
+          <h4>Result for ${exam}</h4>
+          <table>
+            <tr><th>Subject</th><th>Marks</th></tr>${rows}
+            <tr style="font-weight:bold"><td>Total</td><td>${total}/${maxMarks}</td></tr>
+            <tr style="font-weight:bold"><td>Percentage</td><td>${percentage}%</td></tr>
+          </table><br>
+          <button onclick="printResult()">🖨️ Print Result as PDF</button>
+        </div>
+      `;
+    } catch (err) {
+      output.innerHTML = `<p style="color:red">❌ Result for <b>${exam}</b> not yet published.</p>`;
+    }
+  }
+
+  function printResult() {
+    const content = document.getElementById("resultSection").innerHTML;
+    const win = window.open('', '', 'height=600,width=800');
+    win.document.write(`
+      <html><head><title>Print Result</title>
+      <style>
+        body { font-family: Arial; padding: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 10px; border: 1px solid #333; text-align: center; }
+        h4 { text-align: center; }
+      </style>
+      </head><body>${content}</body></html>
+    `);
+    win.document.close();
+    win.print();
   }
 
   window.onload = () => {
