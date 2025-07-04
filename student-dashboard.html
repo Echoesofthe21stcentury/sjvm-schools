@@ -133,20 +133,69 @@
       const marks = data.marks || {};
       const status = data.status || "Pass";
       const color = status === "Fail" ? "#ffdddd" : "#ddffdd";
-      let total = 0, max = 0;
-      const rows = Object.entries(marks).map(([sub, mark]) => {
-        total += mark; max += 100;
-        return `<tr><td>${sub}</td><td>${mark}</td></tr>`;
+
+      const subjects = Object.keys(marks);
+      let totalObtained = 0, totalMax = 0, totalInternal = 0, totalMaxInternal = 0, totalFinal = 0;
+
+      const rows = subjects.map(sub => {
+        const subData = marks[sub];
+        if (!subData) return "";
+        const mo = subData.obtained || 0;
+        const mm = subData.max || 100;
+        const internal = subData.internal || 0;
+        const maxInternal = subData.max_internal || 20;
+        const total = mo + internal;
+        const grade = subData.grade || "-";
+
+        totalObtained += mo;
+        totalMax += mm;
+        totalInternal += internal;
+        totalMaxInternal += maxInternal;
+        totalFinal += total;
+
+        return `<tr>
+          <td>${sub}</td>
+          <td>${mo}</td>
+          <td>${mm}</td>
+          <td>${internal}</td>
+          <td>${maxInternal}</td>
+          <td>${total}</td>
+          <td>${grade}</td>
+        </tr>`;
       }).join("");
-      const percent = ((total / max) * 100).toFixed(2);
+
+      const percentage = ((totalFinal / (totalMax + totalMaxInternal)) * 100).toFixed(2);
+      const finalGrade = data.final_grade || "-";
+
       output.innerHTML = `
         <div style="background:${color};padding:20px;border-radius:10px;">
-          <table><tr><th>Subject</th><th>Marks</th></tr>
-          ${rows}
-          <tr><td><strong>Total</strong></td><td>${total}/${max}</td></tr>
-          <tr><td><strong>Percentage</strong></td><td>${percent}%</td></tr>
-          <tr><td><strong>Status</strong></td><td>${status}</td></tr>
-          <tr><td><strong>Grade</strong></td><td>${data.final_grade || '-'}</td></tr>
+          <h4>📄 Result for ${exam}</h4>
+          <table>
+            <tr>
+              <th>Subject</th>
+              <th>Marks Obtained</th>
+              <th>Max Marks</th>
+              <th>Internal</th>
+              <th>Max Internal</th>
+              <th>Total</th>
+              <th>Grade</th>
+            </tr>
+            ${rows}
+            <tr style="font-weight:bold;background:#f0f0f0">
+              <td>Total</td>
+              <td>${totalObtained}</td>
+              <td>${totalMax}</td>
+              <td>${totalInternal}</td>
+              <td>${totalMaxInternal}</td>
+              <td>${totalFinal}</td>
+              <td>${finalGrade}</td>
+            </tr>
+            <tr style="font-weight:bold">
+              <td colspan="5">Percentage</td><td colspan="2">${percentage}%</td>
+            </tr>
+            <tr style="font-weight:bold">
+              <td colspan="5">Result</td><td colspan="2">${status}</td>
+            </tr>
           </table>
         </div>
       `;
