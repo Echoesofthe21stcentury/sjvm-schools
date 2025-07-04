@@ -15,7 +15,7 @@
         },
         "total": 567,
         "max": 700,
-        "percentage": 81.00,
+        "percentage": 81,
         "grade": "A",
         "result": "Pass"
       },
@@ -58,6 +58,21 @@
         "result": "Pass"
       }
     }
+  },
+  "SBK-501": {
+    "FA1": {
+      "Kannada": 6,
+      "English": 3,
+      "Hindi": 62,
+      "Mathematics": 14,
+      "EVS": 61,
+      "Science": 55,
+      "Social Science": 58,
+      "Total": 259,
+      "Max": 700,
+      "Percentage": 37,
+      "Grade": "A+",
+      "Status": "Pass"
+    }
   }
 }
-
