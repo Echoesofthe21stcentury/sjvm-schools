@@ -1,0 +1,19 @@
+{
+  "student_id": "SBK-501",
+  "class": "Class 5",
+  "exam_type": "FA1",
+  "marks": {
+    "Kannada": 6,
+    "English": 3,
+    "Hindi": 62,
+    "Mathematics": 14,
+    "EVS": 61,
+    "Science": 55,
+    "Social Science": 58,
+    "Total": 259,
+    "Max": 700,
+    "Percentage": 37,
+    "Grade": "A+",
+    "Status": "Pass"
+  }
+}
