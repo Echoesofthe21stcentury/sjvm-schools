@@ -78,15 +78,15 @@
   "SBK-502": {
     "FA1": {
       "Kannada": 6,
-      "English": 3,
-      "Hindi": 62,
-      "Mathematics": 14,
-      "EVS": 61,
-      "Science": 55,
-      "Social Science": 58,
-      "Total": 259,
+      "English": 4,
+      "Hindi": 20,
+      "Mathematics": 8,
+      "EVS": 25,
+      "Science": 24,
+      "Social Science": 7,
+      "Total": 94,
       "Max": 700,
-      "Percentage": 37,
+      "Percentage": 13.43,
       "Grade": "A+",
       "Status": "Fail"
     }
