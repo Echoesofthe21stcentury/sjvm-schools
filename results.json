@@ -1,1 +1,63 @@
+{
+  "Results": {
+    "SBK-401": {
+      "FA1": {
+        "class": "4",
+        "branch": "Bandikodigenahalli",
+        "marks": {
+          "Kannada": 78,
+          "English": 82,
+          "Hindi": 74,
+          "Mathematics": 85,
+          "EVS": 88,
+          "Science": 81,
+          "Social Science": 79
+        },
+        "total": 567,
+        "max": 700,
+        "percentage": 81.00,
+        "grade": "A",
+        "result": "Pass"
+      },
+      "SA1": {
+        "class": "4",
+        "branch": "Bandikodigenahalli",
+        "marks": {
+          "Kannada": 69,
+          "English": 75,
+          "Hindi": 70,
+          "Mathematics": 72,
+          "EVS": 76,
+          "Science": 70,
+          "Social Science": 73
+        },
+        "total": 505,
+        "max": 700,
+        "percentage": 72.14,
+        "grade": "B+",
+        "result": "Pass"
+      }
+    },
+    "SBK-402": {
+      "FA1": {
+        "class": "4",
+        "branch": "Bandikodigenahalli",
+        "marks": {
+          "Kannada": 62,
+          "English": 64,
+          "Hindi": 60,
+          "Mathematics": 58,
+          "EVS": 65,
+          "Science": 67,
+          "Social Science": 70
+        },
+        "total": 446,
+        "max": 700,
+        "percentage": 63.71,
+        "grade": "B",
+        "result": "Pass"
+      }
+    }
+  }
+}
 
