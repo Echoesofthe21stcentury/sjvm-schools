@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <title>Student Dashboard | SJVM</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script src="auth-check.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     body { font-family: Arial, sans-serif; background: #f4f8fc; margin: 0; }
     header { background-color: #003366; color: white; padding: 20px; text-align: center; position: relative; }
@@ -18,6 +18,8 @@
     table { width: 100%; border-collapse: collapse; margin-top: 20px; }
     th, td { padding: 10px; border: 1px solid #ccc; text-align: center; }
     th { background-color: #e0ebff; }
+    #resultOutput button { margin: 10px 5px; padding: 10px 15px; background: #006600; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    #resultOutput button:hover { background: #004d00; }
   </style>
 </head>
 <body>
@@ -42,10 +44,10 @@
 </div>
 
 <script>
-  const usersURL = "https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/users.json";
-  const homeworkURL = "https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/homework.json";
-  const attendanceURL = "https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/attendance.json";
-  const resultsBase = "https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/results/";
+  const usersURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/users.json";
+  const homeworkURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/homework.json";
+  const attendanceURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/attendance.json";
+  const resultsBase = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/results/";
 
   const userid = localStorage.getItem("userid");
   const studentClass = localStorage.getItem("studentClass");
@@ -65,39 +67,14 @@
     const res = await fetch(usersURL);
     const data = await res.json();
     const student = data.Student?.[studentClass]?.[userid];
-
-    if (!student) {
-      document.getElementById("dashboardContent").innerHTML = `<p>Student not found.</p>`;
-      return;
-    }
-
-    const photo = student.photo || "https://via.placeholder.com/150x180?text=Photo";
-    const father = student.father || "-";
-    const mother = student.mother || "-";
-    const mobile = student.mobile || "-";
-    const email = student.email || "-";
-    const address = student.address || "-";
-
-    document.getElementById("dashboardContent").innerHTML = `
-      <h3>👤 Student Profile</h3>
-      <div style="display:flex;gap:30px;align-items:flex-start;flex-wrap:wrap;">
-        <div>
-          <img src="${photo}" alt="Student Photo" style="width:150px;height:180px;border-radius:10px;border:2px solid #ccc;" />
-        </div>
-        <div>
-          <p><strong>User ID:</strong> ${userid}</p>
-          <p><strong>Name:</strong> ${student.name}</p>
-          <p><strong>Father's Name:</strong> ${father}</p>
-          <p><strong>Mother's Name:</strong> ${mother}</p>
-          <p><strong>Date of Birth:</strong> ${student.dob || '-'}</p>
-          <p><strong>Class:</strong> ${studentClass}</p>
-          <p><strong>Branch:</strong> ${branch}</p>
-          <p><strong>Mobile:</strong> ${mobile}</p>
-          <p><strong>Email:</strong> ${email}</p>
-          <p><strong>Address:</strong> ${address}</p>
-        </div>
-      </div>
-    `;
+    document.getElementById("dashboardContent").innerHTML = student ? `
+      <h3>👤 Profile</h3>
+      <p><strong>User ID:</strong> ${userid}</p>
+      <p><strong>Name:</strong> ${student.name}</p>
+      <p><strong>Class:</strong> ${studentClass}</p>
+      <p><strong>Branch:</strong> ${branch}</p>
+      <p><strong>Date of Birth:</strong> ${student.dob || '—'}</p>
+    ` : `<p>Student not found.</p>`;
   }
 
   async function showAttendance() {
@@ -156,77 +133,80 @@
       if (!res.ok) throw new Error();
       const data = await res.json();
       const marks = data.marks || {};
-      const status = data.status || "Pass";
-      const color = status === "Fail" ? "#ffdddd" : "#ddffdd";
+      const status = marks.Status || "Pass";
+      const grade = marks.Grade || "-";
+      const totalMarks = marks.Total || 0;
+      const maxMarks = marks.Max || 700;
+      const percentage = marks.Percentage || ((totalMarks / maxMarks) * 100).toFixed(2);
 
-      const subjects = Object.keys(marks);
-      let totalObtained = 0, totalMax = 0, totalInternal = 0, totalMaxInternal = 0, totalFinal = 0;
+      const bgColor = status === "Fail" ? "#ffcccc" : "#ccffcc";
+      const subjects = ["Kannada", "English", "Hindi", "Mathematics", "EVS", "Science", "Social Science"];
 
-      const rows = subjects.map(sub => {
-        const subData = marks[sub];
-        if (!subData) return "";
-        const mo = subData.obtained || 0;
-        const mm = subData.max || 100;
-        const internal = subData.internal || 0;
-        const maxInternal = subData.max_internal || 20;
-        const total = mo + internal;
-        const grade = subData.grade || "-";
-
-        totalObtained += mo;
-        totalMax += mm;
-        totalInternal += internal;
-        totalMaxInternal += maxInternal;
-        totalFinal += total;
-
-        return `<tr>
-          <td>${sub}</td>
-          <td>${mo}</td>
-          <td>${mm}</td>
-          <td>${internal}</td>
-          <td>${maxInternal}</td>
-          <td>${total}</td>
-          <td>${grade}</td>
-        </tr>`;
+      let rows = subjects.map(sub => {
+        if (marks[sub] !== undefined) {
+          return `<tr>
+            <td>${sub}</td>
+            <td>${marks[sub]}</td>
+            <td>100</td>
+            <td>${marks[`Internal_${sub}`] || "-"}</td>
+            <td>20</td>
+            <td>${marks[sub] + (marks[`Internal_${sub}`] || 0)}</td>
+            <td>${marks[`Grade_${sub}`] || "-"}</td>
+          </tr>`;
+        }
+        return "";
       }).join("");
 
-      const percentage = ((totalFinal / (totalMax + totalMaxInternal)) * 100).toFixed(2);
-      const finalGrade = data.final_grade || "-";
-
       output.innerHTML = `
-        <div style="padding:20px;border-radius:10px;">
-          <h4>📄 Result for ${exam}</h4>
-          <table style="background:${color}">
-            <tr>
-              <th>Subject</th>
-              <th>Marks Obtained</th>
-              <th>Max Marks</th>
-              <th>Internal</th>
-              <th>Max Internal</th>
-              <th>Total</th>
-              <th>Grade</th>
-            </tr>
-            ${rows}
-            <tr style="font-weight:bold;background:#f0f0f0">
-              <td>Total</td>
-              <td>${totalObtained}</td>
-              <td>${totalMax}</td>
-              <td>${totalInternal}</td>
-              <td>${totalMaxInternal}</td>
-              <td>${totalFinal}</td>
-              <td>${finalGrade}</td>
-            </tr>
-            <tr style="font-weight:bold">
-              <td colspan="5">Percentage</td><td colspan="2">${percentage}%</td>
-            </tr>
-            <tr style="font-weight:bold">
-              <td colspan="5">Result</td><td colspan="2">${status}</td>
-            </tr>
-          </table>
+        <div style="background:${bgColor};padding:20px;border-radius:10px;" id="resultSection">
+          <table>
+            <thead>
+              <tr>
+                <th>Subject</th><th>Marks Obtained</th><th>Max Marks</th>
+                <th>Internal</th><th>Max Internal</th><th>Total Marks</th><th>Grade</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+            <tfoot>
+              <tr><td colspan="5"><strong>Total Marks Obtained</strong></td><td colspan="2">${totalMarks}</td></tr>
+              <tr><td colspan="5"><strong>Total Max Marks</strong></td><td colspan="2">${maxMarks}</td></tr>
+              <tr><td colspan="5"><strong>Final Grade</strong></td><td colspan="2">${grade}</td></tr>
+              <tr><td colspan="5"><strong>Percentage</strong></td><td colspan="2">${percentage}%</td></tr>
+              <tr><td colspan="5"><strong>Result</strong></td><td colspan="2" style="font-weight:bold;">${status}</td></tr>
+            </tfoot>
+          </table><br>
+          <button onclick="printResult()">🖨️ Print Result</button>
+          <button onclick="downloadPDF()">⬇️ Download PDF</button>
         </div>
       `;
     } catch {
       output.innerHTML = `<p style='color:red'>Result not found.</p>`;
     }
+  }
+
+  function printResult() {
+    const win = window.open('', '', 'height=700,width=900');
+    win.document.write(`<html><head><title>Print Result</title>
+    <style>
+      body { font-family: Arial; padding: 20px; }
+      table { width: 100%; border-collapse: collapse; }
+      th, td { border: 1px solid #333; padding: 10px; text-align: center; }
+    </style>
+    </head><body>${document.getElementById("resultSection").innerHTML}</body></html>`);
+    win.document.close();
+    win.print();
+  }
+
+  function downloadPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    doc.html(document.getElementById("resultSection"), {
+      callback: function (doc) {
+        doc.save("Result.pdf");
+      },
+      x: 10,
+      y: 10
+    });
   }
 </script>
 
