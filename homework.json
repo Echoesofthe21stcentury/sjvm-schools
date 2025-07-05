@@ -78,5 +78,12 @@
         "description": "read"
       }
     ]
-  }
+  },
+  "Class 1 ": [
+    {
+      "subject": "Kannada",
+      "task": "Do the project ",
+      "dueDate": "2025-07-22"
+    }
+  ]
 }
