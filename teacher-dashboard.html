@@ -69,15 +69,33 @@
     .logout button:hover {
       background: #800000;
     }
+
+    .profile {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: white;
+    }
+    .profile-img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid white;
+    }
   </style>
 </head>
 <body>
 
 <header>
   <h1>👩‍🏫 SJVM Teacher Dashboard</h1>
-  <div style="position:absolute; top:15px; right:20px; color:white;">
-    👤 <span id="usernameDisplay"></span>
-    <button onclick="logout()" style="background: crimson; color: white; padding: 6px 12px; border: none; border-radius: 5px; margin-left: 10px;">Logout</button>
+  <div class="profile">
+    <img id="teacherPhoto" src="teacher-photo.jpg" alt="👩‍🏫" class="profile-img" onerror="this.style.display='none'; document.getElementById('usernameDisplay').insertAdjacentText('beforebegin','👩‍🏫 ');" />
+    <span id="usernameDisplay"></span>
+    <button onclick="logout()">Logout</button>
   </div>
 </header>
 
@@ -95,11 +113,9 @@
   const usersURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/users.json";
   const homeworkURL = "https://api.github.com/repos/Echoesofthe21stcentury/sjvm-schools/contents/homework.json";
   const resultAPIBase = "https://api.github.com/repos/Echoesofthe21stcentury/sjvm-schools/contents/results/";
-  const resultsJSON = "https://api.github.com/repos/Echoesofthe21stcentury/sjvm-schools/contents/results.json";
 
   const username = localStorage.getItem("username");
   const branch = localStorage.getItem("branch");
-
   document.getElementById("usernameDisplay").textContent = username;
 
   if (localStorage.getItem("role") !== "Teacher" || !branch) {
@@ -182,7 +198,7 @@
       <label>Student:</label>
       <select id="studentSelect"><option>Select class first</option></select><br><br>
       <table>
-        <thead><tr><th>Subject</th><th>Marks Obtained</th><th>Max Marks</th><th>Internal</th><th>Internal Max</th><th>Total</th><th>Grade</th></tr></thead>
+        <thead><tr><th>Subject</th><th>Marks Obtained</th><th>Max Marks</th><th>Internal</th><th>Total</th><th>Grade</th></tr></thead>
         <tbody id="marksTable">
           ${["Kannada", "English", "Hindi", "Mathematics", "EVS", "Science", "Social Science"].map(sub => `
             <tr>
@@ -190,9 +206,8 @@
               <td><input type="number" id="ob_${sub}" oninput="calcTotal('${sub}')"></td>
               <td><input type="number" id="max_${sub}" value="80" oninput="calcTotal('${sub}')"></td>
               <td><input type="number" id="int_${sub}" value="20" oninput="calcTotal('${sub}')"></td>
-              <td><input type="number" id="intmax_${sub}" value="20" disabled></td>
               <td><input type="number" id="total_${sub}" readonly></td>
-              <td><input type="text" id="grade_${sub}"></td>
+              <td><input type="text" id="grade_${sub}" placeholder="Auto/Manual"></td>
             </tr>
           `).join("")}
         </tbody>
@@ -221,6 +236,11 @@
     const int = +document.getElementById(`int_${sub}`).value || 0;
     const total = ob + int;
     document.getElementById(`total_${sub}`).value = total;
+
+    const gradeInput = document.getElementById(`grade_${sub}`);
+    if (!gradeInput.value) {
+      gradeInput.value = total >= 90 ? 'A+' : total >= 80 ? 'A' : total >= 70 ? 'B+' : total >= 60 ? 'B' : total >= 50 ? 'C' : total >= 35 ? 'D' : 'F';
+    }
   }
 
   async function submitResult() {
@@ -247,7 +267,6 @@
         obtained: ob,
         maxMarks: max,
         internal: int,
-        internalMax: 20,
         total,
         grade
       };
@@ -267,7 +286,6 @@
     const content = btoa(JSON.stringify({ marks: finalData }, null, 2));
     const fileName = `${examType}_${studentId}.json`;
 
-    // Upload individual result file
     await fetch(resultAPIBase + fileName, {
       method: "PUT",
       headers: { Authorization: `token ${token}` },
