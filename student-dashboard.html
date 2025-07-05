@@ -7,7 +7,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     body { font-family: Arial, sans-serif; background: #f4f8fc; margin: 0; }
-    header { background-color: #003366; color: white; padding: 20px; text-align: center; position: relative; }
+    header { background-color: #003366; color: white; padding: 20px; text-align: center; }
     nav { background: #0059b3; display: flex; justify-content: center; flex-wrap: wrap; }
     nav a { color: white; padding: 14px 20px; text-decoration: none; font-weight: bold; }
     nav a:hover { background: #003366; }
@@ -67,14 +67,31 @@
     const res = await fetch(usersURL);
     const data = await res.json();
     const student = data.Student?.[studentClass]?.[userid];
-    document.getElementById("dashboardContent").innerHTML = student ? `
-      <h3>👤 Profile</h3>
-      <p><strong>User ID:</strong> ${userid}</p>
-      <p><strong>Name:</strong> ${student.name}</p>
-      <p><strong>Class:</strong> ${studentClass}</p>
-      <p><strong>Branch:</strong> ${branch}</p>
-      <p><strong>Date of Birth:</strong> ${student.dob || '—'}</p>
-    ` : `<p>Student not found.</p>`;
+
+    if (!student) {
+      document.getElementById("dashboardContent").innerHTML = `<p>Student not found.</p>`;
+      return;
+    }
+
+    const imgURL = student.photo ? student.photo : "https://via.placeholder.com/100";
+
+    document.getElementById("dashboardContent").innerHTML = `
+      <h3>👤 Student Profile</h3>
+      <div style="display:flex;align-items:center;gap:20px;">
+        <img src="${imgURL}" alt="Student Photo" style="width:100px;height:100px;border-radius:50%;border:2px solid #003366;" onerror="this.src='https://via.placeholder.com/100'"/>
+        <div>
+          <p><strong>User ID:</strong> ${userid}</p>
+          <p><strong>Name:</strong> ${student.name}</p>
+          <p><strong>Class:</strong> ${studentClass}</p>
+          <p><strong>Branch:</strong> ${branch}</p>
+          <p><strong>Date of Birth:</strong> ${student.dob || '—'}</p>
+          <p><strong>Mother's Name:</strong> ${student.mother || '—'}</p>
+          <p><strong>Father's Name:</strong> ${student.father || '—'}</p>
+          <p><strong>Mobile Number:</strong> ${student.mobile || '—'}</p>
+          <p><strong>Email:</strong> ${student.email || '—'}</p>
+        </div>
+      </div>
+    `;
   }
 
   async function showAttendance() {
