@@ -3,9 +3,16 @@
     "Class 4": {
       "SBK-401": {
         "name": "Meghana C",
-        "password": "student123",
         "class": "Class 4",
-        "branch": "Bandikodigenahalli"
+        "branch": "Bandikodigenahalli",
+        "gender": "Girl",
+        "dob": "2015-04-01",
+        "father": "Chandhru M G",
+        "mother": "Mamatha",
+        "address": "Bagaluru Colony ",
+        "mobile": "9916866941",
+        "email": "chanrumg@gmail.com",
+        "password": "student123"
       }
     },
     "Class 5": {
