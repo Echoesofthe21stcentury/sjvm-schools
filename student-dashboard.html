@@ -42,10 +42,10 @@
 </div>
 
 <script>
-  const usersURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/users.json";
-  const homeworkURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/homework.json";
-  const attendanceURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/attendance.json";
-  const resultsBase = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/results/";
+  const usersURL = "https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/users.json";
+  const homeworkURL = "https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/homework.json";
+  const attendanceURL = "https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/attendance.json";
+  const resultsBase = "https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/results/";
 
   const userid = localStorage.getItem("userid");
   const studentClass = localStorage.getItem("studentClass");
@@ -65,14 +65,39 @@
     const res = await fetch(usersURL);
     const data = await res.json();
     const student = data.Student?.[studentClass]?.[userid];
-    document.getElementById("dashboardContent").innerHTML = student ? `
-      <h3>👤 Profile</h3>
-      <p><strong>User ID:</strong> ${userid}</p>
-      <p><strong>Name:</strong> ${student.name}</p>
-      <p><strong>Class:</strong> ${studentClass}</p>
-      <p><strong>Branch:</strong> ${branch}</p>
-      <p><strong>Date of Birth:</strong> ${student.dob || '—'}</p>
-    ` : `<p>Student not found.</p>`;
+
+    if (!student) {
+      document.getElementById("dashboardContent").innerHTML = `<p>Student not found.</p>`;
+      return;
+    }
+
+    const photo = student.photo || "https://via.placeholder.com/150x180?text=Photo";
+    const father = student.father || "-";
+    const mother = student.mother || "-";
+    const mobile = student.mobile || "-";
+    const email = student.email || "-";
+    const address = student.address || "-";
+
+    document.getElementById("dashboardContent").innerHTML = `
+      <h3>👤 Student Profile</h3>
+      <div style="display:flex;gap:30px;align-items:flex-start;flex-wrap:wrap;">
+        <div>
+          <img src="${photo}" alt="Student Photo" style="width:150px;height:180px;border-radius:10px;border:2px solid #ccc;" />
+        </div>
+        <div>
+          <p><strong>User ID:</strong> ${userid}</p>
+          <p><strong>Name:</strong> ${student.name}</p>
+          <p><strong>Father's Name:</strong> ${father}</p>
+          <p><strong>Mother's Name:</strong> ${mother}</p>
+          <p><strong>Date of Birth:</strong> ${student.dob || '-'}</p>
+          <p><strong>Class:</strong> ${studentClass}</p>
+          <p><strong>Branch:</strong> ${branch}</p>
+          <p><strong>Mobile:</strong> ${mobile}</p>
+          <p><strong>Email:</strong> ${email}</p>
+          <p><strong>Address:</strong> ${address}</p>
+        </div>
+      </div>
+    `;
   }
 
   async function showAttendance() {
@@ -168,9 +193,9 @@
       const finalGrade = data.final_grade || "-";
 
       output.innerHTML = `
-        <div style="background:${color};padding:20px;border-radius:10px;">
+        <div style="padding:20px;border-radius:10px;">
           <h4>📄 Result for ${exam}</h4>
-          <table>
+          <table style="background:${color}">
             <tr>
               <th>Subject</th>
               <th>Marks Obtained</th>
