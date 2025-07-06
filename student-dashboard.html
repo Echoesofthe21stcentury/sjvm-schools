@@ -20,6 +20,7 @@
     th { background-color: #e0ebff; }
     #resultOutput button { margin: 10px 5px; padding: 10px 15px; background: #006600; color: white; border: none; border-radius: 5px; cursor: pointer; }
     #resultOutput button:hover { background: #004d00; }
+    .profile-pic { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; }
   </style>
 </head>
 <body>
@@ -52,7 +53,6 @@
   const userid = localStorage.getItem("userid");
   const studentClass = localStorage.getItem("studentClass");
   const branch = localStorage.getItem("branch");
-  const username = localStorage.getItem("username") || userid;
 
   if (!userid || !studentClass || !branch) {
     document.getElementById("dashboardContent").innerHTML = "<p style='color:red'>❌ Access Denied.</p>";
@@ -67,30 +67,22 @@
     const res = await fetch(usersURL);
     const data = await res.json();
     const student = data.Student?.[studentClass]?.[userid];
-
     if (!student) {
       document.getElementById("dashboardContent").innerHTML = `<p>Student not found.</p>`;
       return;
     }
-
-    const imgURL = student.photo ? student.photo : "https://via.placeholder.com/100";
-
     document.getElementById("dashboardContent").innerHTML = `
-      <h3>👤 Student Profile</h3>
-      <div style="display:flex;align-items:center;gap:20px;">
-        <img src="${imgURL}" alt="Student Photo" style="width:100px;height:100px;border-radius:50%;border:2px solid #003366;" onerror="this.src='https://via.placeholder.com/100'"/>
-        <div>
-          <p><strong>User ID:</strong> ${userid}</p>
-          <p><strong>Name:</strong> ${student.name}</p>
-          <p><strong>Class:</strong> ${studentClass}</p>
-          <p><strong>Branch:</strong> ${branch}</p>
-          <p><strong>Date of Birth:</strong> ${student.dob || '—'}</p>
-          <p><strong>Mother's Name:</strong> ${student.mother || '—'}</p>
-          <p><strong>Father's Name:</strong> ${student.father || '—'}</p>
-          <p><strong>Mobile Number:</strong> ${student.mobile || '—'}</p>
-          <p><strong>Email:</strong> ${student.email || '—'}</p>
-        </div>
-      </div>
+      <h3>👤 Profile</h3>
+      <img src="${student.photo}" class="profile-pic" alt="Student Photo" /><br><br>
+      <p><strong>User ID:</strong> ${userid}</p>
+      <p><strong>Name:</strong> ${student.name}</p>
+      <p><strong>Class:</strong> ${studentClass}</p>
+      <p><strong>Branch:</strong> ${branch}</p>
+      <p><strong>Date of Birth:</strong> ${student.dob || '—'}</p>
+      <p><strong>Father's Name:</strong> ${student.father || '—'}</p>
+      <p><strong>Mother's Name:</strong> ${student.mother || '—'}</p>
+      <p><strong>Mobile:</strong> ${student.mobile || '—'}</p>
+      <p><strong>Email:</strong> ${student.email || '—'}</p>
     `;
   }
 
@@ -150,50 +142,48 @@
       if (!res.ok) throw new Error();
       const data = await res.json();
       const marks = data.marks || {};
-      const status = marks.Status || "Pass";
-      const grade = marks.Grade || "-";
-      const totalMarks = marks.Total || 0;
-      const maxMarks = marks.Max || 700;
-      const percentage = marks.Percentage || ((totalMarks / maxMarks) * 100).toFixed(2);
+      const status = data.status || "Pass";
+      const grade = data.final_grade || "-";
+      const total = data.totalMarks || 0;
+      const max = data.maxMarks || 700;
+      const percentage = data.percentage || ((total / max) * 100).toFixed(2);
 
       const bgColor = status === "Fail" ? "#ffcccc" : "#ccffcc";
-      const subjects = ["Kannada", "English", "Hindi", "Mathematics", "EVS", "Science", "Social Science"];
-
-      let rows = subjects.map(sub => {
-        if (marks[sub] !== undefined) {
-          return `<tr>
+      let rows = "";
+      for (let sub in marks) {
+        if (typeof marks[sub] === "object") {
+          rows += `<tr>
             <td>${sub}</td>
-            <td>${marks[sub]}</td>
-            <td>100</td>
-            <td>${marks[`Internal_${sub}`] || "-"}</td>
-            <td>20</td>
-            <td>${marks[sub] + (marks[`Internal_${sub}`] || 0)}</td>
-            <td>${marks[`Grade_${sub}`] || "-"}</td>
+            <td>${marks[sub].obtained}</td>
+            <td>${marks[sub].maxMarks}</td>
+            <td>${marks[sub].internal}</td>
+            <td>${marks[sub].internalMax}</td>
+            <td>${marks[sub].total}</td>
+            <td>${marks[sub].grade}</td>
           </tr>`;
         }
-        return "";
-      }).join("");
+      }
 
       output.innerHTML = `
         <div style="background:${bgColor};padding:20px;border-radius:10px;" id="resultSection">
           <table>
             <thead>
               <tr>
-                <th>Subject</th><th>Marks Obtained</th><th>Max Marks</th>
-                <th>Internal</th><th>Max Internal</th><th>Total Marks</th><th>Grade</th>
+                <th>Subject</th><th>Obtained</th><th>Max</th>
+                <th>Internal</th><th>Max Internal</th><th>Total</th><th>Grade</th>
               </tr>
             </thead>
             <tbody>${rows}</tbody>
             <tfoot>
-              <tr><td colspan="5"><strong>Total Marks Obtained</strong></td><td colspan="2">${totalMarks}</td></tr>
-              <tr><td colspan="5"><strong>Total Max Marks</strong></td><td colspan="2">${maxMarks}</td></tr>
-              <tr><td colspan="5"><strong>Final Grade</strong></td><td colspan="2">${grade}</td></tr>
+              <tr><td colspan="5"><strong>Total Marks</strong></td><td colspan="2">${total}</td></tr>
+              <tr><td colspan="5"><strong>Max Marks</strong></td><td colspan="2">${max}</td></tr>
               <tr><td colspan="5"><strong>Percentage</strong></td><td colspan="2">${percentage}%</td></tr>
-              <tr><td colspan="5"><strong>Result</strong></td><td colspan="2" style="font-weight:bold;">${status}</td></tr>
+              <tr><td colspan="5"><strong>Status</strong></td><td colspan="2">${status}</td></tr>
+              <tr><td colspan="5"><strong>Grade</strong></td><td colspan="2">${grade}</td></tr>
             </tfoot>
           </table><br>
-          <button onclick="printResult()">🖨️ Print Result</button>
-          <button onclick="downloadPDF()">⬇️ Download PDF</button>
+          <button onclick="printResult()">🖨️ Print</button>
+          <button onclick="downloadPDF()">⬇️ PDF</button>
         </div>
       `;
     } catch {
