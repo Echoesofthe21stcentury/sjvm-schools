@@ -1,59 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <title>Student Dashboard | SJVM</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
-    body { font-family: Arial, sans-serif; background: #f4f8fc; margin: 0; }
-    header { background-color: #003366; color: white; padding: 20px; text-align: center; position: relative; }
-    nav { background: #0059b3; display: flex; justify-content: center; flex-wrap: wrap; }
-    nav a { color: white; padding: 14px 20px; text-decoration: none; font-weight: bold; }
-    nav a:hover { background: #003366; }
-    .container { max-width: 900px; margin: 20px auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-    .profile-circle { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid white; }
-    .logout { text-align: center; margin: 20px; }
-    .logout button { padding: 10px 20px; background: #b30000; color: white; border: none; border-radius: 6px; cursor: pointer; }
-    .logout button:hover { background: #800000; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { padding: 10px; border: 1px solid #ccc; text-align: center; }
-    th { background-color: #e0ebff; }
-    #resultOutput button { margin: 10px 5px; padding: 10px 15px; background: #006600; color: white; border: none; border-radius: 5px; cursor: pointer; }
-    #resultOutput button:hover { background: #004d00; }
+    body { font-family:Arial; background:#f4f8fc; margin:0; }
+    header { background:#003366; color:white; padding:20px; text-align:center; }
+    nav { background:#0059b3; display:flex; justify-content:center; flex-wrap:wrap; }
+    nav a { color:white; padding:14px 20px; text-decoration:none; font-weight:bold; }
+    nav a:hover { background:#003366; }
+    .container { max-width:900px; margin:30px auto; background:white; padding:30px; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.1); }
+    table { width:100%; border-collapse:collapse; margin-top:20px; }
+    th,td { padding:10px; border:1px solid #ccc; text-align:center; }
+    th { background:#e0ebff; }
+    #resultSection { padding:20px; border-radius:10px; margin-top:20px;}
+    button { padding:10px 15px; margin:10px 5px; background:#006600; color:white; border:none; border-radius:5px; cursor:pointer; }
+    button:hover { background:#004d00; }
+    .logout { text-align:center; margin:30px; }
+    .logout button { padding:10px 20px; background:#b30000; color:white; border:none; border-radius:6px; }
+    .logout button:hover { background:#800000; }
   </style>
 </head>
 <body>
-
-<header>
-  <h1>🎓 SJVM Student Dashboard</h1>
-</header>
-
+<header><h1>🎓 SJVM Student Dashboard</h1></header>
 <nav>
   <a href="#" onclick="showProfile()">Profile</a>
   <a href="#" onclick="showAttendance()">Attendance</a>
   <a href="#" onclick="showHomework()">Homework</a>
   <a href="#" onclick="viewResults()">View Results</a>
 </nav>
-
-<div class="container" id="dashboardContent">
-  <p>Loading your profile...</p>
-</div>
-
-<div class="logout">
-  <button onclick="logout()">Logout</button>
-</div>
+<div class="container" id="dashboardContent"><p>Welcome to your dashboard!</p></div>
+<div class="logout"><button onclick="logout()">Logout</button></div>
 
 <script>
   const usersURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/users.json";
-  const homeworkURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/homework.json";
   const attendanceURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/attendance.json";
+  const homeworkURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/homework.json";
   const resultsBase = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/results/";
 
   const userid = localStorage.getItem("userid");
   const studentClass = localStorage.getItem("studentClass");
   const branch = localStorage.getItem("branch");
-  const username = localStorage.getItem("username") || userid;
 
   if (!userid || !studentClass || !branch) {
     document.getElementById("dashboardContent").innerHTML = "<p style='color:red'>❌ Access Denied.</p>";
@@ -64,137 +53,109 @@
     window.location.href = "userlogin.html";
   }
 
-  async function showProfile() {
-    const res = await fetch(usersURL);
-    const data = await res.json();
-    const student = data.Student?.[studentClass]?.[userid];
-    if (!student) {
-      return document.getElementById("dashboardContent").innerHTML = "<p>Student not found.</p>";
-    }
-    const photo = student.photo?.trim() || "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/SJVM%20logo%20empowering%20mankind%20without%20background.png";
+  async function showProfile(){
+    const data = await (await fetch(usersURL)).json();
+    const stu = data.Student?.[studentClass]?.[userid] || {};
     document.getElementById("dashboardContent").innerHTML = `
-      <div style="text-align:center;">
-        <img src="${photo}" class="profile-circle" alt="Profile" />
-        <h3>${student.name} (${userid})</h3>
-      </div>
+      <h3>👤 Profile</h3>
+      <p><strong>User ID:</strong> ${userid}</p>
+      <p><strong>Name:</strong> ${stu.name || '—'}</p>
       <p><strong>Class:</strong> ${studentClass}</p>
       <p><strong>Branch:</strong> ${branch}</p>
-      <p><strong>Father:</strong> ${student.father || "-"}</p>
-      <p><strong>Mother:</strong> ${student.mother || "-"}</p>
-      <p><strong>DOB:</strong> ${student.dob || "-"}</p>
-      <p><strong>Mobile:</strong> ${student.mobile || "-"}</p>
-      <p><strong>Email:</strong> ${student.email || "-"}</p>
-    `;
+      <p><strong>Father:</strong> ${stu.father || '—'}</p>
+      <p><strong>Mother:</strong> ${stu.mother || '—'}</p>
+      <p><strong>Mobile:</strong> ${stu.mobile || '—'}</p>
+      <p><strong>Email:</strong> ${stu.email || '—'}</p>
+      <p><strong>DOB:</strong> ${stu.dob || '—'}</p>`;
   }
 
-  async function showAttendance() {
-    try {
-      const res = await fetch(attendanceURL);
-      const data = await res.json();
-      let rows = "";
-      for (let date in data) {
-        const rec = data[date]?.[studentClass]?.[branch]?.[userid];
-        if (rec) {
-          rows += `<tr>
-            <td>${date}</td>
-            <td style="background:${rec==='Present'?'#28FF20':'#c30010'}">${rec}</td>
-          </tr>`;
-        }
-      }
-      document.getElementById("dashboardContent").innerHTML = rows
-        ? `<h3>📝 Attendance</h3><table><tr><th>Date</th><th>Status</th></tr>${rows}</table>`
-        : "<p>No attendance records found.</p>";
-    } catch {
-      document.getElementById("dashboardContent").innerHTML = "<p>Error loading attendance.</p>";
+  async function showAttendance(){
+    const data = await (await fetch(attendanceURL)).json();
+    let rows = '';
+    for (const date in data) {
+      const r = data[date]?.[studentClass]?.[branch]?.[userid];
+      if (r) rows += `<tr><td>${date}</td><td>${r}</td></tr>`;
     }
+    document.getElementById("dashboardContent").innerHTML = rows
+      ? `<h3>📝 Attendance</h3><table><tr><th>Date</th><th>Status</th></tr>${rows}</table>`
+      : "<p>No attendance records found.</p>";
   }
 
-  async function showHomework() {
-    try {
-      const res = await fetch(homeworkURL);
-      const data = await res.json();
-      const hw = data[studentClass] || [];
-      if (!hw.length) return document.getElementById("dashboardContent").innerHTML = "<p>No homework found.</p>";
-      document.getElementById("dashboardContent").innerHTML = `
-        <h3>📚 Homework for ${studentClass}</h3>
-        <ul>${hw.map(h=>`<li><strong>${h.subject}:</strong> ${h.task} <br>Due: ${h.dueDate}</li>`).join("")}</ul>`;
-    } catch {
-      document.getElementById("dashboardContent").innerHTML = "<p>Error loading homework.</p>";
-    }
+  async function showHomework(){
+    const hw = await (await fetch(homeworkURL)).json();
+    const list = (hw[studentClass] || []).map(h=>`<li><strong>${h.subject}</strong>: ${h.task} (Due: ${h.dueDate})</li>`).join("");
+    document.getElementById("dashboardContent").innerHTML = list
+      ? `<h3>📚 Homework</h3><ul>${list}</ul>`
+      : "<p>No homework assigned.</p>";
   }
 
-  function viewResults() {
-    const exams = ["FA1","FA2","SA1","FA3","FA4","SA2"];
+  function viewResults(){
     document.getElementById("dashboardContent").innerHTML = `
       <h3>📊 View Results</h3>
-      <select id="examSelect"><option value="">--Select Exam--</option>${exams.map(e=>`<option>${e}</option>`).join("")}</select>
-      <button onclick="fetchResult()">View Result</button><div id="resultOutput"></div>`;
+      <select id="exam"><option>--Select--</option>
+        ${["FA1","FA2","SA1","FA3","FA4","SA2"].map(ex=>`<option>${ex}</option>`).join('')}
+      </select>
+      <button onclick="fetchResult()">🔍 View</button>
+      <div id="resultOutput"></div>`;
   }
 
-  async function fetchResult() {
-    const exam = document.getElementById("examSelect").value;
-    const output = document.getElementById("resultOutput");
-    if (!exam) return output.innerHTML = "<p style='color:red'>Select exam</p>";
+  async function fetchResult(){
+    const ex = document.getElementById("exam").value;
+    const out = document.getElementById("resultOutput");
+    if (!ex) return out.innerHTML = "<p style='color:red'>Please select exam.</p>";
+
     try {
-      const res = await fetch(`${resultsBase}${exam}_${userid}.json`);
-      if (!res.ok) throw 1;
+      const res = await fetch(`${resultsBase}${ex}_${userid}.json`);
+      if (!res.ok) throw 0;
       const data = await res.json();
-      const m = data.marks;
-      const status = m.Status;
-      const grade = m.finalGrade || "-";
-      const totalMarks = m.totalMarks;
-      const maxMarks = m.maxMarks;
-      const percentage = m.percentage;
-      const bg = status==="Fail"?"#ffcccc":"#ccffcc";
-      const subjects = ["Kannada","English","Hindi","Mathematics","EVS","Science","Social Science"];
-      const rows = subjects.map(sub=>`
-        <tr><td>${sub}</td>
-        <td>${m[sub]?.obtained||0}</td>
-        <td>${m[sub]?.maxMarks||0}</td>
-        <td>${m[sub]?.internal||0}</td>
-        <td>${m[sub]?.internalMax||0}</td>
-        <td>${m[sub]?.total||0}</td>
-        <td>${m[sub]?.grade||"-"}</td></tr>`).join("");
-      output.innerHTML = `
+      const s = data.Status;
+      const bg = s=='Fail'?'#ffcccc':'#ccffcc';
+      const subs = Object.keys(data.marks);
+      const rows = subs.map(sub=>`
+        <tr>
+          <td>${sub}</td>
+          <td>${data.marks[sub].Marks}</td>
+          <td>${data.marks[sub].Max}</td>
+          <td>${data.marks[sub].Internal}</td>
+          <td>${data.marks[sub].Total}</td>
+          <td>${data.marks[sub].Grade}</td>
+        </tr>`).join("");
+      out.innerHTML = `
         <div id="resultSection" style="background:${bg};padding:20px;border-radius:10px;">
-        <table>
-          <thead><tr>
-            <th>Subject</th><th>Obtained</th><th>Max</th>
-            <th>Internal</th><th>Max Int</th><th>Total</th><th>Grade</th>
-          </tr></thead>
-          <tbody>${rows}</tbody>
-          <tfoot>
-            <tr><td colspan="5"><strong>Total Obtained</strong></td><td colspan="2">${totalMarks}/${maxMarks}</td></tr>
-            <tr><td colspan="5"><strong>Final Grade</strong></td><td colspan="2">${grade}</td></tr>
-            <tr><td colspan="5"><strong>Percentage</strong></td><td colspan="2">${percentage}%</td></tr>
-            <tr><td colspan="5"><strong>Status</strong></td><td colspan="2">${status}</td></tr>
-          </tfoot>
-        </table><br>
-        <button onclick="printResult()">🖨️ Print</button>
-        <button onclick="downloadPDF()">⬇️ Download PDF</button>
+          <table>
+            <thead><tr><th>Subject</th><th>Obtained</th><th>Max</th><th>Internal</th><th>Total</th><th>Grade</th></tr></thead>
+            <tbody>${rows}</tbody>
+            <tfoot>
+              <tr><td colspan="4"><b>Total Obtained</b></td><td colspan="2">${data.Total}/${data.Max}</td></tr>
+              <tr><td colspan="4"><b>Percentage</b></td><td colspan="2">${data.Percentage}%</td></tr>
+              <tr><td colspan="4"><b>Status</b></td><td colspan="2">${s}</td></tr>
+            </tfoot>
+          </table>
+          <br><button onclick="printResult()">🖨 Print</button><button onclick="downloadPDF()">⬇️ PDF</button>
         </div>`;
     } catch {
-      output.innerHTML = "<p style='color:red'>Result not found.</p>";
+      out.innerHTML = `<p style="color:red">Result not published yet.</p>`;
     }
   }
 
-  function printResult() {
-    const w = window.open('', '', 'width=800,height=600');
-    w.document.write(`<html><head><title>Print Result</title>
-      <style>body{font-family:Arial}table{width:100%;border-collapse:collapse}th,td{border:1px solid #333;padding:8px;text-align:center}</style></head>
-      <body>${document.getElementById("resultSection").innerHTML}</body></html>`);
-    w.document.close();
-    w.print();
+  function printResult(){
+    const win = window.open("", "", "height=700,width=900");
+    win.document.write(`<html><head><title>Print Result</title>
+      <style>body{font-family:Arial;padding:20px;}table{width:100%;border-collapse:collapse;}
+             th,td{border:1px solid #333;padding:10px;text-align:center;}</style></head><body>`);
+    win.document.write(document.getElementById("resultSection").innerHTML);
+    win.document.write("</body></html>");
+    win.print(); win.close();
   }
 
-  function downloadPDF() {
+  function downloadPDF(){
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
-    doc.html(document.getElementById("resultSection"), { callback: pdf=>pdf.save("Result.pdf"), x:10, y:10 });
+    doc.html(document.getElementById("resultSection"), {
+      callback: () => doc.save("Result.pdf"),
+      x: 10, y: 10
+    });
   }
-
-  window.onload = showProfile;
 </script>
-
 </body>
 </html>
