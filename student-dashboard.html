@@ -7,47 +7,23 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     body { font-family: Arial, sans-serif; background: #f4f8fc; margin: 0; }
-    header { background: #003366; color: white; padding: 20px; text-align: center; }
-    nav {
-      background: #0059b3;
-      display: flex; flex-wrap: wrap; justify-content: center;
-    }
-    nav a {
-      color: white; padding: 14px 20px; text-decoration: none;
-      font-weight: bold; display: block;
-    }
+    header { background-color: #003366; color: white; padding: 20px; text-align: center; }
+    nav { background: #0059b3; display: flex; justify-content: center; flex-wrap: wrap; }
+    nav a { color: white; padding: 14px 20px; text-decoration: none; font-weight: bold; }
     nav a:hover { background: #003366; }
-    .container {
-      max-width: 900px; margin: 30px auto; background: white;
-      padding: 30px; border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td {
-      padding: 10px; border: 1px solid #ccc; text-align: center;
-    }
-    th { background: #e0ebff; }
-    .logout {
-      text-align: center; margin: 30px;
-    }
-    .logout button {
-      padding: 10px 20px; background: #b30000;
-      color: white; border: none; border-radius: 6px; cursor: pointer;
-    }
+    .container { max-width: 900px; margin: 30px auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    .logout { text-align: center; margin: 30px; }
+    .logout button { padding: 10px 20px; background: #b30000; color: white; border: none; border-radius: 6px; cursor: pointer; }
     .logout button:hover { background: #800000; }
-    .profile-pic {
-      width: 120px; height: 120px; border-radius: 50%;
-      object-fit: cover; border: 3px solid #0059b3; margin-bottom: 10px;
-    }
-    #resultOutput button {
-      margin: 10px 5px; padding: 10px 15px;
-      background: #006600; color: white;
-      border: none; border-radius: 5px; cursor: pointer;
-    }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { padding: 10px; border: 1px solid #ccc; text-align: center; }
+    th { background-color: #e0ebff; }
+    #resultOutput button { margin: 10px 5px; padding: 10px 15px; background: #006600; color: white; border: none; border-radius: 5px; cursor: pointer; }
     #resultOutput button:hover { background: #004d00; }
-    @media screen and (max-width: 768px) {
-      .container { margin: 15px; padding: 20px; }
-      nav { flex-direction: column; align-items: center; }
+    .circle-photo { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid #003366; margin-bottom: 15px; }
+    @media(max-width: 600px) {
+      nav { flex-direction: column; }
+      .container { padding: 20px; margin: 20px; }
     }
   </style>
 </head>
@@ -58,10 +34,10 @@
 </header>
 
 <nav>
-  <a href="#" onclick="showProfile()">👤 Profile</a>
-  <a href="#" onclick="showAttendance()">📝 Attendance</a>
-  <a href="#" onclick="showHomework()">📚 Homework</a>
-  <a href="#" onclick="viewResults()">📊 View Results</a>
+  <a href="#" onclick="showProfile()">Profile</a>
+  <a href="#" onclick="showAttendance()">Attendance</a>
+  <a href="#" onclick="showHomework()">Homework</a>
+  <a href="#" onclick="viewResults()">View Results</a>
 </nav>
 
 <div class="container" id="dashboardContent">
@@ -69,7 +45,7 @@
 </div>
 
 <div class="logout">
-  <button onclick="logout()">🚪 Logout</button>
+  <button onclick="logout()">Logout</button>
 </div>
 
 <script>
@@ -82,6 +58,10 @@
   const studentClass = localStorage.getItem("studentClass");
   const branch = localStorage.getItem("branch");
 
+  if (!userid || !studentClass || !branch) {
+    document.getElementById("dashboardContent").innerHTML = "<p style='color:red'>❌ Access Denied.</p>";
+  }
+
   function logout() {
     localStorage.clear();
     window.location.href = "userlogin.html";
@@ -91,23 +71,20 @@
     const res = await fetch(usersURL);
     const data = await res.json();
     const student = data.Student?.[studentClass]?.[userid];
-    if (!student) {
-      document.getElementById("dashboardContent").innerHTML = "<p>❌ Student not found.</p>";
-      return;
-    }
+    if (!student) return document.getElementById("dashboardContent").innerHTML = "<p>Student not found.</p>";
 
     document.getElementById("dashboardContent").innerHTML = `
       <h3>👤 Profile</h3>
-      <center><img src="${student.photo || '#'}" class="profile-pic" alt="Profile Photo" /></center>
-      <p><strong>User ID:</strong> ${userid}</p>
+      <center><img src="${student.photo}" class="circle-photo" alt="Student Photo" /></center>
       <p><strong>Name:</strong> ${student.name}</p>
+      <p><strong>User ID:</strong> ${userid}</p>
       <p><strong>Class:</strong> ${studentClass}</p>
       <p><strong>Branch:</strong> ${branch}</p>
       <p><strong>Date of Birth:</strong> ${student.dob || '—'}</p>
-      <p><strong>Mother Name:</strong> ${student.mother || '—'}</p>
-      <p><strong>Father Name:</strong> ${student.father || '—'}</p>
-      <p><strong>Mobile:</strong> ${student.mobile || '—'}</p>
-      <p><strong>Email:</strong> ${student.email || '—'}</p>
+      <p><strong>Father's Name:</strong> ${student.fatherName || '-'}</p>
+      <p><strong>Mother's Name:</strong> ${student.motherName || '-'}</p>
+      <p><strong>Mobile:</strong> ${student.mobile || '-'}</p>
+      <p><strong>Email:</strong> ${student.email || '-'}</p>
     `;
   }
 
@@ -118,10 +95,10 @@
       let output = `<h3>📝 Attendance</h3><table><tr><th>Date</th><th>Status</th></tr>`;
       let found = false;
       for (let date in data) {
-        const status = data[date]?.[studentClass]?.[branch]?.[userid];
-        if (status) {
-          const bg = status === "Present" ? "#28FF20" : "#c30010";
-          output += `<tr style="background:${bg}"><td>${date}</td><td>${status}</td></tr>`;
+        const record = data[date]?.[studentClass]?.[branch]?.[userid];
+        if (record) {
+          const color = record === "Present" ? "#28FF20" : "#c30010";
+          output += `<tr style="background:${color};color:white;"><td>${date}</td><td>${record}</td></tr>`;
           found = true;
         }
       }
@@ -138,10 +115,10 @@
     const data = await res.json();
     const classHomework = data[studentClass] || [];
     if (classHomework.length > 0) {
-      const list = classHomework.map(h => `<li><strong>${h.subject}:</strong> ${h.task}<br>Due: ${h.dueDate}</li>`).join("");
+      const list = classHomework.map(h => `<li><strong>${h.subject}:</strong> ${h.task}<br>📅 Due: ${h.dueDate}</li>`).join("");
       document.getElementById("dashboardContent").innerHTML = `<h3>📚 Homework</h3><ul>${list}</ul>`;
     } else {
-      document.getElementById("dashboardContent").innerHTML = `<p>No homework found.</p>`;
+      document.getElementById("dashboardContent").innerHTML = `<p>No homework found for your class.</p>`;
     }
   }
 
@@ -150,8 +127,11 @@
     const select = exams.map(e => `<option value="${e}">${e}</option>`).join("");
     document.getElementById("dashboardContent").innerHTML = `
       <h3>📊 View Results</h3>
-      <select id="examSelect"><option value="">-- Select Exam --</option>${select}</select>
-      <button onclick="fetchResult()">🔍 View</button>
+      <select id="examSelect">
+        <option value="">-- Select Exam --</option>
+        ${select}
+      </select>
+      <button onclick="fetchResult()">🔍 View Result</button>
       <div id="resultOutput"></div>
     `;
   }
@@ -164,44 +144,37 @@
       const res = await fetch(`${resultsBase}${exam}_${userid}.json`);
       if (!res.ok) throw new Error();
       const data = await res.json();
-      const marks = data.marks || {};
-      const status = marks.status || "Pass";
-      const grade = marks.final_grade || "-";
-      const totalMarks = marks.totalMarks || 0;
-      const maxMarks = marks.maxMarks || 0;
-      const percentage = marks.percentage || ((totalMarks / maxMarks) * 100).toFixed(2);
+      const result = data.marks || {};
+      const status = result.status || "Pass";
+      const color = status === "Fail" ? "#c30010" : "#28FF20";
+      const grade = result.final_grade || "-";
+      const percent = result.percentage || "0.00";
+      const total = result.totalMarks || 0;
+      const max = result.maxMarks || 0;
 
-      const bgColor = status === "Fail" ? "#ffcccc" : "#ccffcc";
-      const subjects = marks.subjects || {};
-
-      let rows = Object.entries(subjects).map(([sub, info]) => `
-        <tr>
+      const rows = Object.entries(result.subjects || {}).map(([sub, val]) => {
+        return `<tr>
           <td>${sub}</td>
-          <td>${info.obtained}</td>
-          <td>${info.maxMarks}</td>
-          <td>${info.internal}</td>
-          <td>${info.internalMax}</td>
-          <td>${info.total}</td>
-          <td>${info.grade}</td>
-        </tr>
-      `).join("");
+          <td>${val.obtained}</td>
+          <td>${val.maxMarks}</td>
+          <td>${val.internal}</td>
+          <td>${val.internalMax}</td>
+          <td>${val.total}</td>
+          <td>${val.grade}</td>
+        </tr>`;
+      }).join("");
 
       output.innerHTML = `
-        <div style="background:${bgColor};padding:20px;border-radius:10px;" id="resultSection">
+        <div style="background:${color};padding:20px;border-radius:10px;" id="resultSection">
           <table>
-            <thead>
-              <tr><th>Subject</th><th>Written</th><th>Max</th><th>Internal</th><th>Max Internal</th><th>Total</th><th>Grade</th></tr>
-            </thead>
-            <tbody>${rows}</tbody>
-            <tfoot>
-              <tr><td colspan="5"><strong>Total Marks</strong></td><td colspan="2">${totalMarks}</td></tr>
-              <tr><td colspan="5"><strong>Max Marks</strong></td><td colspan="2">${maxMarks}</td></tr>
-              <tr><td colspan="5"><strong>Percentage</strong></td><td colspan="2">${percentage}%</td></tr>
-              <tr><td colspan="5"><strong>Grade</strong></td><td colspan="2">${grade}</td></tr>
-              <tr><td colspan="5"><strong>Status</strong></td><td colspan="2">${status}</td></tr>
-            </tfoot>
+            <tr><th>Subject</th><th>Written</th><th>Max</th><th>Internal</th><th>Max</th><th>Total</th><th>Grade</th></tr>
+            ${rows}
+            <tr><td colspan="5"><strong>Total Marks</strong></td><td colspan="2">${total}/${max}</td></tr>
+            <tr><td colspan="5"><strong>Percentage</strong></td><td colspan="2">${percent}%</td></tr>
+            <tr><td colspan="5"><strong>Final Grade</strong></td><td colspan="2">${grade}</td></tr>
+            <tr><td colspan="5"><strong>Status</strong></td><td colspan="2">${status}</td></tr>
           </table><br>
-          <button onclick="printResult()">🖨️ Print</button>
+          <button onclick="printResult()">🖨️ Print Result</button>
           <button onclick="downloadPDF()">⬇️ Download PDF</button>
         </div>
       `;
@@ -213,9 +186,8 @@
   function printResult() {
     const win = window.open('', '', 'height=700,width=900');
     win.document.write(`<html><head><title>Print Result</title>
-    <style>body{font-family:Arial;padding:20px}table{width:100%;border-collapse:collapse}
-    th,td{border:1px solid #333;padding:10px;text-align:center}</style></head>
-    <body>${document.getElementById("resultSection").innerHTML}</body></html>`);
+      <style>body { font-family: Arial; padding: 20px; } table { width: 100%; border-collapse: collapse; } th, td { border: 1px solid #333; padding: 10px; text-align: center; }</style>
+    </head><body>${document.getElementById("resultSection").innerHTML}</body></html>`);
     win.document.close();
     win.print();
   }
@@ -227,7 +199,8 @@
       callback: function (doc) {
         doc.save("Result.pdf");
       },
-      x: 10, y: 10
+      x: 10,
+      y: 10
     });
   }
 </script>
