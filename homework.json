@@ -85,5 +85,12 @@
       "task": "Do the project ",
       "dueDate": "2025-07-22"
     }
+  ],
+  "Class 2": [
+    {
+      "subject": "English",
+      "task": "DO the HW",
+      "dueDate": "2025-07-06"
+    }
   ]
 }
