@@ -7,12 +7,13 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     body { font-family: Arial, sans-serif; background: #f4f8fc; margin: 0; }
-    header { background-color: #003366; color: white; padding: 20px; text-align: center; }
+    header { background-color: #003366; color: white; padding: 20px; text-align: center; position: relative; }
     nav { background: #0059b3; display: flex; justify-content: center; flex-wrap: wrap; }
     nav a { color: white; padding: 14px 20px; text-decoration: none; font-weight: bold; }
     nav a:hover { background: #003366; }
-    .container { max-width: 900px; margin: 30px auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-    .logout { text-align: center; margin: 30px; }
+    .container { max-width: 900px; margin: 20px auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    .profile-circle { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid white; }
+    .logout { text-align: center; margin: 20px; }
     .logout button { padding: 10px 20px; background: #b30000; color: white; border: none; border-radius: 6px; cursor: pointer; }
     .logout button:hover { background: #800000; }
     table { width: 100%; border-collapse: collapse; margin-top: 20px; }
@@ -20,11 +21,6 @@
     th { background-color: #e0ebff; }
     #resultOutput button { margin: 10px 5px; padding: 10px 15px; background: #006600; color: white; border: none; border-radius: 5px; cursor: pointer; }
     #resultOutput button:hover { background: #004d00; }
-    .circle-photo { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid #003366; margin-bottom: 15px; }
-    @media(max-width: 600px) {
-      nav { flex-direction: column; }
-      .container { padding: 20px; margin: 20px; }
-    }
   </style>
 </head>
 <body>
@@ -41,7 +37,7 @@
 </nav>
 
 <div class="container" id="dashboardContent">
-  <p>Welcome to your dashboard!</p>
+  <p>Loading your profile...</p>
 </div>
 
 <div class="logout">
@@ -57,6 +53,7 @@
   const userid = localStorage.getItem("userid");
   const studentClass = localStorage.getItem("studentClass");
   const branch = localStorage.getItem("branch");
+  const username = localStorage.getItem("username") || userid;
 
   if (!userid || !studentClass || !branch) {
     document.getElementById("dashboardContent").innerHTML = "<p style='color:red'>❌ Access Denied.</p>";
@@ -71,20 +68,22 @@
     const res = await fetch(usersURL);
     const data = await res.json();
     const student = data.Student?.[studentClass]?.[userid];
-    if (!student) return document.getElementById("dashboardContent").innerHTML = "<p>Student not found.</p>";
-
+    if (!student) {
+      return document.getElementById("dashboardContent").innerHTML = "<p>Student not found.</p>";
+    }
+    const photo = student.photo?.trim() || "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/SJVM%20logo%20empowering%20mankind%20without%20background.png";
     document.getElementById("dashboardContent").innerHTML = `
-      <h3>👤 Profile</h3>
-      <center><img src="${student.photo}" class="circle-photo" alt="Student Photo" /></center>
-      <p><strong>Name:</strong> ${student.name}</p>
-      <p><strong>User ID:</strong> ${userid}</p>
+      <div style="text-align:center;">
+        <img src="${photo}" class="profile-circle" alt="Profile" />
+        <h3>${student.name} (${userid})</h3>
+      </div>
       <p><strong>Class:</strong> ${studentClass}</p>
       <p><strong>Branch:</strong> ${branch}</p>
-      <p><strong>Date of Birth:</strong> ${student.dob || '—'}</p>
-      <p><strong>Father's Name:</strong> ${student.fatherName || '-'}</p>
-      <p><strong>Mother's Name:</strong> ${student.motherName || '-'}</p>
-      <p><strong>Mobile:</strong> ${student.mobile || '-'}</p>
-      <p><strong>Email:</strong> ${student.email || '-'}</p>
+      <p><strong>Father:</strong> ${student.father || "-"}</p>
+      <p><strong>Mother:</strong> ${student.mother || "-"}</p>
+      <p><strong>DOB:</strong> ${student.dob || "-"}</p>
+      <p><strong>Mobile:</strong> ${student.mobile || "-"}</p>
+      <p><strong>Email:</strong> ${student.email || "-"}</p>
     `;
   }
 
@@ -92,48 +91,44 @@
     try {
       const res = await fetch(attendanceURL);
       const data = await res.json();
-      let output = `<h3>📝 Attendance</h3><table><tr><th>Date</th><th>Status</th></tr>`;
-      let found = false;
+      let rows = "";
       for (let date in data) {
-        const record = data[date]?.[studentClass]?.[branch]?.[userid];
-        if (record) {
-          const color = record === "Present" ? "#28FF20" : "#c30010";
-          output += `<tr style="background:${color};color:white;"><td>${date}</td><td>${record}</td></tr>`;
-          found = true;
+        const rec = data[date]?.[studentClass]?.[branch]?.[userid];
+        if (rec) {
+          rows += `<tr>
+            <td>${date}</td>
+            <td style="background:${rec==='Present'?'#28FF20':'#c30010'}">${rec}</td>
+          </tr>`;
         }
       }
-      output += `</table>`;
-      if (!found) output = `<p>No attendance found.</p>`;
-      document.getElementById("dashboardContent").innerHTML = output;
+      document.getElementById("dashboardContent").innerHTML = rows
+        ? `<h3>📝 Attendance</h3><table><tr><th>Date</th><th>Status</th></tr>${rows}</table>`
+        : "<p>No attendance records found.</p>";
     } catch {
-      document.getElementById("dashboardContent").innerHTML = `<p>Error loading attendance.</p>`;
+      document.getElementById("dashboardContent").innerHTML = "<p>Error loading attendance.</p>";
     }
   }
 
   async function showHomework() {
-    const res = await fetch(homeworkURL);
-    const data = await res.json();
-    const classHomework = data[studentClass] || [];
-    if (classHomework.length > 0) {
-      const list = classHomework.map(h => `<li><strong>${h.subject}:</strong> ${h.task}<br>📅 Due: ${h.dueDate}</li>`).join("");
-      document.getElementById("dashboardContent").innerHTML = `<h3>📚 Homework</h3><ul>${list}</ul>`;
-    } else {
-      document.getElementById("dashboardContent").innerHTML = `<p>No homework found for your class.</p>`;
+    try {
+      const res = await fetch(homeworkURL);
+      const data = await res.json();
+      const hw = data[studentClass] || [];
+      if (!hw.length) return document.getElementById("dashboardContent").innerHTML = "<p>No homework found.</p>";
+      document.getElementById("dashboardContent").innerHTML = `
+        <h3>📚 Homework for ${studentClass}</h3>
+        <ul>${hw.map(h=>`<li><strong>${h.subject}:</strong> ${h.task} <br>Due: ${h.dueDate}</li>`).join("")}</ul>`;
+    } catch {
+      document.getElementById("dashboardContent").innerHTML = "<p>Error loading homework.</p>";
     }
   }
 
   function viewResults() {
-    const exams = ["FA1", "FA2", "SA1", "FA3", "FA4", "SA2"];
-    const select = exams.map(e => `<option value="${e}">${e}</option>`).join("");
+    const exams = ["FA1","FA2","SA1","FA3","FA4","SA2"];
     document.getElementById("dashboardContent").innerHTML = `
       <h3>📊 View Results</h3>
-      <select id="examSelect">
-        <option value="">-- Select Exam --</option>
-        ${select}
-      </select>
-      <button onclick="fetchResult()">🔍 View Result</button>
-      <div id="resultOutput"></div>
-    `;
+      <select id="examSelect"><option value="">--Select Exam--</option>${exams.map(e=>`<option>${e}</option>`).join("")}</select>
+      <button onclick="fetchResult()">View Result</button><div id="resultOutput"></div>`;
   }
 
   async function fetchResult() {
@@ -142,67 +137,63 @@
     if (!exam) return output.innerHTML = "<p style='color:red'>Select exam</p>";
     try {
       const res = await fetch(`${resultsBase}${exam}_${userid}.json`);
-      if (!res.ok) throw new Error();
+      if (!res.ok) throw 1;
       const data = await res.json();
-      const result = data.marks || {};
-      const status = result.status || "Pass";
-      const color = status === "Fail" ? "#c30010" : "#28FF20";
-      const grade = result.final_grade || "-";
-      const percent = result.percentage || "0.00";
-      const total = result.totalMarks || 0;
-      const max = result.maxMarks || 0;
-
-      const rows = Object.entries(result.subjects || {}).map(([sub, val]) => {
-        return `<tr>
-          <td>${sub}</td>
-          <td>${val.obtained}</td>
-          <td>${val.maxMarks}</td>
-          <td>${val.internal}</td>
-          <td>${val.internalMax}</td>
-          <td>${val.total}</td>
-          <td>${val.grade}</td>
-        </tr>`;
-      }).join("");
-
+      const m = data.marks;
+      const status = m.Status;
+      const grade = m.finalGrade || "-";
+      const totalMarks = m.totalMarks;
+      const maxMarks = m.maxMarks;
+      const percentage = m.percentage;
+      const bg = status==="Fail"?"#ffcccc":"#ccffcc";
+      const subjects = ["Kannada","English","Hindi","Mathematics","EVS","Science","Social Science"];
+      const rows = subjects.map(sub=>`
+        <tr><td>${sub}</td>
+        <td>${m[sub]?.obtained||0}</td>
+        <td>${m[sub]?.maxMarks||0}</td>
+        <td>${m[sub]?.internal||0}</td>
+        <td>${m[sub]?.internalMax||0}</td>
+        <td>${m[sub]?.total||0}</td>
+        <td>${m[sub]?.grade||"-"}</td></tr>`).join("");
       output.innerHTML = `
-        <div style="background:${color};padding:20px;border-radius:10px;" id="resultSection">
-          <table>
-            <tr><th>Subject</th><th>Written</th><th>Max</th><th>Internal</th><th>Max</th><th>Total</th><th>Grade</th></tr>
-            ${rows}
-            <tr><td colspan="5"><strong>Total Marks</strong></td><td colspan="2">${total}/${max}</td></tr>
-            <tr><td colspan="5"><strong>Percentage</strong></td><td colspan="2">${percent}%</td></tr>
+        <div id="resultSection" style="background:${bg};padding:20px;border-radius:10px;">
+        <table>
+          <thead><tr>
+            <th>Subject</th><th>Obtained</th><th>Max</th>
+            <th>Internal</th><th>Max Int</th><th>Total</th><th>Grade</th>
+          </tr></thead>
+          <tbody>${rows}</tbody>
+          <tfoot>
+            <tr><td colspan="5"><strong>Total Obtained</strong></td><td colspan="2">${totalMarks}/${maxMarks}</td></tr>
             <tr><td colspan="5"><strong>Final Grade</strong></td><td colspan="2">${grade}</td></tr>
+            <tr><td colspan="5"><strong>Percentage</strong></td><td colspan="2">${percentage}%</td></tr>
             <tr><td colspan="5"><strong>Status</strong></td><td colspan="2">${status}</td></tr>
-          </table><br>
-          <button onclick="printResult()">🖨️ Print Result</button>
-          <button onclick="downloadPDF()">⬇️ Download PDF</button>
-        </div>
-      `;
+          </tfoot>
+        </table><br>
+        <button onclick="printResult()">🖨️ Print</button>
+        <button onclick="downloadPDF()">⬇️ Download PDF</button>
+        </div>`;
     } catch {
-      output.innerHTML = `<p style='color:red'>Result not found.</p>`;
+      output.innerHTML = "<p style='color:red'>Result not found.</p>";
     }
   }
 
   function printResult() {
-    const win = window.open('', '', 'height=700,width=900');
-    win.document.write(`<html><head><title>Print Result</title>
-      <style>body { font-family: Arial; padding: 20px; } table { width: 100%; border-collapse: collapse; } th, td { border: 1px solid #333; padding: 10px; text-align: center; }</style>
-    </head><body>${document.getElementById("resultSection").innerHTML}</body></html>`);
-    win.document.close();
-    win.print();
+    const w = window.open('', '', 'width=800,height=600');
+    w.document.write(`<html><head><title>Print Result</title>
+      <style>body{font-family:Arial}table{width:100%;border-collapse:collapse}th,td{border:1px solid #333;padding:8px;text-align:center}</style></head>
+      <body>${document.getElementById("resultSection").innerHTML}</body></html>`);
+    w.document.close();
+    w.print();
   }
 
   function downloadPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
-    doc.html(document.getElementById("resultSection"), {
-      callback: function (doc) {
-        doc.save("Result.pdf");
-      },
-      x: 10,
-      y: 10
-    });
+    doc.html(document.getElementById("resultSection"), { callback: pdf=>pdf.save("Result.pdf"), x:10, y:10 });
   }
+
+  window.onload = showProfile;
 </script>
 
 </body>
