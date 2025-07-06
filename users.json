@@ -9,7 +9,7 @@
         "dob": "2015-04-01",
         "father": "Chandhru M G",
         "mother": "Mamatha",
-        "address": "Bagaluru Colony",
+        "address": "Bagaluru Colony ",
         "mobile": "9916866941",
         "email": "chanrumg@gmail.com",
         "password": "student123",
@@ -70,12 +70,12 @@
         "branch": "Bandikodigenahalli",
         "gender": "Male",
         "dob": "2016-08-06",
-        "father": "Chandhrappa",
+        "father": "Chandhrappa ",
         "mother": "Mamatha",
         "address": "Bagaluru Colony",
         "mobile": "9916866941",
         "email": "chanrumg@gmail.com",
-        "photo": "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/photos/883b1006-c708-4702-870a-f3e81635bd20-1_all_1844.jpg"
+        "photo": "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/883b1006-c708-4702-870a-f3e81635bd20-1_all_1844.jpg"
       }
     }
   },
