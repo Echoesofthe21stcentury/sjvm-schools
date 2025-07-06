@@ -21,6 +21,8 @@
     .logout { text-align:center; margin:30px; }
     .logout button { padding:10px 20px; background:#b30000; color:white; border:none; border-radius:6px; }
     .logout button:hover { background:#800000; }
+    .paynow { background: #0073e6; color:white; padding:8px 14px; border:none; border-radius:5px; cursor:pointer; }
+    .paynow:hover { background: #005bb5; }
   </style>
 </head>
 <body>
@@ -30,6 +32,7 @@
   <a href="#" onclick="showAttendance()">Attendance</a>
   <a href="#" onclick="showHomework()">Homework</a>
   <a href="#" onclick="viewResults()">View Results</a>
+  <a href="#" onclick="viewFee()">View Fee</a>
 </nav>
 <div class="container" id="dashboardContent"><p>Welcome to your dashboard!</p></div>
 <div class="logout"><button onclick="logout()">Logout</button></div>
@@ -39,6 +42,7 @@
   const attendanceURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/attendance.json";
   const homeworkURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/homework.json";
   const resultsBase = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/results/";
+  const feeURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/fees.json";
 
   const userid = localStorage.getItem("userid");
   const studentClass = localStorage.getItem("studentClass");
@@ -155,6 +159,38 @@
       callback: () => doc.save("Result.pdf"),
       x: 10, y: 10
     });
+  }
+
+  async function viewFee(){
+    const data = await (await fetch(feeURL)).json();
+    const fee = data?.[studentClass]?.[userid];
+
+    if (!fee) {
+      document.getElementById("dashboardContent").innerHTML = "<p>No fee information found.</p>";
+      return;
+    }
+
+    const { status, amount, paidOn, method } = fee;
+
+    if (status === "Paid") {
+      document.getElementById("dashboardContent").innerHTML = `
+        <h3>💰 Fee Status</h3>
+        <p><strong>Amount:</strong> ₹${amount}</p>
+        <p><strong>Status:</strong> ✅ Paid</p>
+        <p><strong>Payment Method:</strong> ${method}</p>
+        <p><strong>Date Paid:</strong> ${paidOn}</p>`;
+    } else {
+      document.getElementById("dashboardContent").innerHTML = `
+        <h3>💰 Fee Status</h3>
+        <p><strong>Amount Due:</strong> ₹${amount}</p>
+        <p><strong>Status:</strong> <span style="color:blue;">Pending</span></p>
+        <button class="paynow" onclick="redirectToPayment(${amount})">💳 Pay Now</button>`;
+    }
+  }
+
+  function redirectToPayment(amount){
+    alert("Redirecting to payment gateway...");
+    window.location.href = `payment.html?amount=${amount}&student=${userid}`;
   }
 </script>
 </body>
