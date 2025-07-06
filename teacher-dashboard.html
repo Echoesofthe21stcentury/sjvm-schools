@@ -7,49 +7,51 @@
   <script src="auth-check.js"></script>
   <style>
     body { font-family: Arial, sans-serif; background: #f4f8fc; margin: 0; }
-    header { background: #003366; color: white; padding: 20px; position: relative; display: flex; align-items: center; justify-content: space-between; }
-    .profile-info { display: flex; align-items: center; }
-    .profile-circle { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; margin-right: 10px; }
-    nav { background: #0059b3; display: flex; justify-content: center; flex-wrap: wrap; }
-    nav a { color: white; padding: 14px 20px; text-decoration: none; font-weight: bold; }
-    nav a:hover { background: #003366; }
-    .container { max-width: 960px; margin: 20px auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { padding: 8px; border: 1px solid #ccc; text-align: center; }
-    th { background: #e0ebff; }
-    input, select, textarea { padding: 6px; width: 100%; box-sizing: border-box; }
-    button { padding: 10px 15px; margin-top: 10px; cursor: pointer; }
-    .logout { text-align: center; margin: 20px; }
-    .logout button { background: #b30000; color: white; border: none; padding: 10px 20px; border-radius: 6px; }
-    .logout button:hover { background: #800000; }
-    .welcome { background: #ccf2ff; color: #003366; padding: 10px 15px; border-radius: 8px; margin: 20px auto; max-width: 960px; font-weight: bold; text-align: center; }
-    @media (max-width: 600px) {
-      table, th, td { font-size: 12px; }
-      .profile-circle { width: 30px; height: 30px; }
+    header { background: #003366; color: white; padding: 20px; position: relative; display:flex; align-items:center; justify-content:space-between; }
+    .profile {
+      display:flex; align-items:center;
+    }
+    .profile-circle { width:40px; height:40px; border-radius:50%; object-fit:cover; margin-right:10px; }
+    nav { background: #0059b3; display:flex; justify-content:center; flex-wrap:wrap; }
+    nav a { color:white; padding:14px 20px; text-decoration:none; font-weight:bold; }
+    nav a:hover { background:#003366; }
+    .container { max-width:900px; margin:20px auto; background:white; padding:20px; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.1); }
+    table { width:100%; border-collapse:collapse; margin-top:20px; }
+    th,td { padding:8px; border:1px solid #ccc; text-align:center; }
+    th { background:#e0ebff; }
+    input, select, textarea, button { padding:6px; width:100%; margin-top:10px; box-sizing:border-box; }
+    button { cursor:pointer; }
+    .logout { text-align:center; margin:20px; }
+    .logout button { background:#b30000; color:white; border:none; padding:10px 20px; border-radius:6px; }
+    .logout button:hover { background:#800000; }
+    .welcome { background:#ccf2ff; color:#003366; padding:10px 15px; border-radius:8px; margin:20px auto; max-width:900px; font-weight:bold; }
+    @media(max-width:600px){
+      table,th,td { font-size:12px; }
+      .profile-circle { width:30px; height:30px; }
     }
   </style>
 </head>
 <body>
 
 <header>
-  <div class="profile-info">
+  <div class="profile">
     <img id="teacherPhoto" class="profile-circle">
     <span id="usernameDisplay"></span>
   </div>
-  <button onclick="logout()" style="background: crimson; color:white; border:none; padding:6px 12px; border-radius:5px">Logout</button>
+  <button onclick="logout()">Logout</button>
 </header>
 
 <div class="welcome" id="welcomeMsg">Welcome, Teacher!</div>
 
 <nav>
-  <a href="#" onclick="markAttendance()">📅 Mark Attendance</a>
-  <a href="#" onclick="uploadHomework()">📚 Upload Homework</a>
+  <a href="#" onclick="markAttendance()">📅 Attendance</a>
+  <a href="#" onclick="uploadHomework()">📚 Homework</a>
   <a href="#" onclick="uploadResult()">🧾 Upload Result</a>
   <a href="#" onclick="editResult()">✏️ Edit Result</a>
 </nav>
 
 <div class="container" id="dashboardContent">
-  <p>Select a menu option above to begin.</p>
+  <p>Select a menu option.</p>
 </div>
 
 <div class="logout">
@@ -57,175 +59,220 @@
 </div>
 
 <script>
-const usersURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/users.json";
-const resultAPIBase = "https://api.github.com/repos/Echoesofthe21stcentury/sjvm-schools/contents/results/";
+  const usersURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/users.json";
+  const attendanceAPIBase = "https://api.github.com/repos/Echoesofthe21stcentury/sjvm-schools/contents/attendance.json";
+  const homeworkAPI = "https://api.github.com/repos/Echoesofthe21stcentury/sjvm-schools/contents/homework.json";
+  const resultsAPIBase = "https://api.github.com/repos/Echoesofthe21stcentury/sjvm-schools/contents/results/";
 
-const username = localStorage.getItem("username");
-const branch = localStorage.getItem("branch");
-document.getElementById("usernameDisplay").innerText = username;
+  const username = localStorage.getItem("username");
+  const branch = localStorage.getItem("branch");
+  document.getElementById("usernameDisplay").innerText = username;
 
-fetch(usersURL).then(r => r.json()).then(data => {
-  const t = Object.values(data.Teacher || {}).flatMap(o => Object.values(o)).find(u => u.name === username);
-  const photo = t?.photo?.trim() ? 
-    "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/" + t.photo.trim() : 
-    "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/SJVM%20logo%20empowering%20mankind%20without%20background.png";
-  document.getElementById("teacherPhoto").src = photo;
-  document.getElementById("welcomeMsg").innerText = `Welcome, Teacher ${t?.name || username}! 👋`;
-});
-
-function logout() {
-  localStorage.clear();
-  window.location.href = "userlogin.html";
-}
-
-function markAttendance() {
-  document.getElementById("dashboardContent").innerHTML = `
-    <h2>📅 Mark Attendance</h2>
-    <p><em>Attendance feature coming soon.</em></p>
-  `;
-}
-
-function uploadHomework() {
-  document.getElementById("dashboardContent").innerHTML = `
-    <h2>📚 Upload Homework</h2>
-    <label>Class:</label><input type="text"><br><br>
-    <label>Subject:</label><input type="text"><br><br>
-    <label>Homework:</label><textarea rows="3"></textarea><br><br>
-    <label>Due Date:</label><input type="date"><br><br>
-    <button>Submit</button>
-    <p>Feature in progress (GitHub API upload not configured).</p>
-  `;
-}
-
-function uploadResult(edit = false) {
-  fetch(usersURL).then(r => r.json()).then(data => {
-    const students = data.Student;
-    const classes = Object.keys(students);
-
-    document.getElementById("dashboardContent").innerHTML = `
-      <h2>${edit ? '✏️ Edit' : '🧾 Upload'} Result</h2>
-      <label>Class:</label><select id="classSelect"><option value="">--Select--</option>${classes.map(c => `<option>${c}</option>`).join("")}</select><br><br>
-      <label>Exam:</label><select id="examType"><option>FA1</option><option>FA2</option><option>SA1</option><option>FA3</option><option>FA4</option><option>SA2</option></select><br><br>
-      <label>Student:</label><select id="studentSelect"><option>Select Class First</option></select><br><br>
-
-      <table>
-        <thead><tr><th>Subject</th><th>Marks</th><th>Max</th><th>Internal</th><th>Max Internal</th><th>Total</th><th>Grade</th></tr></thead>
-        <tbody id="subjectTableBody">
-          ${["Kannada","English","Hindi","Mathematics","Science","Social Science"].map(sub => `
-            <tr>
-              <td>${sub}</td>
-              <td><input type="number" id="ob_${sub}" oninput="calc('${sub}')"></td>
-              <td><input type="number" id="max_${sub}" oninput="calc('${sub}')"></td>
-              <td><input type="number" id="int_${sub}" oninput="calc('${sub}')"></td>
-              <td><input value="20" disabled></td>
-              <td><input id="total_${sub}" readonly></td>
-              <td><input id="grade_${sub}"></td>
-            </tr>`).join("")}
-        </tbody>
-      </table><br>
-
-      <label>Total Max Marks:</label><input id="grandMax" readonly><br>
-      <label>Total Marks Obtained:</label><input id="grandTotal" readonly><br>
-      <label>Percentage:</label><input id="percentage" readonly><br>
-      <label>Final Grade:</label><input id="finalGrade"><br>
-      <label>Status:</label><select id="status"><option>Pass</option><option>Fail</option></select><br><br>
-
-      <button onclick="submitResult()">Publish Result</button>
-      <p id="resultStatus"></p>
-    `;
-
-    document.getElementById("classSelect").addEventListener("change", e => {
-      const cls = e.target.value;
-      const sel = document.getElementById("studentSelect");
-      sel.innerHTML = Object.entries(students[cls] || {})
-        .filter(([_, s]) => s.branch === branch)
-        .map(([id, s]) => `<option value="${id}">${s.name} (${id})</option>`)
-        .join("");
-    });
-  });
-}
-
-function editResult() {
-  uploadResult(true);
-}
-
-function calc(sub) {
-  const ob = +document.getElementById(`ob_${sub}`).value || 0;
-  const mx = +document.getElementById(`max_${sub}`).value || 0;
-  const intl = +document.getElementById(`int_${sub}`).value || 0;
-  const total = ob + intl;
-  document.getElementById(`total_${sub}`).value = total;
-
-  // Total update
-  let grandTotal = 0, grandMax = 0;
-  ["Kannada","English","Hindi","Mathematics","Science","Social Science"].forEach(s => {
-    const ob1 = +document.getElementById(`ob_${s}`).value || 0;
-    const mx1 = +document.getElementById(`max_${s}`).value || 0;
-    const in1 = +document.getElementById(`int_${s}`).value || 0;
-    grandTotal += (ob1 + in1);
-    grandMax += (mx1 + 20);
+  // Load teacher photo & greeting
+  fetch(usersURL).then(r=>r.json()).then(data=>{
+    const t = Object.values(data.Teacher || {}).flatMap(o=>Object.values(o)).find(u=>u.name===username);
+    const photo = t?.photo?.trim()
+      ? "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/" + t.photo.trim()
+      : "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/SJVM%20logo%20empowering%20mankind%20without%20background.png";
+    document.getElementById("teacherPhoto").src = photo;
+    document.getElementById("welcomeMsg").innerText = `Welcome, Teacher ${t?.name || username}!`;
   });
 
-  document.getElementById("grandTotal").value = grandTotal;
-  document.getElementById("grandMax").value = grandMax;
-  document.getElementById("percentage").value = ((grandTotal / grandMax) * 100).toFixed(2);
-}
-
-async function submitResult() {
-  const className = document.getElementById("classSelect").value;
-  const studentId = document.getElementById("studentSelect").value;
-  const examType = document.getElementById("examType").value;
-  const status = document.getElementById("status").value;
-  const finalGrade = document.getElementById("finalGrade").value;
-  const token = prompt("Enter your GitHub Token:");
-
-  if (!className || !studentId || !examType || !token) return alert("All fields are required!");
-
-  const subs = ["Kannada","English","Hindi","Mathematics","Science","Social Science"];
-  const marks = {};
-  let total = 0, max = 0;
-
-  for (let sub of subs) {
-    const ob = +document.getElementById(`ob_${sub}`).value || 0;
-    const mx = +document.getElementById(`max_${sub}`).value || 0;
-    const intl = +document.getElementById(`int_${sub}`).value || 0;
-    const grade = document.getElementById(`grade_${sub}`).value || "-";
-    const tot = ob + intl;
-    marks[sub] = {obtained: ob, max: mx, internal: intl, total: tot, grade};
-    total += tot;
-    max += mx + 20;
+  function logout(){
+    localStorage.clear();
+    window.location.href="userlogin.html";
   }
 
-  const data = {
-    class: className,
-    studentId: studentId,
-    examType: examType,
-    subjects: marks,
-    totalMarks: total,
-    maxMarks: max,
-    percentage: ((total / max) * 100).toFixed(2),
-    finalGrade: finalGrade,
-    status: status
-  };
+  async function markAttendance(){
+    const users = await fetch(usersURL).then(r=>r.json()).then(d=>d.Student);
+    const classes = Object.keys(users);
+    document.getElementById("dashboardContent").innerHTML = `
+      <h2>📅 Mark Attendance</h2>
+      <label>Date:</label><input type="date" id="attDate"><br><br>
+      <label>Class:</label><select id="attClass"><option>--Select--</option>${classes.map(c=>`<option>${c}</option>`)}</select><br><br>
+      <button onclick="loadAttendance()">Load Students</button>
+      <div id="attContent"></div>
+    `;
+  }
 
-  const filename = `${examType}_${studentId}.json`;
-  const uploadURL = resultAPIBase + filename;
+  function loadAttendance(){
+    const cls = document.getElementById("attClass").value;
+    const date = document.getElementById("attDate").value;
+    if(!cls||!date)return alert("Select both");
+    fetch(usersURL).then(r=>r.json()).then(data=>{
+      const students = data.Student[cls]||{};
+      const rows = Object.entries(students).filter(([_,s])=>s.branch===branch).map(([id,s])=>`
+        <tr data-id="${id}">
+          <td>${s.name} (${id})</td>
+          <td>
+            <select>
+              <option>Present</option><option>Absent</option>
+            </select>
+          </td>
+        </tr>`).join("");
+      document.getElementById("attContent").innerHTML = `
+        <table><tr><th>Student</th><th>Status</th></tr>${rows}</table>
+        <button onclick="submitAttendance()">Submit Attendance</button>
+        <p id="attStatus"></p>
+      `;
+    });
+  }
 
-  const existing = await fetch(uploadURL, { headers: { Authorization: `token ${token}` } }).then(r => r.json());
-  const sha = existing?.sha;
+  async function submitAttendance(){
+    const date = document.getElementById("attDate").value;
+    const cls = document.getElementById("attClass").value;
+    const rows = document.querySelectorAll('#attContent tr[data-id]');
+    const token = prompt("GitHub PAT:");
+    if(!token)return;
+    const data = {};
+    rows.forEach(r=>{
+      const id = r.getAttribute("data-id");
+      const st = r.querySelector("select").value;
+      data[id] = st;
+    });
+    const resp = await fetch(attendanceAPIBase,{headers:{Authorization:`token ${token}`}});
+    const body = await resp.json();
+    const content = JSON.parse(atob(body.content));
+    const sha = body.sha;
+    content[date] = content[date] || {};
+    content[date][cls] = content[date][cls] || {};
+    content[date][cls][branch] = data;
+    await fetch(attendanceAPIBase,{
+      method:"PUT", headers:{Authorization:`token ${token}`},
+      body: JSON.stringify({
+        message:`Attendance ${cls} ${date}`,
+        content:btoa(JSON.stringify(content,null,2)),
+        sha
+      })
+    });
+    document.getElementById("attStatus").innerText = "✅ Attendance saved!";
+  }
 
-  await fetch(uploadURL, {
-    method: "PUT",
-    headers: { Authorization: `token ${token}` },
-    body: JSON.stringify({
-      message: `Result upload for ${studentId}`,
-      content: btoa(JSON.stringify(data, null, 2)),
-      sha
-    })
-  });
+  function uploadHomework(){
+    document.getElementById("dashboardContent").innerHTML = `
+      <h2>📚 Upload Homework</h2>
+      <label>Class:</label><input id="hwClass"><br><br>
+      <label>Subject:</label><input id="hwSubject"><br><br>
+      <label>Task:</label><textarea id="hwTask" rows="3"></textarea><br><br>
+      <label>Due Date:</label><input type="date" id="hwDue"><br><br>
+      <button onclick="submitHomework()">Submit Homework</button>
+      <p id="hwStatus"></p>
+    `;
+  }
 
-  document.getElementById("resultStatus").innerText = "✅ Result published!";
-}
+  async function submitHomework(){
+    const cls = document.getElementById("hwClass").value.trim();
+    const sub = document.getElementById("hwSubject").value.trim();
+    const task = document.getElementById("hwTask").value.trim();
+    const due = document.getElementById("hwDue").value;
+    const token = prompt("GitHub PAT:");
+    if(!cls||!sub||!task||!due||!token)return alert("Fill all");
+    const resp = await fetch(homeworkAPI,{headers:{Authorization:`token ${token}`}});
+    const body = await resp.json();
+    const content = JSON.parse(atob(body.content));
+    const sha = body.sha;
+    content[cls] = content[cls]||[];
+    content[cls].push({subject:sub,task,dueDate:due});
+    await fetch(homeworkAPI,{
+      method:"PUT", headers:{Authorization:`token ${token}`},
+      body: JSON.stringify({
+        message:`Homework ${cls}`,
+        content:btoa(JSON.stringify(content,null,2)),
+        sha
+      })
+    });
+    document.getElementById("hwStatus").innerText = "✅ Homework saved!";
+  }
+
+  function uploadResult(editing=false){
+    fetch(usersURL).then(r=>r.json()).then(data=>{
+      const classes = Object.keys(data.Student);
+      document.getElementById("dashboardContent").innerHTML = `
+        <h2>${editing?"✏️ Edit":"🧾 Upload"} Result</h2>
+        <label>Class:</label><select id="classSelect"><option>--Select--</option>${classes.map(c=>`<option>${c}</option>`)}</select><br><br>
+        <label>Exam:</label><input id="examType" placeholder="e.g. FA1"><br><br>
+        <label>Student:</label><select id="studentSelect"><option>Choose class first</option></select><br><br>
+        <div id="resultFormContainer"></div>
+      `;
+      document.getElementById("classSelect").addEventListener("change", e=>{
+        const cls = e.target.value;
+        const students = data.Student[cls]||{};
+        const sel = document.getElementById("studentSelect");
+        sel.innerHTML = Object.entries(students)
+          .filter(([_,s])=>s.branch===branch)
+          .map(([id,s])=>`<option value="${id}">${s.name} (${id})</option>`).join("");
+        document.getElementById("studentSelect").addEventListener("change", loadResultForm);
+      });
+    });
+  }
+
+  function editResult(){ uploadResult(true); }
+
+  function loadResultForm(){
+    const subs = ["Kannada","English","Hindi","Mathematics","EVS","Science","Social Science"];
+    document.getElementById("resultFormContainer").innerHTML = `
+      <table><thead><tr><th>Subject</th><th>Obtained</th><th>Max</th><th>Internal</th><th>Total</th><th>Grade</th></tr></thead>
+      <tbody>${subs.map(s=>`
+        <tr>
+          <td>${s}</td>
+          <td><input type="number" id="ob_${s}" oninput="calc('${s}')"></td>
+          <td><input type="number" id="max_${s}" placeholder="max"></td>
+          <td><input type="number" id="int_${s}" placeholder="internal"></td>
+          <td><input type="number" id="total_${s}" readonly></td>
+          <td><input type="text" id="grade_${s}" placeholder="A+"></td>
+        </tr>`).join("")}
+      </tbody></table><br>
+      <label>Status:</label><select id="status"><option>Pass</option><option>Fail</option></select><br><br>
+      <button onclick="submitResult()">Submit</button>
+      <p id="resultStatus"></p>
+    `;
+  }
+
+  function calc(sub){
+    const ob = +document.getElementById(`ob_${sub}`).value||0;
+    const intl = +document.getElementById(`int_${sub}`).value||0;
+    document.getElementById(`total_${sub}`).value = ob + intl;
+  }
+
+  async function submitResult(){
+    const cls = document.getElementById("classSelect").value;
+    const sid = document.getElementById("studentSelect").value;
+    const exam = document.getElementById("examType").value;
+    const status = document.getElementById("status").value;
+    const token = prompt("GitHub PAT:");
+    if(!cls||!sid||!exam||!token) return alert("Fill required");
+    const subs = ["Kannada","English","Hindi","Mathematics","EVS","Science","Social Science"];
+    const marksData = {};
+    let total=0, max=0;
+    subs.forEach(s=>{
+      const ob=+document.getElementById(`ob_${s}`).value||0;
+      const mx=+document.getElementById(`max_${s}`).value||0;
+      const intl=+document.getElementById(`int_${s}`).value||0;
+      const grd=document.getElementById(`grade_${s}`).value || "-";
+      const tot=ob+intl;
+      marksData[s]={obtained:ob,max:mx,internal:intl,total:tot,grade:grd};
+      total+=tot; max+=(mx+intl);
+    });
+    const percentage=((total/max)*100).toFixed(2);
+    const payload={studentId:sid,class:cls,exam,marks:marksData,totalMarks:total,maxMarks:max,percentage,status};
+
+    const fileName = `${exam}_${sid}.json`;
+    const url = resultsAPIBase + fileName;
+    const resCheck = await fetch(url,{headers:{Authorization:`token ${token}`}});
+    const existing = resCheck.ok? await resCheck.json(): null;
+    const sha = existing?.sha;
+
+    await fetch(url, {
+      method:"PUT",
+      headers:{Authorization:`token ${token}`},
+      body: JSON.stringify({
+        message:`Result ${exam}_${sid}`,
+        content:btoa(JSON.stringify(payload,null,2)),
+        ...(sha?{sha}:{})
+      })
+    });
+    document.getElementById("resultStatus").innerText = "✅ Result saved!";
+  }
 </script>
 
 </body>
