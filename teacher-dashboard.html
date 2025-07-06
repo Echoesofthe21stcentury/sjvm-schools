@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <title>Teacher Dashboard | SJVM</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="auth-check.js"></script>
   <style>
     body { font-family: Arial, sans-serif; background: #f4f8fc; margin: 0; }
     header { background: #003366; color: white; padding: 20px; position: relative; }
@@ -15,11 +16,12 @@
     table { width:100%; border-collapse:collapse; margin-top:20px; }
     th,td { padding:8px; border:1px solid #ccc; text-align:center; }
     th { background: #e0ebff; }
-    input[type=number],select { padding:6px; width:100%; box-sizing:border-box; }
+    input[type=number],select,textarea,input[type=text],input[type=date] { padding:6px; width:100%; box-sizing:border-box; }
     button { padding:10px 15px; margin-top:10px; cursor:pointer; }
     .logout { text-align:center; margin:20px;}
     .logout button { background:#b30000; color:white; border:none; padding:10px 20px; border-radius:6px; }
     .logout button:hover { background:#800000; }
+    .welcome { background:#ccf2ff; color:#003366; padding:10px 15px; border-radius:8px; margin: 20px auto; max-width: 900px; font-weight:bold; }
     @media(max-width:600px){
       table,th,td{font-size:12px;}
       .profile-circle{width:30px;height:30px;}
@@ -28,18 +30,24 @@
 </head>
 <body>
 <header>
-  👩‍🏫 SJVM Teacher Dashboard
-  <div style="position:absolute; top:15px; right:20px;">
-    <img id="teacherPhoto" class="profile-circle" />
+  <div style="display:flex; align-items:center;">
+    <img id="teacherPhoto" class="profile-circle">
     <span id="usernameDisplay"></span>
-    <button onclick="logout()" style="background: crimson; color:white; border:none; padding:6px 12px; margin-left:10px; border-radius:5px">Logout</button>
+  </div>
+  <div style="position:absolute; top:15px; right:20px;">
+    <button onclick="logout()" style="background: crimson; color:white; border:none; padding:6px 12px; border-radius:5px">Logout</button>
   </div>
 </header>
 
+<div class="welcome" id="welcomeMsg">
+  Welcome, Teacher 👩‍🏫!
+</div>
+
 <nav>
-  <a href="#" onclick="showProfile()">👤 Profile</a>
   <a href="#" onclick="markAttendance()">📅 Mark Attendance</a>
+  <a href="#" onclick="uploadHomework()">📚 Upload Homework</a>
   <a href="#" onclick="uploadResult()">🧾 Upload Result</a>
+  <a href="#" onclick="editResult()">✏️ Edit Result</a>
 </nav>
 
 <div class="container" id="dashboardContent">
@@ -51,165 +59,155 @@
 </div>
 
 <script>
-const usersURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/users.json";
-const attendanceAPI = "https://api.github.com/repos/Echoesofthe21stcentury/sjvm-schools/contents/attendance.json";
-const resultAPIBase = "https://api.github.com/repos/Echoesofthe21stcentury/sjvm-schools/contents/results/";
+  const usersURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/users.json";
+  const resultAPIBase = "https://api.github.com/repos/Echoesofthe21stcentury/sjvm-schools/contents/results/";
 
-const username = localStorage.getItem("username");
-const branch = localStorage.getItem("branch");
-document.getElementById("usernameDisplay").innerText = username;
+  const username = localStorage.getItem("username");
+  const branch = localStorage.getItem("branch");
+  document.getElementById("usernameDisplay").innerText = username;
 
-// Load teacher photo
-fetch(usersURL).then(r => r.json()).then(data => {
-  const t = Object.values(data.Teacher || {}).flatMap(o => Object.values(o)).find(u => u.name === username);
-  const photo = (t?.photo || "").trim();
-  document.getElementById("teacherPhoto").src = photo ? `https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/${photo}` : 
-  "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/SJVM%20logo%20empowering%20mankind%20without%20background.png";
-});
-
-function logout() {
-  localStorage.clear();
-  window.location.href = "userlogin.html";
-}
-
-function showProfile() {
-  fetch(usersURL).then(res => res.json()).then(data => {
-    const teacher = Object.values(data.Teacher[branch] || {}).find(t => t.name === username);
-    const photo = teacher?.photo ? `https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/${teacher.photo}` :
+  fetch(usersURL).then(r=>r.json()).then(data=>{
+    const t = Object.values(data.Teacher || {}).flatMap(o=>Object.values(o)).find(u=>u.name===username);
+    const photo = t?.photo?.trim() ? 
+      "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/" + t.photo.trim() : 
       "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/SJVM%20logo%20empowering%20mankind%20without%20background.png";
-    document.getElementById("dashboardContent").innerHTML = teacher ? `
-      <h2>👤 Profile</h2>
-      <img src="${photo}" alt="Photo" style="width:100px;height:100px;border-radius:50%;margin-bottom:10px;"><br>
-      <p><strong>Name:</strong> ${teacher.name}</p>
-      <p><strong>Branch:</strong> ${teacher.branch || branch}</p>
-    ` : "<p>Teacher data not found.</p>";
+    document.getElementById("teacherPhoto").src = photo;
+
+    const welcome = document.getElementById("welcomeMsg");
+    welcome.innerText = `Welcome, Teacher ${t?.name || username}! 👋`;
   });
-}
 
-async function markAttendance() {
-  const res = await fetch(usersURL);
-  const data = await res.json();
-  const students = data.Student || {};
-  let html = `<h2>📅 Mark Attendance</h2><form id="attForm"><label>Date:</label><input type="date" id="attDate" required><table><tr><th>Name</th><th>Class</th><th>Status</th></tr>`;
+  function logout() {
+    localStorage.clear();
+    window.location.href = "userlogin.html";
+  }
 
-  Object.entries(students).forEach(([cls, stuList]) => {
-    Object.entries(stuList).forEach(([id, s]) => {
-      if (s.branch === branch) {
-        html += `<tr style="background:#fff">
-          <td>${s.name}</td><td>${cls}</td>
-          <td>
-            <select name="${id}_${cls}">
-              <option value="Present" style="background:#28FF20">Present</option>
-              <option value="Absent" style="background:#c30010">Absent</option>
-            </select>
-          </td>
-        </tr>`;
-      }
+  function markAttendance() {
+    document.getElementById("dashboardContent").innerHTML = `
+      <h2>📅 Mark Attendance</h2>
+      <p><em>Feature under development</em></p>
+    `;
+  }
+
+  function uploadHomework() {
+    document.getElementById("dashboardContent").innerHTML = `
+      <h2>📚 Upload Homework</h2>
+      <p>Coming Soon!</p>
+    `;
+  }
+
+  function uploadResult(editing = false) {
+    fetch(usersURL).then(res => res.json()).then(data => {
+      const studentData = data.Student;
+      const classList = Object.keys(studentData);
+      const options = classList.map(c => `<option>${c}</option>`).join("");
+
+      document.getElementById("dashboardContent").innerHTML = `
+        <h2>${editing ? '✏️ Edit' : '🧾 Upload'} Result</h2>
+        <label>Class:</label><select id="classSelect"><option>--Select--</option>${options}</select><br><br>
+        <label>Exam:</label><select id="examType"><option>FA1</option><option>FA2</option><option>SA1</option><option>FA3</option><option>FA4</option><option>SA2</option></select><br><br>
+        <label>Student:</label><select id="studentSelect"><option>Select class first</option></select><br><br>
+        <table><thead><tr><th>Subject</th><th>Obtained</th><th>Max</th><th>Internal</th><th>Max Internal</th><th>Total</th><th>Grade</th></tr></thead>
+          <tbody>${["Kannada","English","Hindi","Mathematics","EVS","Science","Social Science"].map(sub=>`
+            <tr>
+              <td>${sub}</td>
+              <td><input type="number" id="ob_${sub}" oninput="calc('${sub}')"></td>
+              <td><input type="number" id="max_${sub}" value="80" oninput="calc('${sub}')"></td>
+              <td><input type="number" id="int_${sub}" value="20" oninput="calc('${sub}')"></td>
+              <td><input type="number" id="maxint_${sub}" value="20" disabled></td>
+              <td><input type="number" id="total_${sub}" readonly></td>
+              <td><input type="text" id="grade_${sub}"></td>
+            </tr>`).join("")}
+          </tbody>
+        </table><br>
+        <label>Status:</label><select id="status"><option>Pass</option><option>Fail</option></select><br><br>
+        <button onclick="submitResult()">Publish Result</button>
+        <p id="resultStatus"></p>
+      `;
+
+      document.getElementById("classSelect").addEventListener("change", e => {
+        const cls = e.target.value;
+        const students = studentData[cls] || {};
+        const sel = document.getElementById("studentSelect");
+        sel.innerHTML = Object.entries(students)
+          .filter(([id, stu]) => stu.branch === branch)
+          .map(([id, stu]) => `<option value="${id}">${stu.name} (${id})</option>`)
+          .join("");
+      });
     });
-  });
+  }
 
-  html += `</table><br><button type="submit">✅ Submit Attendance</button></form><p id="attStatus"></p>`;
-  document.getElementById("dashboardContent").innerHTML = html;
+  function editResult() {
+    uploadResult(true);
+  }
 
-  document.getElementById("attForm").onsubmit = async function (e) {
-    e.preventDefault();
-    const form = new FormData(this);
-    const date = document.getElementById("attDate").value;
-    if (!date) return alert("Please select date");
-    const token = prompt("GitHub PAT:");
-    const res = await fetch(attendanceAPI, { headers: { Authorization: `token ${token}` } }).then(r => r.json());
-    const data = JSON.parse(atob(res.content));
-    data[date] = data[date] || {};
-    for (let [key, val] of form.entries()) {
-      const [id, cls] = key.split("_");
-      data[date][cls] = data[date][cls] || {};
-      data[date][cls][branch] = data[date][cls][branch] || {};
-      data[date][cls][branch][id] = val;
+  function calc(sub) {
+    const ob = +document.getElementById(`ob_${sub}`).value || 0;
+    const int = +document.getElementById(`int_${sub}`).value || 0;
+    document.getElementById(`total_${sub}`).value = ob + int;
+  }
+
+  async function submitResult() {
+    const className = document.getElementById("classSelect").value;
+    const studentId = document.getElementById("studentSelect").value;
+    const examType = document.getElementById("examType").value;
+    const status = document.getElementById("status").value;
+    const token = prompt("Enter your GitHub Personal Access Token:");
+
+    if (!className || !studentId || !examType || !token) return alert("All fields are required!");
+
+    const subjects = ["Kannada","English","Hindi","Mathematics","EVS","Science","Social Science"];
+    let marks = {}, totalMarks = 0, maxMarks = 0;
+
+    for (let sub of subjects) {
+      const ob = +document.getElementById(`ob_${sub}`).value || 0;
+      const mx = +document.getElementById(`max_${sub}`).value || 0;
+      const intl = +document.getElementById(`int_${sub}`).value || 0;
+      const grade = document.getElementById(`grade_${sub}`).value || "-";
+      const total = ob + intl;
+
+      marks[sub] = {
+        Marks: ob,
+        Max: mx,
+        Internal: intl,
+        Total: total,
+        Grade: grade
+      };
+
+      totalMarks += total;
+      maxMarks += mx + 20;
     }
-    await fetch(attendanceAPI, {
+
+    const percentage = ((totalMarks / maxMarks) * 100).toFixed(2);
+    const finalGrade = "–"; // teacher can assign if needed
+    const data = {
+      marks: marks,
+      Total: totalMarks,
+      Max: maxMarks,
+      Percentage: percentage,
+      Grade: finalGrade,
+      Status: status
+    };
+
+    const filename = `${examType}_${studentId}.json`;
+    const resultFileURL = resultAPIBase + filename;
+
+    const response = await fetch(resultFileURL, { headers: { Authorization: `token ${token}` } });
+    const existing = await response.json();
+    const sha = existing?.sha;
+
+    await fetch(resultFileURL, {
       method: "PUT",
       headers: { Authorization: `token ${token}` },
       body: JSON.stringify({
-        message: `Marked attendance ${date}`,
+        message: `Result for ${studentId} - ${examType}`,
         content: btoa(JSON.stringify(data, null, 2)),
-        sha: res.sha
+        sha: sha
       })
     });
-    document.getElementById("attStatus").innerText = "✅ Attendance marked!";
-  };
-}
 
-async function uploadResult() {
-  const res = await fetch(usersURL);
-  const data = await res.json();
-  const students = data.Student || {};
-  const clsList = Object.keys(students);
-  const subjects = ["Kannada","English","Hindi","Mathematics","EVS","Science","Social Science"];
-  document.getElementById("dashboardContent").innerHTML = `
-    <h2>🧾 Upload Result</h2>
-    <label>Class:</label><select id="classSel">${clsList.map(c => `<option value="${c}">${c}</option>`)}</select><br><br>
-    <label>Exam:</label><select id="examSel"><option>FA1</option><option>FA2</option><option>SA1</option><option>FA3</option><option>FA4</option><option>SA2</option></select><br><br>
-    <label>Student:</label><select id="stuSel"></select><br><br>
-    <table><tr><th>Subject</th><th>Max</th><th>Obtained</th><th>Internal</th><th>Total</th><th>Grade</th></tr>
-    ${subjects.map(s => `
-      <tr>
-        <td>${s}</td>
-        <td><input type="number" id="max_${s}" value="80" oninput="calc('${s}')"></td>
-        <td><input type="number" id="obt_${s}" oninput="calc('${s}')"></td>
-        <td><input type="number" id="int_${s}" value="20" oninput="calc('${s}')"></td>
-        <td><input type="number" id="tot_${s}" readonly></td>
-        <td><input type="text" id="grade_${s}"></td>
-      </tr>`).join("")}</table><br>
-    <label>Status:</label><select id="status"><option>Pass</option><option>Fail</option></select><br><br>
-    <button onclick="submitResult()">📤 Submit</button><p id="resStatus"></p>
-  `;
-
-  document.getElementById("classSel").onchange = function() {
-    const cls = this.value;
-    const stuOpts = Object.entries(students[cls] || {}).filter(([_, s]) => s.branch === branch).map(([id, s]) => `<option value="${id}">${s.name} (${id})</option>`).join("");
-    document.getElementById("stuSel").innerHTML = stuOpts;
-  };
-}
-
-function calc(sub) {
-  const o = +document.getElementById(`obt_${sub}`).value || 0;
-  const i = +document.getElementById(`int_${sub}`).value || 0;
-  document.getElementById(`tot_${sub}`).value = o + i;
-}
-
-async function submitResult() {
-  const studentId = document.getElementById("stuSel").value;
-  const className = document.getElementById("classSel").value;
-  const examType = document.getElementById("examSel").value;
-  const status = document.getElementById("status").value;
-  const token = prompt("GitHub PAT:");
-  const subs = ["Kannada","English","Hindi","Mathematics","EVS","Science","Social Science"];
-  let totalMarks = 0, maxMarks = 0;
-  const marks = {};
-  subs.forEach(sub => {
-    const ob = +document.getElementById(`obt_${sub}`).value || 0;
-    const mx = +document.getElementById(`max_${sub}`).value || 0;
-    const intl = +document.getElementById(`int_${sub}`).value || 0;
-    const grd = document.getElementById(`grade_${sub}`).value || "-";
-    const tot = ob + intl;
-    marks[sub] = {obtained: ob, maxMarks: mx, internal: intl, total: tot, grade: grd};
-    totalMarks += tot;
-    maxMarks += mx + 20;
-  });
-  const percentage = ((totalMarks / maxMarks) * 100).toFixed(2);
-  const final = {
-    studentId, class: className, examType, subjects: marks,
-    totalMarks, maxMarks, percentage, finalGrade: "-", status
-  };
-  const filename = `${examType}_${studentId}.json`;
-  await fetch(resultAPIBase + filename, {
-    method: "PUT", headers: { Authorization: `token ${token}` },
-    body: JSON.stringify({
-      message: `Result for ${studentId}`, content: btoa(JSON.stringify(final, null, 2))
-    })
-  });
-  document.getElementById("resStatus").innerText = "✅ Result uploaded!";
-}
+    document.getElementById("resultStatus").innerText = "✅ Result uploaded successfully!";
+  }
 </script>
 
 </body>
