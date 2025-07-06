@@ -15,24 +15,21 @@
     table { width:100%; border-collapse:collapse; margin-top:20px; }
     th,td { padding:10px; border:1px solid #ccc; text-align:center; }
     th { background:#e0ebff; }
-    #resultSection { padding:20px; border-radius:10px; margin-top:20px;}
     button { padding:10px 15px; margin:10px 5px; background:#006600; color:white; border:none; border-radius:5px; cursor:pointer; }
     button:hover { background:#004d00; }
     .logout { text-align:center; margin:30px; }
     .logout button { padding:10px 20px; background:#b30000; color:white; border:none; border-radius:6px; }
     .logout button:hover { background:#800000; }
-    .paynow { background: #0073e6; color:white; padding:8px 14px; border:none; border-radius:5px; cursor:pointer; }
-    .paynow:hover { background: #005bb5; }
   </style>
 </head>
 <body>
 <header><h1>🎓 SJVM Student Dashboard</h1></header>
 <nav>
-  <a href="#" onclick="showProfile()">Profile</a>
-  <a href="#" onclick="showAttendance()">Attendance</a>
-  <a href="#" onclick="showHomework()">Homework</a>
-  <a href="#" onclick="viewResults()">View Results</a>
-  <a href="#" onclick="viewFee()">View Fee</a>
+  <a href="#" onclick="showProfile()">👤 Profile</a>
+  <a href="#" onclick="showAttendance()">📝 Attendance</a>
+  <a href="#" onclick="showHomework()">📚 Homework</a>
+  <a href="#" onclick="viewResults()">📊 Results</a>
+  <a href="#" onclick="viewFees()">💰 Fees</a>
 </nav>
 <div class="container" id="dashboardContent"><p>Welcome to your dashboard!</p></div>
 <div class="logout"><button onclick="logout()">Logout</button></div>
@@ -41,8 +38,8 @@
   const usersURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/users.json";
   const attendanceURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/attendance.json";
   const homeworkURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/homework.json";
-  const resultsBase = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/results.json";
-  const feeURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/fees.json";
+  const resultsBase = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/results/";
+  const feesURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/fees.json";
 
   const userid = localStorage.getItem("userid");
   const studentClass = localStorage.getItem("studentClass");
@@ -161,36 +158,43 @@
     });
   }
 
-  async function viewFee(){
-    const data = await (await fetch(feeURL)).json();
-    const fee = data?.[studentClass]?.[userid];
-
+  async function viewFees(){
+    const data = await (await fetch(feesURL)).json();
+    const fee = data?.[studentClass]?.[branch]?.[userid];
     if (!fee) {
-      document.getElementById("dashboardContent").innerHTML = "<p>No fee information found.</p>";
+      document.getElementById("dashboardContent").innerHTML = "<p>💰 No fee assigned yet.</p>";
       return;
     }
 
-    const { status, amount, paidOn, method } = fee;
-
-    if (status === "Paid") {
+    if (fee.status === "Paid") {
       document.getElementById("dashboardContent").innerHTML = `
         <h3>💰 Fee Status</h3>
-        <p><strong>Amount:</strong> ₹${amount}</p>
         <p><strong>Status:</strong> ✅ Paid</p>
-        <p><strong>Payment Method:</strong> ${method}</p>
-        <p><strong>Date Paid:</strong> ${paidOn}</p>`;
+        <p><strong>Amount:</strong> ₹${fee.amount}</p>
+        <p><strong>Payment Mode:</strong> ${fee.mode}</p>
+        <p><strong>Paid Date:</strong> ${fee.date}</p>`;
     } else {
       document.getElementById("dashboardContent").innerHTML = `
-        <h3>💰 Fee Status</h3>
-        <p><strong>Amount Due:</strong> ₹${amount}</p>
-        <p><strong>Status:</strong> <span style="color:blue;">Pending</span></p>
-        <button class="paynow" onclick="redirectToPayment(${amount})">💳 Pay Now</button>`;
+        <h3>💰 Fee Due</h3>
+        <p><strong>Status:</strong> ❌ Pending</p>
+        <p><strong>Amount Due:</strong> ₹${fee.amount}</p>
+        <button onclick="payNow(${fee.amount})">Pay Now</button>`;
     }
   }
 
-  function redirectToPayment(amount){
-    alert("Redirecting to payment gateway...");
-    window.location.href = `payment.html?amount=${amount}&student=${userid}`;
+  function payNow(amount) {
+    const method = prompt("Select Payment Mode (Cash / UPI / Card):");
+    const paidAmount = parseInt(prompt("Enter amount to pay (min ₹2000):"));
+    if (paidAmount < 2000 || paidAmount > amount) return alert("Invalid amount.");
+    alert(`✅ Payment of ₹${paidAmount} successful via ${method}. PDF generated.`);
+
+    // You can add pdf generation logic here
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    doc.text(`SJVM Schools\nPayment Receipt\n\nUser: ${userid}\nAmount: ₹${paidAmount}\nMode: ${method}\nStatus: Paid`, 10, 10);
+    doc.save(`SJVM_Fee_Receipt_${userid}.pdf`);
+
+    document.getElementById("dashboardContent").innerHTML = `<p>✅ Fee payment complete. Please wait while admin updates your status.</p>`;
   }
 </script>
 </body>
