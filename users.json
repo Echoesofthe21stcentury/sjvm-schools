@@ -9,10 +9,11 @@
         "dob": "2015-04-01",
         "father": "Chandhru M G",
         "mother": "Mamatha",
-        "address": "Bagaluru Colony ",
+        "address": "Bagaluru Colony",
         "mobile": "9916866941",
         "email": "chanrumg@gmail.com",
-        "password": "student123"
+        "password": "student123",
+        "photo": "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/SJVM%20logo%20empowering%20mankind%20without%20background.png"
       }
     },
     "Class 5": {
@@ -27,7 +28,8 @@
         "mother": "Aruna Kumari",
         "address": "Bagaluru Colony",
         "mobile": "0000000000",
-        "email": "aruna@gmail.com"
+        "email": "aruna@gmail.com",
+        "photo": "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/SJVM%20logo%20empowering%20mankind%20without%20background.png"
       },
       "SBK-502": {
         "name": "Shreyan Tej",
@@ -40,7 +42,8 @@
         "mother": "Aruna Kumari",
         "address": "Bagaluru Colony",
         "mobile": "0000000000",
-        "email": "aruna@gmail.com"
+        "email": "aruna@gmail.com",
+        "photo": "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/SJVM%20logo%20empowering%20mankind%20without%20background.png"
       }
     },
     "Class 1": {
@@ -56,7 +59,7 @@
         "address": "#18, Bagaluru Colony, Bagaluru, Near Govt.Hospital Bagaluru Colony\nBagaluru Post, Jala Hobli, Yelahanka Taluk, Bangalore North, Bangalore",
         "mobile": "08880107003",
         "email": "echoesofthe21stcentury@gmail.com",
-        "photo": ""
+        "photo": "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/SJVM%20logo%20empowering%20mankind%20without%20background.png"
       }
     },
     "Class 2": {
@@ -67,12 +70,12 @@
         "branch": "Bandikodigenahalli",
         "gender": "Male",
         "dob": "2016-08-06",
-        "father": "Chandhrappa ",
+        "father": "Chandhrappa",
         "mother": "Mamatha",
         "address": "Bagaluru Colony",
         "mobile": "9916866941",
         "email": "chanrumg@gmail.com",
-        "photo": "photo": "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/photos/883b1006-c708-4702-870a-f3e81635bd20-1_all_1844.jpg.jpg"
+        "photo": "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/photos/883b1006-c708-4702-870a-f3e81635bd20-1_all_1844.jpg"
       }
     }
   },
@@ -80,25 +83,28 @@
     "Bandikodigenahalli": {
       "TBK-001": {
         "name": "Gayathri",
-        "password": "29082004"
+        "password": "29082004",
+        "photo": "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/SJVM%20logo%20empowering%20mankind%20without%20background.png"
       },
       "EBK-001": {
         "name": "Chaithan B V",
         "password": "chaithan@#123",
         "branch": "Bandikodigenahalli",
-        "photo": ""
+        "photo": "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/SJVM%20logo%20empowering%20mankind%20without%20background.png"
       }
     },
     "Atturu Layout": {
       "TAL-001": {
         "name": "Supriya Jagadish",
         "password": "Supriya@804",
-        "branch": "Atturu Layout"
+        "branch": "Atturu Layout",
+        "photo": "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/SJVM%20logo%20empowering%20mankind%20without%20background.png"
       },
       "TAL-002": {
         "name": "Anusha V",
         "password": "Anu@923",
-        "branch": "Atturu Layout"
+        "branch": "Atturu Layout",
+        "photo": "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/SJVM%20logo%20empowering%20mankind%20without%20background.png"
       }
     }
   },
@@ -107,7 +113,8 @@
       "CBK-201101": {
         "name": "Dheeraj P",
         "password": "coord123",
-        "branch": "Bandikodigenahalli"
+        "branch": "Bandikodigenahalli",
+        "photo": "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/SJVM%20logo%20empowering%20mankind%20without%20background.png"
       }
     }
   },
@@ -116,14 +123,16 @@
       "AD-002": {
         "name": "Suma M R",
         "password": "Suma@20",
-        "branch": "Atturu Layout"
+        "branch": "Atturu Layout",
+        "photo": "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/SJVM%20logo%20empowering%20mankind%20without%20background.png"
       }
     }
   },
   "Principal": {
     "PR-001": {
       "name": "Dr. Sandarshini B.K",
-      "password": "head123"
+      "password": "head123",
+      "photo": "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/SJVM%20logo%20empowering%20mankind%20without%20background.png"
     }
   },
   "Chairman": {}
