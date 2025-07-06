@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Payment | SJVM</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    body { font-family:Arial; background:#f4f8fc; margin:0; padding:20px; }
+    h2 { color:#003366; }
+    .container { background:white; padding:20px; max-width:500px; margin:auto; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.1); }
+    label { display:block; margin-top:15px; }
+    select, input[type=number] { width:100%; padding:8px; margin-top:5px; border-radius:5px; border:1px solid #ccc; }
+    button { margin-top:20px; padding:10px 15px; background:#0066cc; color:white; border:none; border-radius:5px; cursor:pointer; }
+    button:hover { background:#004080; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>💳 Make Payment</h2>
+  <p><strong>Student ID:</strong> <span id="studentId"></span></p>
+  <p><strong>Fee Amount:</strong> ₹<span id="amountDue"></span></p>
+
+  <label for="paymentMode">Select Payment Mode:</label>
+  <select id="paymentMode">
+    <option value="Cash">Cash</option>
+    <option value="UPI">UPI</option>
+    <option value="Card">Card</option>
+    <option value="Net Banking">Net Banking</option>
+  </select>
+
+  <label for="amountPaid">Enter Amount to Pay (Min ₹2000):</label>
+  <input type="number" id="amountPaid" min="2000"/>
+
+  <button onclick="makePayment()">✅ Pay</button>
+
+  <p id="paymentStatus" style="margin-top:15px;"></p>
+</div>
+
+<script>
+  const urlParams = new URLSearchParams(window.location.search);
+  const student = urlParams.get("student");
+  const amount = urlParams.get("amount");
+
+  document.getElementById("studentId").innerText = student;
+  document.getElementById("amountDue").innerText = amount;
+
+  function makePayment(){
+    const mode = document.getElementById("paymentMode").value;
+    const paid = +document.getElementById("amountPaid").value;
+    const status = document.getElementById("paymentStatus");
+
+    if (paid < 2000) {
+      status.style.color = "red";
+      status.innerText = "❌ Minimum payment amount is ₹2000.";
+      return;
+    }
+
+    const date = new Date().toLocaleDateString();
+    const left = amount - paid;
+
+    status.style.color = "green";
+    status.innerText = "✅ Payment successful! Generating receipt...";
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    doc.setFontSize(14);
+    doc.text("SJVM School - Payment Receipt", 20, 20);
+    doc.text(`Student ID: ${student}`, 20, 35);
+    doc.text(`Date: ${date}`, 20, 45);
+    doc.text(`Paid: ₹${paid}`, 20, 55);
+    doc.text(`Payment Method: ${mode}`, 20, 65);
+    doc.text(`Amount Due: ₹${amount}`, 20, 75);
+    doc.text(`Balance Pending: ₹${left}`, 20, 85);
+    doc.text("Thank you!", 20, 100);
+    doc.save("SJVM_Payment_Receipt.pdf");
+
+    setTimeout(() => {
+      window.location.href = "student-dashboard.html"; // change to your actual dashboard file
+    }, 3000);
+  }
+</script>
+
+</body>
+</html>
