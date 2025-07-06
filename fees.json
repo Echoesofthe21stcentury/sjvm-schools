@@ -1,0 +1,14 @@
+{
+  "Class 5": {
+    "SBK-501": {
+      "status": "Paid",
+      "amount": 3000,
+      "paidOn": "2025-07-04",
+      "method": "Cash"
+    },
+    "SBK-502": {
+      "status": "Pending",
+      "amount": 3500
+    }
+  }
+}
