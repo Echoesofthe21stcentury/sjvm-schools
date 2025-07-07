@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Upload or Edit Result | SJVM</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; background: #f4f8fc; padding: 20px; }
+    h2 { text-align: center; color: #003366; }
+    .container { max-width: 1000px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 15px rgba(0,0,0,0.1); }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
+    th, td { border: 1px solid #ccc; padding: 10px; text-align: center; }
+    th { background: #0059b3; color: white; }
+    input[type=number], input[type=text], select { width: 100%; padding: 6px; box-sizing: border-box; }
+    .summary { margin-top: 20px; font-weight: bold; }
+    .status-pass { background: #ccffcc; padding: 10px; border-radius: 6px; }
+    .status-fail { background: #ffcccc; padding: 10px; border-radius: 6px; }
+    @media (max-width: 600px) {
+      table, th, td { font-size: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>🧾 Upload or Edit Result</h2>
+
+  <label><b>Class:</b></label>
+  <select id="classSelect">
+    <option value="">--Select Class--</option>
+    <option value="Class 1">Class 1</option>
+    <option value="Class 2">Class 2</option>
+    <option value="Class 3">Class 3</option>
+    <option value="Class 4">Class 4</option>
+    <option value="Class 5">Class 5</option>
+    <option value="Class 6">Class 6</option>
+    <option value="Class 7">Class 7</option>
+    <option value="Class 8">Class 8</option>
+    <option value="Class 9">Class 9</option>
+    <option value="Class 10">Class 10</option>
+  </select><br><br>
+
+  <label><b>Student ID:</b></label>
+  <input type="text" id="studentId" placeholder="e.g., S123"/><br><br>
+
+  <label><b>Exam:</b></label>
+  <select id="examType">
+    <option value="FA1">FA1</option>
+    <option value="FA2">FA2</option>
+    <option value="SA1">SA1</option>
+    <option value="FA3">FA3</option>
+    <option value="FA4">FA4</option>
+    <option value="SA2">SA2</option>
+  </select><br><br>
+
+  <table id="marksTable">
+    <thead>
+      <tr>
+        <th>Subject</th>
+        <th>Marks Obtained</th>
+        <th>Max Marks</th>
+        <th>Internal Obtained</th>
+        <th>Internal Max</th>
+        <th>Total</th>
+        <th>Grade</th>
+        <th>Pass/Fail</th>
+      </tr>
+    </thead>
+    <tbody id="markRows"></tbody>
+  </table>
+
+  <div class="summary" id="finalSummary"></div>
+  <br>
+  <button onclick="calculate()">✅ Calculate & Show Result</button>
+</div>
+
+<script>
+  const subjects = ["Kannada", "English", "Hindi", "Mathematics", "Science", "Social Science"];
+  const tbody = document.getElementById("markRows");
+
+  subjects.forEach(sub => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${sub}</td>
+      <td><input type="number" id="ob_${sub}" value="0" /></td>
+      <td><input type="number" id="max_${sub}" value="80" /></td>
+      <td><input type="number" id="int_${sub}" value="0" /></td>
+      <td><input type="number" id="intmax_${sub}" value="20" /></td>
+      <td><input type="number" id="total_${sub}" readonly /></td>
+      <td><input type="text" id="grade_${sub}" placeholder="A/B/C" /></td>
+      <td><select id="status_${sub}">
+        <option value="Pass">Pass</option>
+        <option value="Fail">Fail</option>
+      </select></td>
+    `;
+    tbody.appendChild(row);
+  });
+
+  function calculate() {
+    let totalObtained = 0;
+    let totalMax = 0;
+    let failedSubjects = 0;
+
+    subjects.forEach(sub => {
+      const ob = +document.getElementById(`ob_${sub}`).value || 0;
+      const max = +document.getElementById(`max_${sub}`).value || 0;
+      const int = +document.getElementById(`int_${sub}`).value || 0;
+      const intMax = +document.getElementById(`intmax_${sub}`).value || 0;
+
+      const total = ob + int;
+      document.getElementById(`total_${sub}`).value = total;
+
+      totalObtained += total;
+      totalMax += (max + intMax);
+
+      const status = document.getElementById(`status_${sub}`).value;
+      if (status === "Fail") failedSubjects++;
+    });
+
+    const percentage = ((totalObtained / totalMax) * 100).toFixed(2);
+    const grade = percentage >= 90 ? "A+" :
+                  percentage >= 75 ? "A" :
+                  percentage >= 60 ? "B" :
+                  percentage >= 45 ? "C" : "D";
+
+    const finalStatus = failedSubjects > 0 ? "Fail" : "Pass";
+    const statusColor = finalStatus === "Pass" ? "status-pass" : "status-fail";
+
+    document.getElementById("finalSummary").innerHTML = `
+      <div class="${statusColor}">
+        <p>📊 <b>Total Marks Obtained:</b> ${totalObtained}</p>
+        <p>📈 <b>Total Maximum Marks:</b> ${totalMax}</p>
+        <p>🏅 <b>Percentage:</b> ${percentage}%</p>
+        <p>🎖 <b>Final Grade:</b> ${grade}</p>
+        <p><b>Total Result:</b> <span style="color:${finalStatus==='Pass'?'green':'red'}">${finalStatus}</span></p>
+      </div>
+    `;
+  }
+</script>
+
+</body>
+</html>
