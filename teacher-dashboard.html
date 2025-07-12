@@ -6,233 +6,159 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body { font-family: Arial, sans-serif; margin: 0; background: #f4f8fc; }
-    header { background: #003366; color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
-    .profile { display: flex; align-items: center; }
-    .profile-circle { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; margin-right: 10px; }
-    nav { background: #0059b3; padding: 10px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
-    nav button { background: white; color: #003366; font-weight: bold; padding: 10px 20px; border: none; cursor: pointer; border-radius: 6px; }
-    nav button:hover { background: #003366; color: white; }
-    .container { max-width: 1000px; margin: 20px auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
-    th { background: #e0ebff; }
-    input, select, textarea {
-      width: 100%; padding: 6px; margin-top: 5px; box-sizing: border-box;
-    }
-    .status-pass { background: #ccffcc; padding: 10px; border-radius: 5px; }
-    .status-fail { background: #ffcccc; padding: 10px; border-radius: 5px; }
-    .present { background-color: #d0ffd0; }
-    .absent { background-color: #ffd0d0; }
+    header { background: #003366; color: white; padding: 10px 20px; display:flex; align-items:center; justify-content:space-between; }
+    .profile { display:flex; align-items:center; }
+    .profile-circle { width:40px; height:40px; border-radius:50%; object-fit:cover; margin-right:10px; }
+    nav { background: #0059b3; display:flex; justify-content:center; flex-wrap:wrap; }
+    nav a { color:white; padding:12px 15px; text-decoration:none; font-weight:bold; }
+    nav a:hover { background:#003366; }
+    .container { max-width:1000px; margin:20px auto; background:white; padding:20px; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.1); }
+    table { width:100%; border-collapse:collapse; margin-top:20px; font-size:14px; }
+    th,td { padding:8px; border:1px solid #ccc; text-align:center; }
+    th { background:#e0ebff; }
+    select, input, textarea, button { margin-top:8px; padding:6px; width:100%; box-sizing:border-box; }
+    .status-pass { background:#ccffcc; }
+    .status-fail { background:#ffcccc; }
+    @media (max-width:600px){ table,th,td { font-size:12px; } }
   </style>
 </head>
 <body>
-  <header>
-    <div class="profile">
-      <img id="teacherPhoto" class="profile-circle" alt="Teacher" />
-      <span id="teacherName">Loading...</span>
-    </div>
-    <button onclick="logout()">Logout</button>
-  </header>
 
-  <nav>
-    <button onclick="showAttendance()">📅 Attendance</button>
-    <button onclick="showHomework()">📚 Homework</button>
-    <button onclick="showResults()">🧾 Result Upload/Edit</button>
-  </nav>
+<header>
+  <div class="profile">
+    <img id="teacherPhoto" class="profile-circle" alt="Teacher Photo" src="https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/SJVM%20logo%20empowering%20mankind%20without%20background.png">
+    <span id="usernameDisplay">Teacher</span>
+  </div>
+</header>
 
-  <div class="container" id="mainContent">Please select an option above.</div>
+<nav>
+  <a href="#" onclick="loadAttendance()">📅 Attendance</a>
+  <a href="#" onclick="loadHomework()">📚 Homework</a>
+  <a href="#" onclick="loadResult()">🧾 Upload/Edit Result</a>
+</nav>
 
-  <script>
-    const usersURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/users.json";
-    const attendanceAPI = "https://api.github.com/repos/Echoesofthe21stcentury/sjvm-schools/contents/attendance.json";
-    const homeworkAPI = "https://api.github.com/repos/Echoesofthe21stcentury/sjvm-schools/contents/homework.json";
-    const resultsAPIBase = "https://api.github.com/repos/Echoesofthe21stcentury/sjvm-schools/contents/results/";
+<div class="container" id="dashboardContent">
+  <h3>Select a menu above to begin.</h3>
+</div>
 
-    const username = localStorage.getItem("username");
-    const branch = localStorage.getItem("branch");
+<script>
+const studentsPerClass = {
+  "Class 1": { "S101": "Arjun", "S102": "Megha" },
+  "Class 2": { "S201": "Ravi", "S202": "Sneha" },
+  "Class 3": { "S301": "Raj", "S302": "Diya" }
+};
 
-    async function loadProfile() {
-      const data = await fetch(usersURL).then(r=>r.json());
-      const teacher = Object.values(data.Teacher || {}).flatMap(x => Object.values(x)).find(t => t.name === username);
-      const img = teacher?.photo ? "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/" + teacher.photo : "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/SJVM%20logo%20empowering%20mankind%20without%20background.png";
-      document.getElementById("teacherPhoto").src = img;
-      document.getElementById("teacherName").textContent = "Welcome, " + (teacher?.name || username);
-    }
+const subjects = ["Kannada", "English", "Hindi", "Mathematics", "Science", "Social Science"];
+const exams = ["FA-1", "FA-2", "FA-3", "FA-4", "SA-1", "SA-2"];
 
-    function logout() {
-      localStorage.clear();
-      window.location.href = "userlogin.html";
-    }
+function loadAttendance() {
+  const classOptions = Object.keys(studentsPerClass).map(c => `<option>${c}</option>`).join("");
+  document.getElementById("dashboardContent").innerHTML = `
+    <h2>📅 Mark Attendance</h2>
+    <label>Select Date:</label><input type="date" id="attDate">
+    <label>Select Class:</label><select id="attClass"><option>--Select--</option>${classOptions}</select>
+    <button onclick="showAttendance()">Load Students</button>
+    <div id="attTable"></div>
+  `;
+}
 
-    async function showAttendance() {
-      const data = await fetch(usersURL).then(r=>r.json());
-      const classes = Object.keys(data.Student || {});
-      document.getElementById("mainContent").innerHTML = `
-        <h2>📅 Mark Attendance</h2>
-        <label>Select Date:</label><input type="date" id="attDate"><br>
-        <label>Select Class:</label>
-        <select id="attClass">
-          <option value="">--Select--</option>
-          ${classes.map(cls => `<option>${cls}</option>`).join("")}
-        </select><br><br>
-        <button onclick="loadStudentsForAttendance()">Load Students</button>
-        <div id="attArea"></div>
-      `;
-    }
+function showAttendance() {
+  const cls = document.getElementById("attClass").value;
+  const date = document.getElementById("attDate").value;
+  if (!cls || !date) return alert("Please select class and date.");
 
-    async function loadStudentsForAttendance() {
-      const cls = document.getElementById("attClass").value;
-      const date = document.getElementById("attDate").value;
-      if (!cls || !date) return alert("Select both class and date.");
+  const students = studentsPerClass[cls];
+  const rows = Object.entries(students).map(([id, name]) => `
+    <tr>
+      <td>${name} (${id})</td>
+      <td><select id="att_${id}">
+        <option style="background:lightgreen" value="Present">Present</option>
+        <option style="background:salmon" value="Absent">Absent</option>
+      </select></td>
+    </tr>`).join("");
 
-      const data = await fetch(usersURL).then(r=>r.json());
-      const students = data.Student?.[cls] || {};
-      const studentList = Object.entries(students).filter(([_, s]) => s.branch === branch);
+  document.getElementById("attTable").innerHTML = `
+    <table><tr><th>Student</th><th>Status</th></tr>${rows}</table>
+    <button onclick="alert('Attendance saved! ✅')">Submit Attendance</button>
+  `;
+}
 
-      const rows = studentList.map(([id, s]) => `
-        <tr data-id="${id}">
-          <td>${s.name} (${id})</td>
-          <td>
-            <select onchange="updateRowColor(this)">
-              <option value="Present">Present</option>
-              <option value="Absent">Absent</option>
-            </select>
-          </td>
-        </tr>
-      `).join("");
+function loadHomework() {
+  const classOptions = Object.keys(studentsPerClass).map(c => `<option>${c}</option>`).join("");
+  document.getElementById("dashboardContent").innerHTML = `
+    <h2>📚 Upload Homework</h2>
+    <label>Select Class:</label><select id="hwClass"><option>--Select--</option>${classOptions}</select>
+    <label>Subject:</label><input id="hwSubject">
+    <label>Homework Description:</label><textarea id="hwDesc" rows="4"></textarea>
+    <button onclick="alert('Homework uploaded! ✅')">Submit Homework</button>
+  `;
+}
 
-      document.getElementById("attArea").innerHTML = `
-        <table><tr><th>Student</th><th>Status</th></tr>${rows}</table>
-        <br><button onclick="submitAttendance()">✅ Submit Attendance</button>
-        <p id="attStatus"></p>
-      `;
-    }
+function loadResult() {
+  const classOptions = Object.keys(studentsPerClass).map(c => `<option>${c}</option>`).join("");
+  const examOptions = exams.map(e => `<option>${e}</option>`).join("");
 
-    function updateRowColor(select) {
-      const row = select.closest("tr");
-      row.className = select.value === "Present" ? "present" : "absent";
-    }
+  document.getElementById("dashboardContent").innerHTML = `
+    <h2>🧾 Upload or Edit Result</h2>
+    <label>Select Class:</label><select id="resClass"><option>--Select--</option>${classOptions}</select>
+    <label>Select Student:</label><select id="resStudent"><option>--Select Class First--</option></select>
+    <label>Select Exam:</label><select id="resExam"><option>--Select--</option>${examOptions}</select>
+    <div id="marksArea"></div>
+  `;
 
-    async function submitAttendance() {
-      const cls = document.getElementById("attClass").value;
-      const date = document.getElementById("attDate").value;
-      const token = prompt("Enter GitHub PAT:");
-      if (!token) return;
+  document.getElementById("resClass").addEventListener("change", () => {
+    const cls = document.getElementById("resClass").value;
+    const students = studentsPerClass[cls] || {};
+    const studentOptions = Object.entries(students).map(([id, name]) => `<option value="${id}">${name} (${id})</option>`).join("");
+    document.getElementById("resStudent").innerHTML = `<option>--Select--</option>${studentOptions}`;
+  });
 
-      const rows = document.querySelectorAll("#attArea tr[data-id]");
-      const data = {};
-      rows.forEach(row => {
-        const id = row.dataset.id;
-        const status = row.querySelector("select").value;
-        data[id] = status;
-      });
+  document.getElementById("resStudent").addEventListener("change", showMarksForm);
+}
 
-      const file = await fetch(attendanceAPI, { headers: { Authorization: `token ${token}` } }).then(r => r.json());
-      const content = JSON.parse(atob(file.content));
-      const sha = file.sha;
+function showMarksForm() {
+  const rows = subjects.map(sub => `
+    <tr>
+      <td>${sub}</td>
+      <td><input type="number" id="ob_${sub}" /></td>
+      <td><input type="number" id="max_${sub}" /></td>
+      <td><input type="number" id="int_${sub}" /></td>
+      <td><input type="number" id="intmax_${sub}" /></td>
+      <td><input type="number" id="total_${sub}" readonly /></td>
+      <td><input type="text" id="grade_${sub}" /></td>
+      <td><select id="status_${sub}">
+        <option value="Pass">Pass</option>
+        <option value="Fail">Fail</option>
+      </select></td>
+    </tr>`).join("");
 
-      content[date] = content[date] || {};
-      content[date][cls] = content[date][cls] || {};
-      content[date][cls][branch] = data;
+  document.getElementById("marksArea").innerHTML = `
+    <table>
+      <tr><th>Subject</th><th>Obtained</th><th>Max</th><th>Internal</th><th>Internal Max</th><th>Total</th><th>Grade</th><th>Status</th></tr>
+      ${rows}
+    </table><br>
+    <label>Total Marks:</label><input id="totalMarks">
+    <label>Total Max Marks:</label><input id="maxMarks">
+    <label>Percentage:</label><input id="percentage">
+    <label>Final Grade:</label><input id="finalGrade">
+    <label>Final Result:</label><select id="finalStatus">
+      <option>Pass</option><option>Fail</option>
+    </select><br><br>
+    <button onclick="alert('Result submitted! ✅')">Submit Result</button>
+  `;
 
-      await fetch(attendanceAPI, {
-        method: "PUT",
-        headers: { Authorization: `token ${token}` },
-        body: JSON.stringify({
-          message: `Attendance for ${cls} on ${date}`,
-          content: btoa(JSON.stringify(content, null, 2)),
-          sha
-        })
-      });
+  subjects.forEach(sub => {
+    document.getElementById(`ob_${sub}`).addEventListener("input", () => calcTotal(sub));
+    document.getElementById(`int_${sub}`).addEventListener("input", () => calcTotal(sub));
+  });
+}
 
-      document.getElementById("attStatus").textContent = "✅ Attendance submitted!";
-    }
+function calcTotal(sub) {
+  const ob = +document.getElementById(`ob_${sub}`).value || 0;
+  const intl = +document.getElementById(`int_${sub}`).value || 0;
+  document.getElementById(`total_${sub}`).value = ob + intl;
+}
+</script>
 
-    function showHomework() {
-      document.getElementById("mainContent").innerHTML = `
-        <h2>📚 Upload Homework</h2>
-        <label>Select Class:</label><input id="hwClass"><br><br>
-        <label>Subject:</label><input id="hwSubject"><br><br>
-        <label>Homework Description:</label><textarea id="hwDesc" rows="4"></textarea><br><br>
-        <button onclick="submitHomework()">Submit</button>
-        <p id="hwStatus"></p>
-      `;
-    }
-
-    async function submitHomework() {
-      const cls = document.getElementById("hwClass").value.trim();
-      const subject = document.getElementById("hwSubject").value.trim();
-      const task = document.getElementById("hwDesc").value.trim();
-      const token = prompt("Enter GitHub PAT:");
-      if (!cls || !subject || !task || !token) return alert("All fields required");
-
-      const file = await fetch(homeworkAPI, { headers: { Authorization: `token ${token}` } }).then(r => r.json());
-      const content = JSON.parse(atob(file.content));
-      const sha = file.sha;
-
-      content[cls] = content[cls] || [];
-      content[cls].push({ subject, task });
-
-      await fetch(homeworkAPI, {
-        method: "PUT",
-        headers: { Authorization: `token ${token}` },
-        body: JSON.stringify({
-          message: `Homework added for ${cls}`,
-          content: btoa(JSON.stringify(content, null, 2)),
-          sha
-        })
-      });
-
-      document.getElementById("hwStatus").textContent = "✅ Homework uploaded!";
-    }
-
-    async function showResults() {
-      const data = await fetch(usersURL).then(r => r.json());
-      const classes = Object.keys(data.Student || {});
-      document.getElementById("mainContent").innerHTML = `
-        <h2>🧾 Upload/Edit Result</h2>
-        <label>Class:</label><select id="resClass">
-          <option value="">--Select--</option>
-          ${classes.map(c => `<option>${c}</option>`).join("")}
-        </select><br><br>
-        <label>Exam Name:</label><input id="resExam" placeholder="e.g., FA1"><br><br>
-        <label>Student:</label><select id="resStudent"><option>Select class first</option></select><br><br>
-        <div id="resultForm"></div>
-      `;
-
-      document.getElementById("resClass").addEventListener("change", () => {
-        const cls = document.getElementById("resClass").value;
-        const students = data.Student?.[cls] || {};
-        const list = Object.entries(students)
-          .filter(([_, s]) => s.branch === branch)
-          .map(([id, s]) => `<option value="${id}">${s.name} (${id})</option>`).join("");
-        document.getElementById("resStudent").innerHTML = list;
-        document.getElementById("resStudent").addEventListener("change", renderResultForm);
-      });
-    }
-
-    function renderResultForm() {
-      const subjects = ["Kannada","English","Hindi","Mathematics","Science","Social Science"];
-      const rows = subjects.map(s => `
-        <tr>
-          <td>${s}</td>
-          <td><input type="number" placeholder="Written" /></td>
-          <td><input type="number" placeholder="Internal" /></td>
-          <td><input type="number" placeholder="Max Written" /></td>
-          <td><input type="number" placeholder="Max Internal" /></td>
-          <td><input type="text" placeholder="Grade" /></td>
-          <td><select><option>Pass</option><option>Fail</option></select></td>
-        </tr>
-      `).join("");
-
-      document.getElementById("resultForm").innerHTML = `
-        <table><tr><th>Subject</th><th>Written</th><th>Internal</th><th>Max W</th><th>Max I</th><th>Grade</th><th>Result</th></tr>${rows}</table>
-        <br><button>Submit Result</button>
-      `;
-    }
-
-    // Initial Load
-    loadProfile();
-  </script>
 </body>
 </html>
