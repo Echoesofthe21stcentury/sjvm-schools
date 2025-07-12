@@ -3,120 +3,127 @@
 <head>
   <meta charset="UTF-8" />
   <title>Teacher Dashboard | SJVM</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    body { font-family: Arial, sans-serif; margin: 0; background: #f4f8fc; }
-    header { background: #003366; color: white; padding: 10px 20px; display:flex; align-items:center; justify-content:space-between; }
-    .profile { display:flex; align-items:center; }
-    .profile-circle { width:40px; height:40px; border-radius:50%; object-fit:cover; margin-right:10px; }
-    nav { background: #0059b3; display:flex; justify-content:center; flex-wrap:wrap; }
-    nav a { color:white; padding:12px 15px; text-decoration:none; font-weight:bold; }
-    nav a:hover { background:#003366; }
-    .container { max-width:1000px; margin:20px auto; background:white; padding:20px; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.1); }
-    table { width:100%; border-collapse:collapse; margin-top:20px; font-size:14px; }
-    th,td { padding:8px; border:1px solid #ccc; text-align:center; }
-    th { background:#e0ebff; }
-    select, input, textarea, button { margin-top:8px; padding:6px; width:100%; box-sizing:border-box; }
-    .status-pass { background:#ccffcc; }
-    .status-fail { background:#ffcccc; }
-    @media (max-width:600px){ table,th,td { font-size:12px; } }
+    body{font-family:Arial;margin:0;background:#f4f8fc}
+    header{background:#003366;color:#fff;padding:10px 20px;display:flex;align-items:center;justify-content:space-between}
+    .profile{display:flex;align-items:center}
+    .profile-circle{width:40px;height:40px;border-radius:50%;object-fit:cover;margin-right:10px}
+    nav{background:#0059b3;display:flex;flex-wrap:wrap;justify-content:center}
+    nav a{color:#fff;padding:12px;cursor:pointer;text-decoration:none;font-weight:bold}
+    nav a:hover{background:#003366}
+    .container{max-width:1000px;margin:20px auto;background:#fff;padding:20px;border-radius:10px;box-shadow:0 0 10px rgba(0,0,0,0.1)}
+    table{width:100%;border-collapse:collapse;margin-top:20px;font-size:14px}
+    th,td{border:1px solid #ccc;padding:8px;text-align:center}
+    th{background:#e0ebff}
+    select,input,textarea,button{margin-top:8px;padding:6px;width:100%;box-sizing:border-box}
+    button{cursor:pointer}
+    @media(max-width:600px){table,th,td{font-size:12px}}
   </style>
 </head>
 <body>
-
 <header>
   <div class="profile">
-    <img id="teacherPhoto" class="profile-circle" alt="Teacher Photo" src="https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/SJVM%20logo%20empowering%20mankind%20without%20background.png">
-    <span id="usernameDisplay">Teacher</span>
+    <img id="teacherPhoto" class="profile-circle" src="https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/SJVM%20logo%20empowering%20mankind%20without%20background.png" alt="Photo">
+    <span id="teacherName">Teacher</span>
   </div>
 </header>
-
 <nav>
-  <a href="#" onclick="loadAttendance()">📅 Attendance</a>
-  <a href="#" onclick="loadHomework()">📚 Homework</a>
-  <a href="#" onclick="loadResult()">🧾 Upload/Edit Result</a>
+  <a onclick="loadAttendance()">📅 Attendance</a>
+  <a onclick="loadHomework()">📚 Homework</a>
+  <a onclick="loadResult()">🧾 Upload/Edit Result</a>
 </nav>
-
 <div class="container" id="dashboardContent">
-  <h3>Select a menu above to begin.</h3>
+  <h3>Start by selecting a menu above</h3>
 </div>
-
 <script>
-const studentsPerClass = {
-  "Class 1": { "S101": "Arjun", "S102": "Megha" },
-  "Class 2": { "S201": "Ravi", "S202": "Sneha" },
-  "Class 3": { "S301": "Raj", "S302": "Diya" }
-};
+const usersURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/users.json";
+const subjects = ["Kannada","English","Hindi","Mathematics","Science","Social Science"];
+const exams = ["FA-1","FA-2","FA-3","FA-4","SA-1","SA-2"];
+let allStudents = {}, branch = localStorage.getItem("branch") || "";
 
-const subjects = ["Kannada", "English", "Hindi", "Mathematics", "Science", "Social Science"];
-const exams = ["FA-1", "FA-2", "FA-3", "FA-4", "SA-1", "SA-2"];
+// Load teacher info
+fetch(usersURL).then(r=>r.json()).then(d=> {
+  const teachers = Object.values(d.Teacher||{}).flatMap(o=>Object.values(o));
+  const name = localStorage.getItem("username");
+  const me = teachers.find(t=>t.name===name);
+  if(me){
+    document.getElementById("teacherName").innerText = me.name;
+    if(me.photo?.trim()){
+      document.getElementById("teacherPhoto").src = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/" + me.photo.trim();
+    }
+  }
+  allStudents = d.Student || {};
+});
 
-function loadAttendance() {
-  const classOptions = Object.keys(studentsPerClass).map(c => `<option>${c}</option>`).join("");
+function loadAttendance(){
+  const classes = Object.keys(allStudents);
   document.getElementById("dashboardContent").innerHTML = `
     <h2>📅 Mark Attendance</h2>
-    <label>Select Date:</label><input type="date" id="attDate">
-    <label>Select Class:</label><select id="attClass"><option>--Select--</option>${classOptions}</select>
+    <label>Date:</label><input type="date" id="attDate">
+    <label>Class:</label><select id="attClass"><option>--Select--</option>${classes.map(c=>`<option>${c}</option>`)}</select>
     <button onclick="showAttendance()">Load Students</button>
-    <div id="attTable"></div>
-  `;
+    <div id="attArea"></div>`;
 }
 
-function showAttendance() {
+function showAttendance(){
   const cls = document.getElementById("attClass").value;
   const date = document.getElementById("attDate").value;
-  if (!cls || !date) return alert("Please select class and date.");
-
-  const students = studentsPerClass[cls];
-  const rows = Object.entries(students).map(([id, name]) => `
-    <tr>
-      <td>${name} (${id})</td>
+  if(!cls||!date) return alert("Select both date & class.");
+  const students = allStudents[cls]||{};
+  const rows = Object.entries(students).filter(([id,s])=>s.branch===branch)
+    .map(([id,s])=>`<tr>
+      <td>${s.name} (${id})</td>
       <td><select id="att_${id}">
-        <option style="background:lightgreen" value="Present">Present</option>
-        <option style="background:salmon" value="Absent">Absent</option>
+        <option value="Present">Present</option>
+        <option value="Absent">Absent</option>
       </select></td>
     </tr>`).join("");
-
-  document.getElementById("attTable").innerHTML = `
+  document.getElementById("attArea").innerHTML = `
     <table><tr><th>Student</th><th>Status</th></tr>${rows}</table>
-    <button onclick="alert('Attendance saved! ✅')">Submit Attendance</button>
-  `;
+    <button onclick="saveAttendance()">Save Attendance</button>
+    <p id="attStatus"></p>`;
 }
 
-function loadHomework() {
-  const classOptions = Object.keys(studentsPerClass).map(c => `<option>${c}</option>`).join("");
+function saveAttendance(){
+  // implement saving logic (similar GitHub PUT)
+  document.getElementById("attStatus").innerText = "✅ Attendance saved!";
+}
+
+function loadHomework(){
+  const classes = Object.keys(allStudents);
   document.getElementById("dashboardContent").innerHTML = `
     <h2>📚 Upload Homework</h2>
-    <label>Select Class:</label><select id="hwClass"><option>--Select--</option>${classOptions}</select>
+    <label>Class:</label><select id="hwClass"><option>--Select--</option>${classes.map(c=>`<option>${c}</option>`)}</select>
     <label>Subject:</label><input id="hwSubject">
-    <label>Homework Description:</label><textarea id="hwDesc" rows="4"></textarea>
-    <button onclick="alert('Homework uploaded! ✅')">Submit Homework</button>
-  `;
+    <label>Description:</label><textarea id="hwDesc" rows="4"></textarea>
+    <button onclick="saveHomework()">Save Homework</button>
+    <p id="hwStatus"></p>`;
 }
 
-function loadResult() {
-  const classOptions = Object.keys(studentsPerClass).map(c => `<option>${c}</option>`).join("");
-  const examOptions = exams.map(e => `<option>${e}</option>`).join("");
+function saveHomework(){
+  document.getElementById("hwStatus").innerText = "✅ Homework saved!";
+}
 
+function loadResult(){
+  const classes = Object.keys(allStudents);
   document.getElementById("dashboardContent").innerHTML = `
-    <h2>🧾 Upload or Edit Result</h2>
-    <label>Select Class:</label><select id="resClass"><option>--Select--</option>${classOptions}</select>
-    <label>Select Student:</label><select id="resStudent"><option>--Select Class First--</option></select>
-    <label>Select Exam:</label><select id="resExam"><option>--Select--</option>${examOptions}</select>
-    <div id="marksArea"></div>
-  `;
-
-  document.getElementById("resClass").addEventListener("change", () => {
-    const cls = document.getElementById("resClass").value;
-    const students = studentsPerClass[cls] || {};
-    const studentOptions = Object.entries(students).map(([id, name]) => `<option value="${id}">${name} (${id})</option>`).join("");
-    document.getElementById("resStudent").innerHTML = `<option>--Select--</option>${studentOptions}`;
-  });
-
-  document.getElementById("resStudent").addEventListener("change", showMarksForm);
+    <h2>🧾 Upload/Edit Result</h2>
+    <label>Class:</label><select id="resClass"><option>--Select--</option>${classes.map(c=>`<option>${c}</option>`)}</select>
+    <label>Student:</label><select id="resStudent"><option>Select class first</option></select>
+    <label>Exam:</label><select id="resExam"><option>--Select--</option>${exams.map(e=>`<option>${e}</option>`)}</select>
+    <div id="marksArea"></div>`;
+  document.getElementById("resClass").onchange = e => {
+    const st = allStudents[e.target.value]||{};
+    document.getElementById("resStudent").innerHTML = `<option>--Select--</option>${
+      Object.entries(st).filter(([_,s])=>s.branch===branch)
+        .map(([id,s])=>`<option value="${id}">${s.name} (${id})</option>`).join("")
+    }`;
+  };
+  document.getElementById("resStudent").onchange = showMarksForm;
 }
 
-function showMarksForm() {
+function showMarksForm(){
   const rows = subjects.map(sub => `
     <tr>
       <td>${sub}</td>
@@ -124,41 +131,34 @@ function showMarksForm() {
       <td><input type="number" id="max_${sub}" /></td>
       <td><input type="number" id="int_${sub}" /></td>
       <td><input type="number" id="intmax_${sub}" /></td>
-      <td><input type="number" id="total_${sub}" readonly /></td>
+      <td><input type="number" id="tot_${sub}" readonly /></td>
       <td><input type="text" id="grade_${sub}" /></td>
-      <td><select id="status_${sub}">
-        <option value="Pass">Pass</option>
-        <option value="Fail">Fail</option>
-      </select></td>
+      <td><select id="stat_${sub}"><option>Pass</option><option>Fail</option></select></td>
     </tr>`).join("");
-
   document.getElementById("marksArea").innerHTML = `
-    <table>
-      <tr><th>Subject</th><th>Obtained</th><th>Max</th><th>Internal</th><th>Internal Max</th><th>Total</th><th>Grade</th><th>Status</th></tr>
-      ${rows}
-    </table><br>
-    <label>Total Marks:</label><input id="totalMarks">
-    <label>Total Max Marks:</label><input id="maxMarks">
-    <label>Percentage:</label><input id="percentage">
-    <label>Final Grade:</label><input id="finalGrade">
-    <label>Final Result:</label><select id="finalStatus">
-      <option>Pass</option><option>Fail</option>
-    </select><br><br>
-    <button onclick="alert('Result submitted! ✅')">Submit Result</button>
-  `;
-
+    <table><tr><th>Subject</th><th>Obtained</th><th>Max</th><th>Internal</th><th>Int Max</th><th>Total</th><th>Grade</th><th>Status</th></tr>${rows}</table>
+    <label>Total Marks:</label><input id="totMarks">
+    <label>Total Max Marks:</label><input id="mxMarks">
+    <label>Percentage:</label><input id="perc">
+    <label>Final Grade:</label><input id="finGrade">
+    <label>Final Status:</label><select id="finStatus"><option>Pass</option><option>Fail</option></select>
+    <button onclick="submitResult()">Submit Result</button>
+    <p id="resStatus"></p>`;
   subjects.forEach(sub => {
-    document.getElementById(`ob_${sub}`).addEventListener("input", () => calcTotal(sub));
-    document.getElementById(`int_${sub}`).addEventListener("input", () => calcTotal(sub));
+    document.getElementById(`ob_${sub}`).oninput = () => calcSubject(sub);
+    document.getElementById(`int_${sub}`).oninput = () => calcSubject(sub);
   });
 }
 
-function calcTotal(sub) {
+function calcSubject(sub){
   const ob = +document.getElementById(`ob_${sub}`).value || 0;
   const intl = +document.getElementById(`int_${sub}`).value || 0;
-  document.getElementById(`total_${sub}`).value = ob + intl;
+  document.getElementById(`tot_${sub}`).value = ob + intl;
+}
+
+function submitResult(){
+  document.getElementById("resStatus").innerText = "✅ Result saved!";
 }
 </script>
-
 </body>
 </html>
