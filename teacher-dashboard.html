@@ -1,22 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Teacher Dashboard | SJVM</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <style>
-    body { font-family: Arial, sans-serif; background: #f4f8fc; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; margin: 0; background: #f4f8fc; }
     header { background: #003366; color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; }
     nav { background: #0059b3; display: flex; justify-content: center; flex-wrap: wrap; }
     nav button { background: transparent; border: none; color: white; font-weight: bold; padding: 14px 20px; cursor: pointer; }
     nav button:hover { background: #003366; }
-    .container { max-width: 900px; margin: 20px auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    .container { max-width: 1000px; margin: 20px auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
     label, select, input, textarea, button { display: block; width: 100%; margin: 10px 0; padding: 8px; box-sizing: border-box; }
     table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { border: 1px solid #ccc; padding: 10px; text-align: center; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
     th { background: #0059b3; color: white; }
-    .pass { background: #ccffcc; }
-    .fail { background: #ffcccc; }
     .green { color: green; }
     .red { color: red; }
   </style>
@@ -29,9 +27,10 @@
 </header>
 
 <nav>
-  <button onclick="showAttendance()">📅 Attendance</button>
-  <button onclick="showHomework()">📚 Homework</button>
-  <button onclick="showResult()">🧾 Upload/Edit Result</button>
+  <button onclick="showAttendance()">📅 Class Attendance</button>
+  <button onclick="showHomework()">📚 Upload Homework</button>
+  <button onclick="showResult()">🧾 Upload Result</button>
+  <button onclick="showExamAttendance()">🎫 Exam Attendance</button>
 </nav>
 
 <div class="container" id="content">
@@ -40,24 +39,25 @@
 
 <script>
 const usersURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/users.json";
+const attendanceURL = "https://api.github.com/repos/Echoesofthe21stcentury/sjvm-schools/contents/attendance.json";
 const resultsURL = "https://api.github.com/repos/Echoesofthe21stcentury/sjvm-schools/contents/results.json";
 const homeworkURL = "https://api.github.com/repos/Echoesofthe21stcentury/sjvm-schools/contents/homework.json";
-const attendanceURL = "https://api.github.com/repos/Echoesofthe21stcentury/sjvm-schools/contents/attendance.json";
+const examScheduleURL = "https://api.github.com/repos/Echoesofthe21stcentury/sjvm-schools/contents/examination.json";
 
 function logout() {
-  alert("Logged out.");
+  localStorage.clear();
+  alert("Logged out");
   location.href = "userlogin.html";
 }
 
+// 📅 CLASS ATTENDANCE
 function showAttendance() {
-  fetch(usersURL).then(res => res.json()).then(data => {
+  fetch(usersURL).then(r=>r.json()).then(data=>{
     const classes = Object.keys(data.Student || {});
     document.getElementById("content").innerHTML = `
-      <h3>📅 Mark Attendance</h3>
-      <label>Select Date:</label>
-      <input type="date" id="attDate">
-      <label>Select Class:</label>
-      <select id="attClass">${classes.map(c => `<option value="${c}">${c}</option>`)}</select>
+      <h3>📅 Class Attendance</h3>
+      <label>Date:</label><input type="date" id="attDate">
+      <label>Class:</label><select id="attClass">${classes.map(c=>`<option>${c}</option>`)}</select>
       <button onclick="loadStudents()">Load Students</button>
       <div id="attTable"></div>
     `;
@@ -67,76 +67,69 @@ function showAttendance() {
 function loadStudents() {
   const cls = document.getElementById("attClass").value;
   const date = document.getElementById("attDate").value;
-  if (!cls || !date) return alert("Select both date and class");
+  if (!cls || !date) return alert("Fill both");
 
-  fetch(usersURL).then(res => res.json()).then(data => {
+  fetch(usersURL).then(r=>r.json()).then(data=>{
     const students = data.Student[cls] || {};
-    let rows = '';
-    Object.entries(students).forEach(([id, s]) => {
-      rows += `<tr><td>${s.name} (${id})</td>
-      <td><select><option value="Present">Present</option><option value="Absent">Absent</option></select></td></tr>`;
-    });
-
+    let rows = Object.entries(students).map(([id, s]) =>
+      `<tr><td>${s.name} (${id})</td><td><select><option>Present</option><option>Absent</option></select></td></tr>`).join("");
     document.getElementById("attTable").innerHTML = `
       <table><tr><th>Student</th><th>Status</th></tr>${rows}</table>
-      <button onclick="submitAttendance('${cls}', '${date}')">✅ Submit Attendance</button>
+      <button onclick="submitAttendance('${cls}', '${date}')">✅ Submit</button>
     `;
   });
 }
 
 async function submitAttendance(cls, date) {
-  const rows = document.querySelectorAll("#attTable table tr");
-  const attendance = {};
+  const token = prompt("GitHub Token:");
+  if (!token) return;
+  const rows = document.querySelectorAll("#attTable tr");
+  const data = {};
   rows.forEach((row, i) => {
     if (i === 0) return;
-    const id = row.cells[0].textContent.split("(")[1].split(")")[0];
+    const id = row.cells[0].textContent.match(/\((.*?)\)/)[1];
     const status = row.cells[1].querySelector("select").value;
-    attendance[id] = status;
+    data[id] = status;
   });
 
-  const token = prompt("Enter GitHub Token:");
-  const old = await fetch(attendanceURL, { headers: { Authorization: `token ${token}` }}).then(r=>r.json());
-  const content = JSON.parse(atob(old.content));
-  const sha = old.sha;
-
+  const res = await fetch(attendanceURL, { headers: { Authorization: `token ${token}` }}).then(r=>r.json());
+  const content = JSON.parse(atob(res.content));
+  const sha = res.sha;
   content[date] = content[date] || {};
-  content[date][cls] = attendance;
+  content[date][cls] = data;
 
   await fetch(attendanceURL, {
     method: "PUT",
     headers: { Authorization: `token ${token}` },
     body: JSON.stringify({
-      message: `Attendance updated for ${cls} on ${date}`,
+      message: `Attendance ${cls} ${date}`,
       content: btoa(JSON.stringify(content, null, 2)),
       sha
     })
   });
 
-  alert("✅ Attendance saved.");
+  alert("✅ Attendance saved!");
 }
 
+// 📚 HOMEWORK
 function showHomework() {
   document.getElementById("content").innerHTML = `
     <h3>📚 Upload Homework</h3>
     <label>Class:</label><input id="hwClass">
     <label>Subject:</label><input id="hwSubject">
     <label>Description:</label><textarea id="hwDesc" rows="4"></textarea>
-    <button onclick="submitHomework()">✅ Submit Homework</button>
+    <button onclick="submitHomework()">✅ Submit</button>
   `;
 }
 
 async function submitHomework() {
-  const cls = document.getElementById("hwClass").value;
-  const subject = document.getElementById("hwSubject").value;
-  const desc = document.getElementById("hwDesc").value;
-  const token = prompt("Enter GitHub Token:");
+  const cls = hwClass.value, subject = hwSubject.value, desc = hwDesc.value;
+  const token = prompt("GitHub Token:");
+  if (!cls || !subject || !desc || !token) return alert("Fill all");
 
-  if (!cls || !subject || !desc || !token) return alert("Fill all fields");
-
-  const old = await fetch(homeworkURL, { headers: { Authorization: `token ${token}` }}).then(r=>r.json());
-  const content = JSON.parse(atob(old.content));
-  const sha = old.sha;
-
+  const res = await fetch(homeworkURL, { headers: { Authorization: `token ${token}` }}).then(r=>r.json());
+  const content = JSON.parse(atob(res.content));
+  const sha = res.sha;
   content[cls] = content[cls] || [];
   content[cls].push({ subject, task: desc });
 
@@ -153,17 +146,15 @@ async function submitHomework() {
   alert("✅ Homework saved.");
 }
 
+// 🧾 UPLOAD RESULT
 function showResult() {
-  fetch(usersURL).then(res => res.json()).then(data => {
+  fetch(usersURL).then(r=>r.json()).then(data=>{
     const classes = Object.keys(data.Student || {});
-    document.getElementById("content").innerHTML = `
+    content.innerHTML = `
       <h3>🧾 Upload/Edit Result</h3>
-      <label>Select Class:</label>
-      <select id="resClass">${classes.map(c => `<option>${c}</option>`)}</select>
-      <label>Exam Type:</label>
-      <select id="resExam">
-        <option>FA-1</option><option>FA-2</option><option>FA-3</option><option>FA-4</option>
-        <option>SA-1</option><option>SA-2</option>
+      <label>Class:</label><select id="resClass">${classes.map(c=>`<option>${c}</option>`)}</select>
+      <label>Exam:</label><select id="resExam">
+        <option>FA-1</option><option>FA-2</option><option>FA-3</option><option>FA-4</option><option>SA-1</option><option>SA-2</option>
       </select>
       <button onclick="loadResultForm()">📄 Load Students</button>
       <div id="resForm"></div>
@@ -172,34 +163,28 @@ function showResult() {
 }
 
 function loadResultForm() {
-  const cls = document.getElementById("resClass").value;
-  const exam = document.getElementById("resExam").value;
-
-  fetch(usersURL).then(res => res.json()).then(data => {
+  const cls = resClass.value, exam = resExam.value;
+  fetch(usersURL).then(r=>r.json()).then(data=>{
     const students = data.Student[cls] || {};
+    const subjects = ["Kannada", "English", "Hindi", "Maths", "Science", "Social"];
     let html = "";
+
     Object.entries(students).forEach(([id, s]) => {
-      html += `
-        <h4>${s.name} (${id})</h4>
-        <table>
-          <tr><th>Subject</th><th>Written</th><th>Internal</th><th>Total</th><th>Grade</th><th>Result</th></tr>
-          ${["Kannada","English","Hindi","Maths","Science","Social"].map(sub => `
-            <tr>
-              <td>${sub}</td>
-              <td><input data-id="${id}" data-sub="${sub}" class="written"></td>
-              <td><input data-id="${id}" data-sub="${sub}" class="internal"></td>
-              <td><input data-id="${id}" data-sub="${sub}" class="total" readonly></td>
-              <td><input data-id="${id}" data-sub="${sub}" class="grade"></td>
-              <td>
-                <select data-id="${id}" data-sub="${sub}" class="status">
-                  <option>Pass</option><option>Fail</option>
-                </select>
-              </td>
-            </tr>`).join("")}
-        </table><br>`;
+      html += `<h4>${s.name} (${id})</h4><table><tr><th>Subject</th><th>Written</th><th>Internal</th><th>Total</th><th>Grade</th><th>Result</th></tr>`;
+      subjects.forEach(sub => {
+        html += `<tr>
+          <td>${sub}</td>
+          <td><input data-id="${id}" data-sub="${sub}" class="written"></td>
+          <td><input data-id="${id}" data-sub="${sub}" class="internal"></td>
+          <td><input data-id="${id}" data-sub="${sub}" class="total" readonly></td>
+          <td><input data-id="${id}" data-sub="${sub}" class="grade"></td>
+          <td><select data-id="${id}" data-sub="${sub}" class="status"><option>Pass</option><option>Fail</option></select></td>
+        </tr>`;
+      });
+      html += `</table><br>`;
     });
-    html += `<button onclick="submitResult('${cls}', '${exam}')">✅ Save Result</button>`;
-    document.getElementById("resForm").innerHTML = html;
+    html += `<button onclick="submitResult('${cls}', '${exam}')">✅ Submit</button>`;
+    resForm.innerHTML = html;
 
     document.querySelectorAll(".written, .internal").forEach(inp => {
       inp.addEventListener("input", () => {
@@ -214,45 +199,103 @@ function loadResultForm() {
 
 async function submitResult(cls, exam) {
   const token = prompt("GitHub Token:");
-  const allStudents = {};
-
+  const results = {};
   document.querySelectorAll("h4").forEach(h4 => {
     const id = h4.textContent.match(/\((.*?)\)/)[1];
-    allStudents[id] = { exam, class: cls, marks: {}, total: 0 };
+    results[id] = { exam, class: cls, marks: {}, total: 0 };
   });
 
   document.querySelectorAll("input.total").forEach(input => {
     const id = input.dataset.id, sub = input.dataset.sub;
-    const written = +document.querySelector(`[data-id="${id}"][data-sub="${sub}"].written`).value || 0;
-    const internal = +document.querySelector(`[data-id="${id}"][data-sub="${sub}"].internal`).value || 0;
-    const grade = document.querySelector(`[data-id="${id}"][data-sub="${sub}"].grade`).value || "-";
-    const status = document.querySelector(`[data-id="${id}"][data-sub="${sub}"].status`).value;
-    const total = written + internal;
-
-    allStudents[id].marks[sub] = { written, internal, total, grade, status };
-    allStudents[id].total += total;
+    const w = +document.querySelector(`[data-id="${id}"][data-sub="${sub}"].written`).value || 0;
+    const i = +document.querySelector(`[data-id="${id}"][data-sub="${sub}"].internal`).value || 0;
+    const g = document.querySelector(`[data-id="${id}"][data-sub="${sub}"].grade`).value;
+    const s = document.querySelector(`[data-id="${id}"][data-sub="${sub}"].status`).value;
+    results[id].marks[sub] = { written: w, internal: i, total: w+i, grade: g, status: s };
+    results[id].total += w + i;
   });
 
-  const old = await fetch(resultsURL, { headers: { Authorization: `token ${token}` }}).then(r=>r.json());
-  const content = JSON.parse(atob(old.content));
-  const sha = old.sha;
-
-  Object.entries(allStudents).forEach(([id, res]) => {
+  const res = await fetch(resultsURL, { headers: { Authorization: `token ${token}` }}).then(r=>r.json());
+  const content = JSON.parse(atob(res.content));
+  const sha = res.sha;
+  Object.entries(results).forEach(([id, d]) => {
     content[id] = content[id] || {};
-    content[id][exam] = res;
+    content[id][exam] = d;
   });
 
   await fetch(resultsURL, {
     method: "PUT",
     headers: { Authorization: `token ${token}` },
     body: JSON.stringify({
-      message: `Results updated for ${cls} - ${exam}`,
+      message: `Results for ${cls} ${exam}`,
       content: btoa(JSON.stringify(content, null, 2)),
       sha
     })
   });
 
-  alert("✅ Result saved!");
+  alert("✅ Result Saved!");
+}
+
+// 🎫 EXAM ATTENDANCE
+function showExamAttendance() {
+  fetch(examScheduleURL).then(r=>r.json()).then(data=>{
+    const exams = JSON.parse(atob(data.content));
+    const dates = Object.keys(exams);
+    content.innerHTML = `
+      <h3>🎫 Exam Attendance</h3>
+      <label>Date:</label><select id="examDate">
+        ${dates.map(d=>`<option>${d}</option>`).join("")}
+      </select>
+      <label>Room No:</label><select id="examRoom"></select>
+      <div id="examTable"></div>
+    `;
+
+    document.getElementById("examDate").addEventListener("change", () => {
+      const date = examDate.value;
+      const rooms = Object.keys(exams[date]);
+      examRoom.innerHTML = rooms.map(r=>`<option>${r}</option>`).join("");
+      examRoom.dispatchEvent(new Event("change"));
+    });
+
+    document.getElementById("examRoom").addEventListener("change", () => {
+      const date = examDate.value, room = examRoom.value;
+      const stds = exams[date][room].students;
+      const invigilator = exams[date][room].invigilator;
+      const rows = Object.entries(stds).map(([id, s]) =>
+        `<tr><td>${s.name} (${id})</td><td><select id="att_${id}"><option>Present</option><option>Absent</option></select></td></tr>`).join("");
+      examTable.innerHTML = `
+        <p><b>Invigilator:</b> ${invigilator}</p>
+        <table><tr><th>Student</th><th>Status</th></tr>${rows}</table>
+        <button onclick="submitExamAttendance('${date}', '${room}')">✅ Submit</button>
+      `;
+    });
+
+    examDate.dispatchEvent(new Event("change"));
+  });
+}
+
+async function submitExamAttendance(date, room) {
+  const token = prompt("GitHub Token:");
+  if (!token) return;
+  const res = await fetch(examScheduleURL, { headers: { Authorization: `token ${token}` }}).then(r=>r.json());
+  const content = JSON.parse(atob(res.content));
+  const sha = res.sha;
+  const stds = content[date][room].students;
+  Object.keys(stds).forEach(id => {
+    stds[id].attendance = document.getElementById(`att_${id}`).value;
+  });
+
+  await fetch(examScheduleURL, {
+    method: "PUT",
+    headers: { Authorization: `token ${token}` },
+    body: JSON.stringify({
+      message: `Exam Attendance for ${room} ${date}`,
+      content: btoa(JSON.stringify(content, null, 2)),
+      sha
+    })
+  });
+
+  alert("✅ Exam Attendance saved!");
 }
 </script>
 
