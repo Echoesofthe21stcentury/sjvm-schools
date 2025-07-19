@@ -5,6 +5,125 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>About Us - SJVM Schools</title>
   <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body.dark-theme {
+      background-color: #000;
+      color: #fff;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 1200px;
+      margin: auto;
+      padding: 20px 0;
+    }
+
+    .header {
+      background-color: #0d0d0d;
+      padding: 15px 0;
+      border-bottom: 1px solid #222;
+    }
+
+    .logo {
+      height: 50px;
+    }
+
+    .nav-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav-links {
+      list-style: none;
+      display: flex;
+      gap: 25px;
+      padding: 0;
+    }
+
+    .nav-links a {
+      color: #fff;
+      text-decoration: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      transition: background 0.3s ease;
+    }
+
+    .nav-links a:hover,
+    .nav-links .active {
+      background-color: #007bff;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 60px 20px 40px;
+      background-color: #111;
+    }
+
+    .hero h1 {
+      font-size: 2.8rem;
+      margin-bottom: 10px;
+      color: #66b2ff;
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      max-width: 700px;
+      margin: auto;
+      color: #ccc;
+    }
+
+    .features {
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+      background-color: #121212;
+      padding: 40px 0;
+    }
+
+    .feature-box {
+      background-color: #1a1a1a;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    }
+
+    .feature-box h2 {
+      color: #66b2ff;
+      margin-bottom: 10px;
+    }
+
+    .feature-box p {
+      color: #ccc;
+      line-height: 1.6;
+    }
+
+    .footer {
+      background-color: #0a0a0a;
+      text-align: center;
+      padding: 20px 0;
+      border-top: 1px solid #222;
+    }
+
+    .footer p {
+      color: #999;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 768px) {
+      .features {
+        flex-direction: column;
+      }
+
+      .nav-links {
+        flex-wrap: wrap;
+        gap: 15px;
+      }
+    }
+  </style>
 </head>
 <body class="dark-theme">
   <header class="header">
