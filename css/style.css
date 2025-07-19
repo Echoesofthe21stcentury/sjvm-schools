@@ -1,114 +1,83 @@
-/* Reset & Base */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
 body {
-  font-family: 'Roboto', sans-serif;
-  background-color: #f5f9ff;
-  color: #222;
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #0a0a0a;
+  color: #ffffff;
 }
 
-/* Header */
-.header {
-  background-color: #003366;
-  padding: 10px 0;
-}
-.nav-container {
+header {
+  background-color: #111111;
+  padding: 10px 20px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  max-width: 1200px;
-  margin: auto;
-  padding: 0 20px;
+  justify-content: space-between;
 }
 .logo {
-  height: 60px;
+  height: 50px;
 }
-.navbar ul {
+nav ul {
   list-style: none;
   display: flex;
   gap: 20px;
 }
-.navbar a {
+nav a {
   color: white;
   text-decoration: none;
-  font-weight: 500;
+  padding: 10px;
+  background-color: #222222;
+  border-radius: 5px;
 }
-.navbar a:hover,
-.navbar .active {
-  text-decoration: underline;
-}
-.btn-login {
-  background-color: #0055aa;
-  padding: 8px 14px;
-  border-radius: 4px;
-  font-weight: bold;
-}
-.btn-login:hover {
-  background-color: #0077cc;
+nav a:hover, .active {
+  background-color: #0074D9;
 }
 
-/* Hero Section */
-.hero {
-  background-color: #002244;
-  color: white;
-  padding: 80px 20px;
+.hero, .features, .dashboard, .shop-notice, .about-container {
+  padding: 40px;
   text-align: center;
 }
-.hero .buttons {
-  margin-top: 30px;
+
+.grid {
+  display: flex;
+  gap: 30px;
+  justify-content: center;
+  flex-wrap: wrap;
 }
-.btn {
-  background-color: #004080;
+
+.feature-box {
+  background: #1a1a1a;
+  padding: 20px;
+  border-radius: 10px;
+  width: 250px;
+}
+
+.button {
+  display: inline-block;
+  padding: 12px 30px;
+  background-color: #0074D9;
   color: white;
-  padding: 12px 24px;
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 16px;
+  margin: 10px;
+  transition: 0.3s;
+}
+.button:hover {
+  background-color: #005fa3;
+}
+
+.login-container, .about-container, .shop-notice, .dashboard {
+  max-width: 500px;
+  margin: auto;
+  margin-top: 60px;
+  background: #1a1a1a;
+  padding: 30px;
+  border-radius: 10px;
+}
+
+input[type="text"], input[type="password"] {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
   border: none;
   border-radius: 6px;
-  margin-right: 10px;
-  text-decoration: none;
 }
-.btn:hover {
-  background-color: #0059b3;
-}
-.btn-outline {
-  border: 2px solid white;
-  color: white;
-  padding: 10px 22px;
-  border-radius: 6px;
-  text-decoration: none;
-}
-.btn-outline:hover {
-  background-color: white;
-  color: #002244;
-}
-
-/* Features */
-.features {
-  padding: 50px 20px;
-  background-color: #e6f0ff;
-}
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 30px;
-  max-width: 1200px;
-  margin: auto;
-}
-.feature-box {
-  background-color: white;
-  padding: 25px;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  text-align: center;
-}
-
-/* Footer */
-.footer {
-  background-color: #003366;
-  color: white;
-  text-align: center;
-  padding: 20px 0;
-}
-
