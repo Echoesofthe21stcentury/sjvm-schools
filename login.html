@@ -3,40 +3,118 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Login - SJVM Schools</title>
-  <link rel="stylesheet" href="css/style.css" />
+  <title>SJVM Schools - Login</title>
+  <style>
+    body {
+      background-color: #0d1117;
+      color: #f0f6fc;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    .login-container {
+      background-color: #161b22;
+      padding: 40px 30px;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 24px;
+      font-size: 24px;
+      color: #f0f6fc;
+    }
+
+    label {
+      display: block;
+      margin: 12px 0 6px;
+      font-size: 14px;
+      color: #c9d1d9;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px;
+      background-color: #0d1117;
+      border: 1px solid #30363d;
+      color: #f0f6fc;
+      border-radius: 6px;
+      font-size: 16px;
+      box-sizing: border-box;
+      outline: none;
+      transition: 0.3s;
+    }
+
+    input:focus, select:focus {
+      border-color: #58a6ff;
+    }
+
+    .btn {
+      margin-top: 20px;
+      width: 100%;
+      padding: 12px;
+      background-color: #238636;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .btn:hover {
+      background-color: #2ea043;
+    }
+
+    .note {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 13px;
+      color: #8b949e;
+    }
+  </style>
 </head>
 <body>
-  <header class="header">
-    <div class="container">
-      <img src="assets/logo.png" alt="SJVM Logo" class="logo" />
-      <nav>
-        <ul class="nav-links">
-          <li><a href="index.html">Home</a></li>
-          <li><a href="about.html">About Us</a></li>
-          <li><a href="shop.html">Shop</a></li>
-          <li><a href="login.html" class="active">Login</a></li>
-        </ul>
-      </nav>
-    </div>
-  </header>
+  <div class="login-container">
+    <h2>Login to SJVM</h2>
+    <form action="#">
+      <label for="userid">User ID / Email</label>
+      <input type="text" id="userid" name="userid" required>
 
-  <section class="login-section">
-    <div class="container form-container">
-      <h1>Login</h1>
-      <p>Access your SJVM School dashboard.</p>
-      <form>
-        <input type="text" placeholder="Enter your ID or Email" required />
-        <input type="password" placeholder="Enter your Password" required />
-        <button type="submit" class="btn">Login</button>
-      </form>
-    </div>
-  </section>
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" required>
 
-  <footer class="footer">
-    <div class="container">
-      <p>© 2025 SJVM Schools. All rights reserved.</p>
+      <label for="branch">Select Branch</label>
+      <select id="branch" name="branch" required>
+        <option value="">-- Select Branch --</option>
+        <option value="Bandikodigenahalli">Bandikodigenahalli</option>
+        <option value="Atturu Layout">Atturu Layout</option>
+      </select>
+
+      <label for="role">Select Role</label>
+      <select id="role" name="role" required>
+        <option value="">-- Select Role --</option>
+        <option value="Student">Student</option>
+        <option value="Teacher">Teacher</option>
+        <option value="Principal">Principal</option>
+        <option value="Admin">Admin</option>
+        <option value="Chairman">Chairman</option>
+        <option value="Coordinator">Coordinator</option>
+      </select>
+
+      <button type="submit" class="btn">Login</button>
+    </form>
+
+    <div class="note">
+      Don’t have credentials? Contact your school admin.
     </div>
-  </footer>
+  </div>
 </body>
 </html>
