@@ -1,0 +1,33 @@
+.dashboard {
+  padding: 40px 0;
+  background-color: #f1f6fc;
+  min-height: 70vh;
+}
+
+.dashboard h1 {
+  color: #003366;
+  margin-bottom: 5px;
+}
+
+.dashboard p {
+  color: #333;
+  margin-bottom: 30px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.card h2 {
+  color: #004080;
+}
