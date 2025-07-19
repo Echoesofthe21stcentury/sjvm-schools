@@ -1,102 +1,93 @@
 body {
   margin: 0;
-  font-family: 'Segoe UI', sans-serif;
-  background: #f2f8ff;
-  color: #000;
+  font-family: 'Poppins', sans-serif;
+  background: #f9f9f9;
+  color: #333;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 1rem;
 }
 
 header {
-  background-color: #004080;
+  background: #007bff;
+  padding: 1rem 0;
   color: white;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 20px;
-  flex-wrap: wrap;
 }
 
 .logo {
-  display: flex;
-  align-items: center;
-}
-
-.logo img {
   height: 40px;
-  margin-right: 10px;
+  vertical-align: middle;
 }
 
-.nav-links {
-  display: flex;
+nav ul {
   list-style: none;
-  gap: 20px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
 }
 
-.nav-links li a {
+nav a {
   color: white;
   text-decoration: none;
-  padding: 8px;
-  border-radius: 5px;
+  font-weight: 600;
 }
 
-.nav-links li a:hover,
-.nav-links li a.active {
-  background: #0070cc;
-}
-
-.hamburger {
-  display: none;
-  font-size: 24px;
-  cursor: pointer;
+nav a.active {
+  text-decoration: underline;
 }
 
 .hero {
-  background: linear-gradient(to right, #0055cc, #007bff);
+  background: #0056b3;
   color: white;
+  padding: 4rem 1rem;
   text-align: center;
-  padding: 60px 20px;
 }
 
-.section {
-  padding: 40px 20px;
-  max-width: 800px;
-  margin: auto;
+.notices {
+  background: #fff;
+  padding: 2rem 1rem;
 }
 
-.shop-links a {
+.notices ul {
+  padding: 0;
+  list-style: disc inside;
+}
+
+.links {
+  text-align: center;
+  padding: 2rem 1rem;
+}
+
+.btn {
   display: inline-block;
-  margin: 10px;
-  padding: 12px 20px;
-  background: #004080;
+  margin: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: #007bff;
   color: white;
-  border-radius: 8px;
+  border-radius: 5px;
   text-decoration: none;
+  font-weight: 600;
+  transition: background 0.3s;
 }
 
-.shop-links a:hover {
-  background: #0070cc;
+.btn:hover {
+  background: #0056b3;
 }
 
 footer {
-  background: #002f5f;
+  background: #007bff;
   color: white;
   text-align: center;
-  padding: 20px;
+  padding: 1rem 0;
+  margin-top: 2rem;
 }
 
-/* Responsive Menu */
 @media (max-width: 768px) {
-  .nav-links {
-    display: none;
+  nav ul {
     flex-direction: column;
-    background-color: #004080;
-    width: 100%;
-  }
-
-  .nav-links.active {
-    display: flex;
-  }
-
-  .hamburger {
-    display: block;
+    text-align: right;
   }
 }
