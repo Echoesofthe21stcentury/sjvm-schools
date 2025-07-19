@@ -1,51 +1,190 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SJVM School | Home</title>
-  <link rel="stylesheet" href="assets/css/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SJVM Schools | Home</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: #f0f8ff;
+      color: #222;
+    }
+
+    header {
+      background: #004080;
+      color: white;
+      padding: 1rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    header h1 {
+      font-size: 1.8rem;
+    }
+
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 1rem;
+    }
+
+    nav ul li a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .hero {
+      background: #e6f0ff;
+      padding: 4rem 2rem;
+      text-align: center;
+    }
+
+    .hero h2 {
+      font-size: 2.5rem;
+      color: #004080;
+    }
+
+    .section {
+      padding: 2rem;
+    }
+
+    .section h3 {
+      color: #004080;
+      margin-bottom: 1rem;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+    }
+
+    .card {
+      background: white;
+      padding: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .card h4 {
+      color: #004080;
+    }
+
+    .login-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .login-buttons a {
+      background: #004080;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+
+    footer {
+      background: #004080;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+    }
+
+    @media (max-width: 600px) {
+      nav ul {
+        flex-direction: column;
+      }
+    }
+  </style>
 </head>
 <body>
+
   <header>
-    <nav class="navbar">
-      <div class="logo">SJVM School</div>
-      <ul class="nav-menu">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="about.html">About</a></li>
-        <li><a href="admissions.html">Admissions</a></li>
-        <li><a href="gallery.html">Gallery</a></li>
-        <li><a href="notices.html">Notices</a></li>
-        <li><a href="contact.html">Contact</a></li>
-        <li><a href="login.html" class="login-btn">Login</a></li>
+    <nav>
+      <h1>SJVM Schools</h1>
+      <ul>
+        <li><a href="#about">About</a></li>
+        <li><a href="#notices">Notices</a></li>
+        <li><a href="#login">Login</a></li>
+        <li><a href="#shop">Shop</a></li>
+        <li><a href="#contact">Contact</a></li>
       </ul>
     </nav>
   </header>
 
-  <main>
-    <section class="hero">
-      <h1>Welcome to SJVM Schools</h1>
-      <p>Empowering education with care, discipline, and excellence.</p>
-    </section>
+  <section class="hero">
+    <h2>Welcome to SJVM Schools</h2>
+    <p>Empowering students with knowledge, values, and discipline.</p>
+  </section>
 
-    <section class="features">
-      <div class="feature-box">
-        <h2>Our Vision</h2>
-        <p>To create a nurturing environment where students can thrive and succeed.</p>
-      </div>
-      <div class="feature-box">
-        <h2>Our Branches</h2>
-        <p>Bandikodigenahalli | Atturu Layout</p>
-      </div>
-      <div class="feature-box">
-        <h2>Explore More</h2>
-        <p>Join us and become part of a bright future.</p>
-      </div>
-    </section>
-  </main>
+  <section class="section" id="about">
+    <h3>About Us</h3>
+    <p>SJVM Schools are committed to holistic education, nurturing every child's potential with the best facilities and teaching.</p>
+  </section>
 
-  <footer>
-    <p>&copy; 2025 SJVM Schools. All rights reserved.</p>
+  <section class="section" id="notices">
+    <h3>Latest Notices</h3>
+    <div class="cards">
+      <div class="card">
+        <h4>PTM Meeting - July 25</h4>
+        <p>All parents are requested to attend.</p>
+      </div>
+      <div class="card">
+        <h4>Mid-Term Exams from August 5</h4>
+        <p>Ensure syllabus completion and revision.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="login">
+    <h3>Login Portals</h3>
+    <div class="login-buttons">
+      <a href="login-admin.html">Admin</a>
+      <a href="login-principal.html">Principal</a>
+      <a href="login-teacher.html">Teacher</a>
+      <a href="login-student.html">Student</a>
+      <a href="login-parent.html">Parent</a>
+      <a href="login-branch.html">Branch</a>
+    </div>
+  </section>
+
+  <section class="section" id="shop">
+    <h3>School Store (Preorder)</h3>
+    <div class="cards">
+      <div class="card">
+        <h4>School Diary</h4>
+        <p>Price: ₹50</p>
+        <a href="shop.html">Preorder</a>
+      </div>
+      <div class="card">
+        <h4>School Bag</h4>
+        <p>Price: ₹400</p>
+        <a href="shop.html">Preorder</a>
+      </div>
+    </div>
+  </section>
+
+  <footer id="contact">
+    <p>© 2025 SJVM Schools | Bandikodigenahalli & Atturu Layout</p>
   </footer>
+
 </body>
 </html>
