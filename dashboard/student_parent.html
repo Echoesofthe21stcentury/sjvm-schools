@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>SJVM | Student & Parent Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #0a1f44;
+      color: white;
+    }
+
+    header {
+      background-color: #102a5c;
+      padding: 20px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      color: #fff;
+      letter-spacing: 1px;
+    }
+
+    .container {
+      padding: 30px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background-color: #163b75;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+      transition: transform 0.2s;
+    }
+
+    .card:hover {
+      transform: scale(1.05);
+      background-color: #1f4c95;
+    }
+
+    .card h3 {
+      margin-bottom: 10px;
+    }
+
+    .logout-btn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 10px 16px;
+      background-color: crimson;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .logout-btn:hover {
+      background-color: darkred;
+    }
+  </style>
+</head>
+<body>
+
+  <header>👨‍👩‍👧 SJVM Dashboard – Student & Parent</header>
+
+  <button class="logout-btn" onclick="logout()">Logout</button>
+
+  <div class="container">
+    <div class="card">
+      <h3>📚 Subjects</h3>
+      <p>View class subjects and materials.</p>
+    </div>
+    <div class="card">
+      <h3>🧾 Fee Details</h3>
+      <p>Check and pay fees.</p>
+    </div>
+    <div class="card">
+      <h3>📅 Timetable</h3>
+      <p>Check class schedule.</p>
+    </div>
+    <div class="card">
+      <h3>📈 Progress</h3>
+      <p>View marks and attendance.</p>
+    </div>
+    <div class="card">
+      <h3>📥 Downloads</h3>
+      <p>Homework, circulars, etc.</p>
+    </div>
+    <div class="card">
+      <h3>🛍️ School Store</h3>
+      <p>Buy diary, bag, uniform & more.</p>
+    </div>
+  </div>
+
+  <script>
+    // Allow student or parent
+    const loggedIn = localStorage.getItem("sjvm_logged_in");
+    const role = localStorage.getItem("sjvm_role");
+
+    if (loggedIn !== "true" || (role !== "student" && role !== "parent")) {
+      window.location.href = "../login.html";
+    }
+
+    function logout() {
+      localStorage.clear();
+      window.location.href = "../login.html";
+    }
+  </script>
+
+</body>
+</html>
