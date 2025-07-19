@@ -3,118 +3,70 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SJVM Schools - Login</title>
-  <style>
-    body {
-      background-color: #0d1117;
-      color: #f0f6fc;
-      font-family: 'Segoe UI', sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      margin: 0;
-    }
-
-    .login-container {
-      background-color: #161b22;
-      padding: 40px 30px;
-      border-radius: 12px;
-      width: 100%;
-      max-width: 400px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.5);
-    }
-
-    h2 {
-      text-align: center;
-      margin-bottom: 24px;
-      font-size: 24px;
-      color: #f0f6fc;
-    }
-
-    label {
-      display: block;
-      margin: 12px 0 6px;
-      font-size: 14px;
-      color: #c9d1d9;
-    }
-
-    input, select {
-      width: 100%;
-      padding: 12px;
-      background-color: #0d1117;
-      border: 1px solid #30363d;
-      color: #f0f6fc;
-      border-radius: 6px;
-      font-size: 16px;
-      box-sizing: border-box;
-      outline: none;
-      transition: 0.3s;
-    }
-
-    input:focus, select:focus {
-      border-color: #58a6ff;
-    }
-
-    .btn {
-      margin-top: 20px;
-      width: 100%;
-      padding: 12px;
-      background-color: #238636;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-size: 16px;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-
-    .btn:hover {
-      background-color: #2ea043;
-    }
-
-    .note {
-      text-align: center;
-      margin-top: 20px;
-      font-size: 13px;
-      color: #8b949e;
-    }
-  </style>
+  <title>Login - SJVM School</title>
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
-  <div class="login-container">
-    <h2>Login to SJVM</h2>
-    <form action="#">
-      <label for="userid">User ID / Email</label>
-      <input type="text" id="userid" name="userid" required>
 
-      <label for="password">Password</label>
-      <input type="password" id="password" name="password" required>
+  <header class="header">
+    <h1 style="text-align:center; color:#f0f6fc;">SJVM School</h1>
+    <nav class="nav-links" style="text-align:center; margin-top: 10px;">
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="shop.html">Shop</a>
+      <a href="login.html" class="active">Login</a>
+    </nav>
+  </header>
 
-      <label for="branch">Select Branch</label>
-      <select id="branch" name="branch" required>
-        <option value="">-- Select Branch --</option>
-        <option value="Bandikodigenahalli">Bandikodigenahalli</option>
-        <option value="Atturu Layout">Atturu Layout</option>
-      </select>
+  <main>
+    <div class="form-container">
+      <h2>Login to Your Account</h2>
+      <form id="loginForm">
+        <label for="role">Select Role:</label><br/>
+        <select id="role" required class="input">
+          <option value="">-- Choose Role --</option>
+          <option value="Student">Student</option>
+          <option value="Teacher">Teacher</option>
+          <option value="Principal">Principal</option>
+          <option value="Admin">Admin</option>
+        </select><br/>
 
-      <label for="role">Select Role</label>
-      <select id="role" name="role" required>
-        <option value="">-- Select Role --</option>
-        <option value="Student">Student</option>
-        <option value="Teacher">Teacher</option>
-        <option value="Principal">Principal</option>
-        <option value="Admin">Admin</option>
-        <option value="Chairman">Chairman</option>
-        <option value="Coordinator">Coordinator</option>
-      </select>
+        <label for="branch">Select Branch:</label><br/>
+        <select id="branch" required class="input">
+          <option value="">-- Choose Branch --</option>
+          <option value="Bandikodigenahalli">Bandikodigenahalli</option>
+          <option value="Atturu Layout">Atturu Layout</option>
+        </select><br/>
 
-      <button type="submit" class="btn">Login</button>
-    </form>
+        <label for="password">Password:</label><br/>
+        <input type="password" id="password" placeholder="Enter password" required/><br/>
 
-    <div class="note">
-      Don’t have credentials? Contact your school admin.
+        <button type="submit" class="btn">Login</button>
+      </form>
     </div>
-  </div>
+  </main>
+
+  <footer style="text-align:center; padding:20px; color:#8b949e;">
+    © 2025 SJVM School. All rights reserved.
+  </footer>
+
+  <script>
+    document.getElementById("loginForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const role = document.getElementById("role").value;
+      const branch = document.getElementById("branch").value;
+      const password = document.getElementById("password").value;
+
+      if (password === "sjvm123") {
+        sessionStorage.setItem("isLoggedIn", "true");
+        sessionStorage.setItem("userRole", role);
+        sessionStorage.setItem("userBranch", branch);
+        window.location.href = "dashboard.html";
+      } else {
+        alert("Incorrect password. Hint: Try 'sjvm123'");
+      }
+    });
+  </script>
+
 </body>
 </html>
