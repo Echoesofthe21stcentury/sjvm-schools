@@ -3,128 +3,75 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SJVM School - Home</title>
-  <link rel="stylesheet" href="css/style.css"/>
-  <style>
-    * {
-      margin: 0; padding: 0; box-sizing: border-box;
-    }
-
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4faff;
-      color: #333;
-    }
-
-    header {
-      background-color: #0058b0;
-      padding: 15px 20px;
-      color: white;
-    }
-
-    nav {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .logo {
-      font-size: 24px;
-      font-weight: bold;
-    }
-
-    .menu {
-      display: flex;
-      gap: 20px;
-    }
-
-    .menu a {
-      color: white;
-      text-decoration: none;
-      font-weight: bold;
-    }
-
-    .menu a:hover {
-      text-decoration: underline;
-    }
-
-    .main {
-      padding: 20px;
-    }
-
-    .hero {
-      background: #e0f0ff;
-      padding: 40px 20px;
-      text-align: center;
-      border-radius: 10px;
-      margin-bottom: 30px;
-    }
-
-    .section {
-      margin-bottom: 30px;
-      padding: 20px;
-      background-color: white;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-
-    footer {
-      background-color: #003c7e;
-      color: white;
-      text-align: center;
-      padding: 15px 10px;
-      font-size: 14px;
-    }
-
-    @media (max-width: 768px) {
-      .menu {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-    }
-  </style>
+  <title>SJVM Schools</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="images/logo.png">
 </head>
 <body>
 
+  <!-- Navbar -->
   <header>
-    <nav>
-      <div class="logo">SJVM Schools</div>
-      <div class="menu">
-        <a href="index.html">Home</a>
-        <a href="about.html">About</a>
-        <a href="shop.html">Shop</a>
-        <a href="contact.html">Contact</a>
-        <a href="login.php">Login</a>
-        <a href="dashboard/student-parent.php">Dashboard</a>
-      </div>
+    <div class="logo">
+      <img src="images/logo.png" alt="SJVM Logo">
+      <h1>SJVM Schools</h1>
+    </div>
+    <nav id="nav-menu">
+      <ul class="nav-links">
+        <li><a href="index.html" class="active">Home</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#branches">Branches</a></li>
+        <li><a href="#notices">Notices</a></li>
+        <li><a href="#shop">Shop</a></li>
+        <li><a href="login.html">Login</a></li>
+      </ul>
+      <div class="hamburger" onclick="toggleMenu()">☰</div>
     </nav>
   </header>
 
-  <div class="main">
-    <section class="hero">
-      <h1>Welcome to SJVM Schools</h1>
-      <p>Empowering education for a brighter tomorrow. A place where students grow with values and wisdom.</p>
-    </section>
+  <!-- Hero Section -->
+  <section class="hero">
+    <h2>Welcome to SJVM Schools</h2>
+    <p>Where education meets excellence</p>
+  </section>
 
-    <section class="section">
-      <h2>📢 Latest Notices</h2>
-      <ul>
-        <li>School reopens on July 22nd – All students must attend.</li>
-        <li>Uniform distribution available from July 18th in school office.</li>
-        <li>New diary and school bag preorders open in Shop section.</li>
-      </ul>
-    </section>
+  <!-- About -->
+  <section id="about" class="section">
+    <h2>About SJVM</h2>
+    <p>SJVM Schools focus on academic brilliance and character building through an inclusive curriculum.</p>
+  </section>
 
-    <section class="section">
-      <h2>🏫 About Our School</h2>
-      <p>SJVM Schools offer holistic education from PKG to Class 10 with modern infrastructure, dedicated faculty, and focus on discipline, values, and academic excellence.</p>
-    </section>
-  </div>
+  <!-- Branches -->
+  <section id="branches" class="section">
+    <h2>Our Branches</h2>
+    <ul>
+      <li>SJVM Bandikodigenahalli</li>
+      <li>SJVM Atturu Layout</li>
+    </ul>
+    <p>Classes from PKG to Class 10</p>
+  </section>
 
+  <!-- Notices -->
+  <section id="notices" class="section">
+    <h2>Latest Notices</h2>
+    <ul id="notice-list"></ul>
+  </section>
+
+  <!-- Shop -->
+  <section id="shop" class="section">
+    <h2>School Store</h2>
+    <div class="shop-links">
+      <a href="shop/bags.html">🎒 Bags</a>
+      <a href="shop/diary.html">📘 Diary</a>
+      <a href="shop/preorder.html">🛍️ Preorder Items</a>
+    </div>
+  </section>
+
+  <!-- Footer -->
   <footer>
-    &copy; 2025 SJVM Schools. All rights reserved.
+    <p>&copy; 2025 SJVM Schools. All rights reserved.</p>
+    <p>Contact: sjvmschools@gmail.com</p>
   </footer>
 
+  <script src="js/script.js"></script>
 </body>
 </html>
