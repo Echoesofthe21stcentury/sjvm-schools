@@ -2,14 +2,51 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Shop | SJVM</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Shop - SJVM Schools</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-  <div class="shop-notice">
-    <h2>Please Login to Shop</h2>
-    <p>You must be logged in to access the SJVM shop.</p>
-    <a href="login.html" class="button">Login Now</a>
-  </div>
+  <header class="header">
+    <div class="container">
+      <img src="assets/logo.png" alt="SJVM Logo" class="logo" />
+      <nav>
+        <ul class="nav-links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html">About Us</a></li>
+          <li><a href="shop.html" class="active">Shop</a></li>
+          <li><a href="login.html">Login</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <section class="shop">
+    <div class="container">
+      <h1>Welcome to the SJVM School Store</h1>
+      <p class="info-msg">You must <a href="login.html" class="btn-inline">Login</a> to shop with us.</p>
+
+      <div class="shop-preview">
+        <div class="product-box">
+          <h2>School Bag</h2>
+          <p>Durable and spacious SJVM branded school bag.</p>
+        </div>
+        <div class="product-box">
+          <h2>School Diary</h2>
+          <p>Customized academic diary for all students.</p>
+        </div>
+        <div class="product-box">
+          <h2>Books Bundle</h2>
+          <p>All required textbooks and notebooks by class.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <p>© 2025 SJVM Schools. All rights reserved.</p>
+    </div>
+  </footer>
 </body>
 </html>
