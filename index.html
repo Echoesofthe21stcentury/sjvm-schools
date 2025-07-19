@@ -4,17 +4,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SJVM Schools</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
   <header class="header">
     <div class="container">
-      <img src="assets/logo.png" alt="SJVM Logo" class="logo">
+      <img src="assets/logo.png" alt="SJVM Logo" class="logo" />
       <nav>
         <ul class="nav-links">
           <li><a href="index.html" class="active">Home</a></li>
           <li><a href="about.html">About Us</a></li>
-          <li><a href="#" onclick="alertLogin()">Shop</a></li>
+          <li><a href="shop.html">Shop</a></li>
           <li><a href="login.html">Login</a></li>
         </ul>
       </nav>
@@ -27,7 +27,7 @@
       <p>Empowering students through value-based education and technology.</p>
       <div class="buttons">
         <a href="login.html" class="btn">Login to Dashboard</a>
-        <a href="#" class="btn-outline" onclick="alertLogin()">Preorder Supplies</a>
+        <a href="shop.html" class="btn-outline">Preorder Supplies</a>
       </div>
     </div>
   </section>
@@ -54,12 +54,5 @@
       <p>© 2025 SJVM Schools. All rights reserved.</p>
     </div>
   </footer>
-
-  <script>
-    function alertLogin() {
-      alert("Please login to access the shop.");
-      window.location.href = "login.html";
-    }
-  </script>
 </body>
 </html>
