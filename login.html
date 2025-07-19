@@ -1,36 +1,58 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>SJVM Login</title>
-  <link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SJVM Schools-Home</title>
+  <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-  <div class="login-container">
-    <h1>Login to SJVM Portal</h1>
-    <form onsubmit="login(event)">
-      <input type="text" id="username" placeholder="Username or Email" required>
-      <input type="password" id="password" placeholder="Password" required>
-      <button type="submit" class="button">Login</button>
-    </form>
-    <p>Only authorized users are allowed to log in.</p>
-  </div>
+  <header class="header">
+    <div class="container">
+      <img src="assets/logo.png" alt="SJVM Logo" class="logo" />
+      <nav>
+        <ul class="nav-links">
+          <li><a href="index.html" class="active">Home</a></li>
+          <li><a href="about.html">About Us</a></li>
+          <li><a href="shop.html">Shop</a></li>
+          <li><a href="login.html">Login</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
 
-  <script>
-    function login(e) {
-      e.preventDefault();
-      const user = document.getElementById("username").value;
-      const pass = document.getElementById("password").value;
+  <section class="hero">
+    <div class="container">
+      <h1>Welcome to SJVM Schools</h1>
+      <p>Empowering students through value-based education and technology.</p>
+      <div class="buttons">
+        <a href="login.html" class="btn">Login to Dashboard</a>
+        <a href="shop.html" class="btn-outline">Preorder Supplies</a>
+      </div>
+    </div>
+  </section>
 
-      // Simple mock login condition
-      if (user === "student" && pass === "1234") {
-        window.location.href = "dashboard/student-dashboard.html";
-      } else if (user === "teacher" && pass === "abcd") {
-        window.location.href = "dashboard/teacher-dashboard.html";
-      } else {
-        alert("Invalid login credentials.");
-      }
-    }
-  </script>
+  <section class="features">
+    <div class="container grid">
+      <div class="feature-box">
+        <h2>Digital Diary</h2>
+        <p>Get your homework, notes, and updates in one place.</p>
+      </div>
+      <div class="feature-box">
+        <h2>Online Fees</h2>
+        <p>Pay your school fees online with instant confirmation.</p>
+      </div>
+      <div class="feature-box">
+        <h2>Smart Attendance</h2>
+        <p>Track student attendance in real time.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <p>© 2025 SJVM Schools. All rights reserved.</p>
+    </div>
+  </footer>
 </body>
 </html>
