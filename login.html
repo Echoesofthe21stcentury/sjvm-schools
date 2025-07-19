@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SJVM Schools-Home</title>
+  <title>Login - SJVM Schools</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
@@ -12,40 +12,29 @@
       <img src="assets/logo.png" alt="SJVM Logo" class="logo" />
       <nav>
         <ul class="nav-links">
-          <li><a href="index.html" class="active">Home</a></li>
+          <li><a href="index.html">Home</a></li>
           <li><a href="about.html">About Us</a></li>
           <li><a href="shop.html">Shop</a></li>
-          <li><a href="login.html">Login</a></li>
+          <li><a href="login.html" class="active">Login</a></li>
         </ul>
       </nav>
     </div>
   </header>
 
-  <section class="hero">
+  <section class="login-section">
     <div class="container">
-      <h1>Welcome to SJVM Schools</h1>
-      <p>Empowering students through value-based education and technology.</p>
-      <div class="buttons">
-        <a href="login.html" class="btn">Login to Dashboard</a>
-        <a href="shop.html" class="btn-outline">Preorder Supplies</a>
-      </div>
-    </div>
-  </section>
+      <h1>Login to Your Dashboard</h1>
+      <form class="login-form">
+        <label for="username">Username or Email</label>
+        <input type="text" id="username" placeholder="Enter your username" required />
 
-  <section class="features">
-    <div class="container grid">
-      <div class="feature-box">
-        <h2>Digital Diary</h2>
-        <p>Get your homework, notes, and updates in one place.</p>
-      </div>
-      <div class="feature-box">
-        <h2>Online Fees</h2>
-        <p>Pay your school fees online with instant confirmation.</p>
-      </div>
-      <div class="feature-box">
-        <h2>Smart Attendance</h2>
-        <p>Track student attendance in real time.</p>
-      </div>
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Enter your password" required />
+
+        <button type="submit" class="btn">Login</button>
+      </form>
+
+      <p class="login-note">Haven't received login credentials? Contact school administration.</p>
     </div>
   </section>
 
