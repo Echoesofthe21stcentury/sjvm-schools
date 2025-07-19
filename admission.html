@@ -1,244 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Admission Form – SJVM Schools</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/png" href="favicon.png" />
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #f0f8ff;
-      margin: 0;
-      padding: 0;
-    }
-
-    header {
-      background-color: #003366;
-      color: white;
-      padding: 20px;
-      text-align: center;
-    }
-
-    header img {
-      height: 60px;
-      vertical-align: middle;
-    }
-
-    header h1 {
-      display: inline-block;
-      margin-left: 15px;
-      vertical-align: middle;
-      font-size: 28px;
-    }
-
-    nav {
-      background-color: #0059b3;
-      overflow: hidden;
-    }
-
-    nav a {
-      float: left;
-      display: block;
-      color: white;
-      text-align: center;
-      padding: 14px 20px;
-      text-decoration: none;
-      font-weight: bold;
-    }
-
-    nav a:hover {
-      background-color: #003366;
-    }
-
-    .container {
-      max-width: 700px;
-      margin: 40px auto;
-      background-color: white;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-    }
-
-    h2 {
-      text-align: center;
-      color: #003366;
-      margin-bottom: 25px;
-    }
-
-    label {
-      display: block;
-      margin-top: 15px;
-      font-weight: 600;
-      color: #333;
-    }
-
-    input, select, textarea {
-      width: 100%;
-      padding: 10px;
-      margin-top: 6px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 16px;
-      box-sizing: border-box;
-    }
-
-    textarea {
-      resize: vertical;
-    }
-
-    button {
-      width: 100%;
-      margin-top: 25px;
-      padding: 12px;
-      font-size: 16px;
-      background-color: #003366;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-
-    button:hover {
-      background-color: #00264d;
-    }
-
-    video, canvas {
-      display: block;
-      margin: 10px auto;
-      max-width: 100%;
-      border-radius: 8px;
-    }
-
-    .photo-buttons {
-      text-align: center;
-    }
-
-    footer {
-      background-color: #003366;
-      color: white;
-      text-align: center;
-      padding: 10px;
-      margin-top: 40px;
-    }
-
-    @media (max-width: 600px) {
-      .container {
-        margin: 20px;
-        padding: 20px;
-      }
-    }
-  </style>
-</head>
-<body>
-
-  <header>
-    <img src="SJVM logo empowering mankind without background.png" alt="SJVM Logo">
-    <h1>SJVM Schools</h1>
-    <p>Where Education Meets Excellence</p>
-  </header>
-
-  <nav>
-    <a href="index.html">Home</a>
-    <a href="admission.html">Admission Form</a>
-    <a href="gallery.html">Gallery</a>
-    <a href="https://sjvmschools.org/userlogin.html">Login</a>
-  </nav>
-
-  <div class="container">
-    <h2>Admission Form</h2>
-
-    <form action="https://formsubmit.co/echoesofthe21stcentury@gmail.com" method="POST">
-      <label for="studentname">Student Full Name</label>
-      <input type="text" name="studentname" id="studentname" required>
-
-      <label for="dob">Date of Birth</label>
-      <input type="date" name="dob" id="dob" required>
-
-      <label for="gender">Gender</label>
-      <select name="gender" id="gender" required>
-        <option value="">Select Gender</option>
-        <option value="Male">Male</option>
-        <option value="Female">Female</option>
-        <option value="Other">Other</option>
-      </select>
-
-      <label for="class">Class Applying For</label>
-      <select name="class" id="class" required>
-        <option value="">Select Class</option>
-        <option value="PKG">PKG</option>
-        <option value="LKG">LKG</option>
-        <option value="UKG">UKG</option>
-        <option value="1">Class 1</option>
-        <option value="2">Class 2</option>
-        <option value="3">Class 3</option>
-        <option value="4">Class 4</option>
-        <option value="5">Class 5</option>
-        <option value="6">Class 6</option>
-        <option value="7">Class 7</option>
-        <option value="8">Class 8</option>
-        <option value="9">Class 9</option>
-        <option value="10">Class 10</option>
-      </select>
-
-      <label for="aadhaar">Aadhaar Number</label>
-      <input type="text" name="aadhaar" id="aadhaar" required>
-
-      <label>Capture Student Photo</label>
-      <video id="video" autoplay playsinline width="320" height="240"></video>
-      <div class="photo-buttons">
-        <button type="button" onclick="capturePhoto()">📸 Capture Photo</button>
-      </div>
-      <canvas id="canvas" width="320" height="240" style="display:none;"></canvas>
-      <input type="hidden" name="studentphoto" id="studentphoto">
-
-      <label for="parentname">Parent/Guardian Name</label>
-      <input type="text" name="parentname" id="parentname" required>
-
-      <label for="mobile">Mobile Number</label>
-      <input type="tel" name="mobile" id="mobile" required>
-
-      <label for="email">Email ID</label>
-      <input type="email" name="email" id="email" required>
-
-      <label for="address">Residential Address</label>
-      <textarea name="address" id="address" rows="4" required></textarea>
-
-      <!-- Hidden Fields -->
-      <input type="hidden" name="_captcha" value="false">
-      <input type="hidden" name="_next" value="https://sjvmschools.org/thankyou.html">
-
-      <button type="submit">Submit Admission Form</button>
-    </form>
-  </div>
-
-  <footer>
-    &copy; 2025 SJVM Schools. All rights reserved.
-  </footer>
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Apply for Admission</title>
+  <link rel="stylesheet" href="style.css"/>
   <script>
-    const video = document.getElementById('video');
-    const canvas = document.getElementById('canvas');
-    const studentphoto = document.getElementById('studentphoto');
+    function sendMail() {
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const phone = document.getElementById('phone').value;
+      const grade = document.getElementById('grade').value;
+      const message = document.getElementById('message').value;
 
-    // Ask for camera permission
-    navigator.mediaDevices.getUserMedia({ video: true })
-      .then((stream) => {
-        video.srcObject = stream;
-      })
-      .catch((err) => {
-        alert("Camera access denied or not supported: " + err.message);
-      });
+      const subject = `Admission Request - ${name}`;
+      const body = `Student Name: ${name}%0D%0AEmail: ${email}%0D%0APhone: ${phone}%0D%0AGrade: ${grade}%0D%0AMessage: ${message}`;
 
-    function capturePhoto() {
-      const context = canvas.getContext('2d');
-      context.drawImage(video, 0, 0, canvas.width, canvas.height);
-      const dataURL = canvas.toDataURL('image/png');
-      studentphoto.value = dataURL;
-      alert("Photo captured and attached to form!");
+      const mailLink = `mailto:YOUR_EMAIL@example.com?subject=${subject}&body=${body}`;
+      window.location.href = mailLink;
+
+      setTimeout(() => {
+        window.location.href = 'thankyou.html'; // Redirect to thank-you page after 5 seconds
+      }, 5000);
+
+      return false; // Prevent form reload
     }
   </script>
+</head>
+<body class="dark-theme">
+
+  <header>
+    <h1>Apply for Admission</h1>
+    <nav>
+      <a href="index.html" class="btn">Home</a>
+      <a href="about.html" class="btn">About Us</a>
+      <a href="shop.html" class="btn">Shop</a>
+      <a href="login.html" class="btn">Login</a>
+    </nav>
+  </header>
+
+  <main>
+    <form onsubmit="return sendMail()" class="form-box">
+      <label for="name">Full Name:</label>
+      <input type="text" id="name" required />
+
+      <label for="email">Email Address:</label>
+      <input type="email" id="email" required />
+
+      <label for="phone">Phone Number:</label>
+      <input type="tel" id="phone" required />
+
+      <label for="grade">Applying for Grade:</label>
+      <input type="text" id="grade" required />
+
+      <label for="message">Message:</label>
+      <textarea id="message" rows="4"></textarea>
+
+      <button type="submit" class="btn">Submit Application</button>
+    </form>
+  </main>
+
+  <footer>
+    <p>© 2025 SJVM School. All rights reserved.</p>
+  </footer>
 
 </body>
 </html>
