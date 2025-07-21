@@ -1,94 +1,98 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Student Register - SJVM</title>
-  <style>
-    body { font-family: Arial; background: #f4f4f4; padding: 20px; }
-    input, select { margin: 5px; padding: 8px; }
-    button { padding: 10px 15px; }
-    #status { margin-top: 15px; font-weight: bold; }
-  </style>
+  <title>Student Registration - SJVM</title>
 </head>
 <body>
-  <h2>Register Student</h2>
-  <input type="text" id="studentName" placeholder="Student Name" required />
-  <input type="text" id="class" placeholder="Class (e.g. Class 4)" required />
-  <input type="text" id="regNumber" placeholder="Register Number (e.g. SBK-401)" required />
-  <select id="branch" required>
-    <option value="">-- Select Branch --</option>
-    <option value="Bandikodigenahalli">Bandikodigenahalli</option>
-    <option value="Atturu Layout">Atturu Layout</option>
-  </select>
-  <br />
-  <button onclick="registerStudent()">Register</button>
+  <h2>SJVM Student Registration Form</h2>
 
-  <div id="status"></div>
+  <form id="studentForm">
+    <label>Student Name:</label><br>
+    <input type="text" id="name" required><br><br>
+
+    <label>Class:</label><br>
+    <input type="text" id="class" required><br><br>
+
+    <label>Register Number:</label><br>
+    <input type="text" id="register" required><br><br>
+
+    <label>Branch:</label><br>
+    <select id="branch" required>
+      <option value="Atturu">Atturu</option>
+      <option value="Bandikodigenahalli">Bandikodigenahalli</option>
+    </select><br><br>
+
+    <label>GitHub Token (Hidden in prod):</label><br>
+    <input type="password" id="token" required><br><br>
+
+    <button type="submit">Register</button>
+  </form>
+
+  <div id="message"></div>
 
   <script>
-    async function registerStudent() {
-      const name = document.getElementById('studentName').value.trim();
-      const cls = document.getElementById('class').value.trim();
-      const reg = document.getElementById('regNumber').value.trim();
-      const branch = document.getElementById('branch').value;
+    document.getElementById("studentForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
 
-      if (!name || !cls || !reg || !branch) {
-        document.getElementById('status').textContent = "❌ Fill all fields.";
+      const name = document.getElementById("name").value;
+      const studentClass = document.getElementById("class").value;
+      const register = document.getElementById("register").value;
+      const branch = document.getElementById("branch").value;
+      const token = document.getElementById("token").value;
+
+      const repoOwner = "Echoesofthe21stcentury";
+      const repoName = "sjvm-schools";
+      const filePath = "data/student_register.json";
+      const apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`;
+
+      const newStudent = {
+        name: name,
+        class: studentClass,
+        register_number: register,
+        branch: branch
+      };
+
+      // Fetch existing content
+      const response = await fetch(apiUrl, {
+        headers: {
+          Authorization: `token ${token}`,
+          Accept: "application/vnd.github.v3+json"
+        }
+      });
+
+      if (!response.ok) {
+        document.getElementById("message").innerHTML = "❌ Failed to load existing student data.";
         return;
       }
 
-      const repo = "Echoesofthe21stcentury/sjvm-schools";
-      const token = "ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxx"; // Replace with your real token
-      const filePath = "student_register.json";
+      const fileData = await response.json();
+      const content = atob(fileData.content); // base64 decode
+      const students = JSON.parse(content);
 
-      const apiUrl = `https://api.github.com/repos/${repo}/contents/${filePath}`;
+      students.push(newStudent);
 
-      // Step 1: Get existing file (if any)
-      let existingData = {};
-      let sha = "";
-      try {
-        const res = await fetch(apiUrl, {
-          headers: { Authorization: `token ${token}` }
-        });
-        const json = await res.json();
-        if (json.content) {
-          existingData = JSON.parse(atob(json.content));
-          sha = json.sha;
-        }
-      } catch (e) {
-        existingData = {};
-      }
+      const updatedContent = btoa(JSON.stringify(students, null, 2)); // encode to base64
 
-      // Step 2: Add new student
-      if (!existingData[cls]) existingData[cls] = {};
-      existingData[cls][reg] = { name, class: cls, register: reg, branch };
-
-      // Step 3: Update file on GitHub
-      const updatedContent = btoa(JSON.stringify(existingData, null, 2));
-      const payload = {
-        message: `Add student ${reg}`,
-        content: updatedContent,
-        sha: sha || undefined
-      };
-
-      const putRes = await fetch(apiUrl, {
+      const updateResponse = await fetch(apiUrl, {
         method: "PUT",
         headers: {
           Authorization: `token ${token}`,
-          "Content-Type": "application/json"
+          Accept: "application/vnd.github.v3+json"
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({
+          message: `Added student ${name}`,
+          content: updatedContent,
+          sha: fileData.sha
+        })
       });
 
-      if (putRes.ok) {
-        document.getElementById('status').textContent = `✅ Student ${name} registered!`;
+      if (updateResponse.ok) {
+        document.getElementById("message").innerHTML = "✅ Student registered successfully!";
+        document.getElementById("studentForm").reset();
       } else {
-        const err = await putRes.json();
-        console.error(err);
-        document.getElementById('status').textContent = "❌ Failed to register student.";
+        document.getElementById("message").innerHTML = "❌ Failed to register student.";
       }
-    }
+    });
   </script>
 </body>
 </html>
