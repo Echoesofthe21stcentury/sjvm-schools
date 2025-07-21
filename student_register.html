@@ -1,180 +1,159 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Student Registration - SJVM</title>
+  <meta charset="UTF-8">
+  <title>Student Register - SJVM</title>
   <style>
     body {
+      background: linear-gradient(to right, #1e3c72, #2a5298);
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to right, #3f87a6, #ebf8e1);
-      margin: 0;
-      padding: 20px;
-      color: #333;
-    }
-
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-      background: #fff;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
     }
-
     h1 {
-      text-align: center;
-      color: #2a5d84;
+      color: #fcd34d;
     }
-
-    img.logo {
-      display: block;
-      margin: 0 auto 20px;
-      width: 100px;
+    form {
+      background: #0f172a;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 0 20px #00000088;
+      width: 320px;
     }
-
-    label {
-      display: block;
-      margin: 15px 0 5px;
-      font-weight: bold;
-    }
-
-    input, select {
+    input, select, button {
       width: 100%;
       padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-    }
-
-    button {
-      margin-top: 20px;
-      width: 100%;
-      padding: 12px;
-      background: #2a5d84;
-      color: white;
-      font-size: 16px;
+      margin: 10px 0;
+      border-radius: 8px;
       border: none;
-      border-radius: 6px;
+      font-size: 14px;
+    }
+    input, select {
+      background: #1e293b;
+      color: #fff;
+    }
+    button {
+      background: #22c55e;
+      color: #fff;
       cursor: pointer;
+      transition: background 0.3s;
     }
-
     button:hover {
-      background: #184561;
-    }
-
-    .status {
-      margin-top: 15px;
-      font-weight: bold;
-      text-align: center;
-    }
-
-    .success {
-      color: green;
-    }
-
-    .error {
-      color: red;
+      background: #16a34a;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <img src="school-logo.png" alt="School Logo" class="logo">
-    <h1>Student Registration</h1>
 
-    <label>GitHub Token</label>
-    <input type="password" id="token" placeholder="Enter GitHub PAT" required>
-
-    <label>Student Name</label>
-    <input type="text" id="name" required>
-
-    <label>Class</label>
-    <select id="class">
-      <option value="">-- Select Class --</option>
+  <h1>Student Registration</h1>
+  <form id="studentForm">
+    <input type="text" id="regno" placeholder="Register Number" required />
+    <input type="text" id="name" placeholder="Full Name" required />
+    <input type="text" id="father" placeholder="Father's Name" required />
+    <input type="text" id="mobile" placeholder="Mobile Number" required />
+    <input type="text" id="address" placeholder="Address" required />
+    <select id="class" required>
+      <option value="">Select Class</option>
       <option value="Class 1">Class 1</option>
       <option value="Class 2">Class 2</option>
-      <option value="Class 3">Class 3</option>
-      <option value="Class 4">Class 4</option>
-      <option value="Class 5">Class 5</option>
-      <option value="Class 6">Class 6</option>
-      <option value="Class 7">Class 7</option>
-      <option value="Class 8">Class 8</option>
-      <option value="Class 9">Class 9</option>
-      <option value="Class 10">Class 10</option>
+      <!-- Add more classes as needed -->
     </select>
-
-    <label>Register Number</label>
-    <input type="text" id="reg" required>
-
-    <label>Branch</label>
-    <select id="branch">
-      <option value="">-- Select Branch --</option>
+    <select id="branch" required>
+      <option value="">Select Branch</option>
       <option value="Bandikodigenahalli">Bandikodigenahalli</option>
       <option value="Atturu Layout">Atturu Layout</option>
     </select>
-
-    <button onclick="registerStudent()">Register</button>
-    <div class="status" id="status"></div>
-  </div>
+    <button type="submit">Register</button>
+  </form>
 
   <script>
-    async function registerStudent() {
-      const token = document.getElementById('token').value;
-      const name = document.getElementById('name').value;
-      const cls = document.getElementById('class').value;
-      const reg = document.getElementById('reg').value;
-      const branch = document.getElementById('branch').value;
-      const status = document.getElementById('status');
+    const filePath = "data/student_register.json";
 
-      if (!token || !name || !cls || !reg || !branch) {
-        status.innerHTML = '<span class="error">❌ Please fill in all fields.</span>';
-        return;
+    async function updateGitHubFile(filePath, modifyCallback, commitMsg, token) {
+      const url = `https://api.github.com/repos/Echoesofthe21stcentury/sjvm-schools/contents/${filePath}`;
+      
+      const response = await fetch(url, {
+        headers: {
+          Authorization: `token ${token}`,
+          Accept: "application/vnd.github.v3+json"
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch file: " + response.status);
       }
 
-      const repo = "Echoesofthe21stcentury/sjvm-schools";
-      const filePath = "student_register.json";
-      const apiUrl = `https://api.github.com/repos/${repo}/contents/${filePath}`;
+      const file = await response.json();
+      const sha = file.sha;
+      const content = atob(file.content);
+      const data = JSON.parse(content);
+      const updatedData = modifyCallback(data);
+      const newContent = btoa(JSON.stringify(updatedData, null, 2));
 
-      // Get current JSON
-      const headers = {
-        Authorization: `token ${token}`,
-        Accept: "application/vnd.github.v3+json"
+      return await fetch(url, {
+        method: "PUT",
+        headers: {
+          Authorization: `token ${token}`,
+          Accept: "application/vnd.github.v3+json"
+        },
+        body: JSON.stringify({
+          message: commitMsg,
+          content: newContent,
+          sha
+        })
+      });
+    }
+
+    document.getElementById("studentForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const regno = document.getElementById("regno").value.trim();
+      const name = document.getElementById("name").value.trim();
+      const father = document.getElementById("father").value.trim();
+      const mobile = document.getElementById("mobile").value.trim();
+      const address = document.getElementById("address").value.trim();
+      const classValue = document.getElementById("class").value;
+      const branch = document.getElementById("branch").value;
+
+      const token = prompt("🔐 Enter your GitHub OTT (Personal Access Token):");
+      if (!token) return alert("❌ Token is required!");
+
+      const newStudent = {
+        regno,
+        name,
+        father,
+        mobile,
+        address,
+        class: classValue,
+        branch
       };
 
       try {
-        const response = await fetch(apiUrl, { headers });
-        let content = "[]";
-        let sha = "";
+        const response = await updateGitHubFile(
+          filePath,
+          (data) => {
+            data.push(newStudent);
+            return data;
+          },
+          `📘 New student registered: ${regno}`,
+          token
+        );
 
         if (response.ok) {
-          const data = await response.json();
-          content = atob(data.content);
-          sha = data.sha;
-        }
-
-        const students = JSON.parse(content);
-        students.push({ name, class: cls, reg, branch });
-
-        const updatedContent = btoa(JSON.stringify(students, null, 2));
-
-        const update = await fetch(apiUrl, {
-          method: "PUT",
-          headers,
-          body: JSON.stringify({
-            message: `Register new student: ${name}`,
-            content: updatedContent,
-            sha
-          })
-        });
-
-        if (update.ok) {
-          status.innerHTML = '<span class="success">✅ Student registered successfully.</span>';
+          alert("✅ Student registered successfully!");
+          document.getElementById("studentForm").reset();
         } else {
-          throw new Error();
+          const error = await response.json();
+          alert("❌ Error updating file: " + error.message);
         }
-      } catch (error) {
-        status.innerHTML = '<span class="error">❌ Failed to register student.</span>';
+      } catch (err) {
+        alert("⚠️ Error: " + err.message);
       }
-    }
+    });
   </script>
+
 </body>
 </html>
