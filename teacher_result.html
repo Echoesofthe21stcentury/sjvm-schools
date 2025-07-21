@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SJVM - Secure Result Entry</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f3f3f3;
+      padding: 40px;
+      text-align: center;
+    }
+    input, select, button {
+      padding: 10px;
+      margin: 10px;
+      font-size: 16px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background: #fff;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background-color: #007BFF;
+      color: white;
+    }
+    #resultForm {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>🔒 Enter Magical Access Code</h2>
+  <input type="password" id="magicCode" placeholder="Enter secret code..." />
+  <button onclick="checkCode()">Unlock</button>
+
+  <div id="resultForm">
+    <h2>SJVM FA-1 Result Entry</h2>
+
+    <label>Uploader Name: <input type="text" id="uploader" placeholder="Uploader's name" /></label><br>
+    <label>Branch: 
+      <select id="branch">
+        <option>Bandikodigenahalli</option>
+        <option>Atturu Layout</option>
+      </select>
+    </label>
+    <label>Class:
+      <select id="class">
+        <option>Class 1</option>
+        <option>Class 2</option>
+        <option>Class 3</option>
+        <option>Class 4</option>
+        <option>Class 5</option>
+        <option>Class 6</option>
+        <option>Class 7</option>
+        <option>Class 8</option>
+        <option>Class 9</option>
+        <option>Class 10</option>
+      </select>
+    </label><br>
+    <label>Student Name: <input type="text" id="studentName" /></label>
+    <label>Register Number: <input type="text" id="regNo" /></label>
+
+    <table>
+      <tr>
+        <th>Subject</th><th>Max Marks</th><th>Marks Obtained</th><th>Max Internal</th><th>Internal Obtained</th><th>Grade</th>
+      </tr>
+      <tbody id="subjectTable">
+        <!-- Rows added via JS -->
+      </tbody>
+      <tr>
+        <th>Total</th>
+        <td><input id="totalMax" type="number"></td>
+        <td><input id="totalObtained" type="number"></td>
+        <td colspan="2">Percentage: <input id="percentage" type="text"></td>
+        <td>
+          Final Grade:
+          <select id="finalGrade">
+            <option>A+</option><option>A</option><option>B+</option><option>B</option>
+            <option>C+</option><option>C</option><option>D+</option><option>D</option>
+          </select><br>
+          Result:
+          <select id="result">
+            <option>Pass</option><option>Fail</option>
+          </select>
+        </td>
+      </tr>
+    </table>
+
+    <button onclick="submitResult()">Submit Result</button>
+  </div>
+
+  <script>
+    const subjects = ["Kannada", "English", "Hindi", "Mathematics", "Science", "Social"];
+
+    window.onload = function () {
+      let tableBody = document.getElementById("subjectTable");
+      subjects.forEach(subject => {
+        const row = `
+          <tr>
+            <td>${subject}</td>
+            <td><input type="number" class="maxMarks"></td>
+            <td><input type="number" class="obtMarks"></td>
+            <td><input type="number" class="maxInternal"></td>
+            <td><input type="number" class="obtInternal"></td>
+            <td>
+              <select class="grade">
+                <option>A+</option><option>A</option><option>B+</option><option>B</option>
+                <option>C+</option><option>C</option><option>D+</option><option>D</option>
+              </select>
+            </td>
+          </tr>`;
+        tableBody.insertAdjacentHTML("beforeend", row);
+      });
+    };
+
+    function checkCode() {
+      const code = document.getElementById("magicCode").value;
+      if (code === "180609") {
+        document.getElementById("resultForm").style.display = "block";
+        document.getElementById("magicCode").style.display = "none";
+        event.target.style.display = "none";
+        document.querySelector("h2").textContent = "✅ Access Granted";
+      } else {
+        alert("❌ Incorrect code. Please try again.");
+      }
+    }
+
+    async function submitResult() {
+      const uploader = document.getElementById("uploader").value;
+      const branch = document.getElementById("branch").value;
+      const className = document.getElementById("class").value;
+      const studentName = document.getElementById("studentName").value;
+      const regNo = document.getElementById("regNo").value;
+
+      const rows = document.querySelectorAll("#subjectTable tr");
+      const subjects = [];
+      rows.forEach(row => {
+        const cols = row.querySelectorAll("input, select");
+        subjects.push({
+          subject: row.cells[0].innerText,
+          maxMarks: cols[0].value,
+          obtainedMarks: cols[1].value,
+          maxInternal: cols[2].value,
+          obtainedInternal: cols[3].value,
+          grade: cols[4].value
+        });
+      });
+
+      const data = {
+        uploader, branch, class: className, studentName, regNo,
+        subjects,
+        totalMax: document.getElementById("totalMax").value,
+        totalObtained: document.getElementById("totalObtained").value,
+        percentage: document.getElementById("percentage").value,
+        finalGrade: document.getElementById("finalGrade").value,
+        result: document.getElementById("result").value
+      };
+
+      const content = btoa(JSON.stringify(data, null, 2));
+      const fileName = `results/${branch}_${className}_${regNo}.json`;
+
+      const response = await fetch(`https://api.github.com/repos/YOUR_USERNAME/YOUR_REPO/contents/${fileName}`, {
+        method: "PUT",
+        headers: {
+          "Authorization": "token YOUR_GITHUB_TOKEN",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          message: `Add result for ${regNo}`,
+          content: content
+        })
+      });
+
+      if (response.ok) {
+        alert("✅ Result successfully uploaded to GitHub!");
+      } else {
+        alert("❌ Failed to upload result");
+        console.error(await response.json());
+      }
+    }
+  </script>
+
+</body>
+</html>
