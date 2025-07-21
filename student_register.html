@@ -2,97 +2,133 @@
 <html>
 <head>
   <title>Student Registration - SJVM</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #1b2a41;
+      color: white;
+      padding: 30px;
+    }
+    input, select, button {
+      padding: 10px;
+      margin: 8px;
+      width: 300px;
+      border-radius: 5px;
+      border: none;
+    }
+    button {
+      background-color: #2980b9;
+      color: white;
+      cursor: pointer;
+    }
+    .status {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
-  <h2>SJVM Student Registration Form</h2>
+  <h2>📘 SJVM Student Registration</h2>
 
-  <form id="studentForm">
-    <label>Student Name:</label><br>
-    <input type="text" id="name" required><br><br>
+  <label>GitHub Token:</label><br>
+  <input type="password" id="github_token" placeholder="Paste your GitHub PAT"><br>
 
-    <label>Class:</label><br>
-    <input type="text" id="class" required><br><br>
+  <label>Student Name:</label><br>
+  <input type="text" id="student_name"><br>
 
-    <label>Register Number:</label><br>
-    <input type="text" id="register" required><br><br>
+  <label>Class:</label><br>
+  <select id="student_class">
+    <option value="">Select Class</option>
+    <option>Class 1</option><option>Class 2</option><option>Class 3</option>
+    <option>Class 4</option><option>Class 5</option><option>Class 6</option>
+    <option>Class 7</option><option>Class 8</option><option>Class 9</option>
+    <option>Class 10</option>
+  </select><br>
 
-    <label>Branch:</label><br>
-    <select id="branch" required>
-      <option value="Atturu">Atturu</option>
-      <option value="Bandikodigenahalli">Bandikodigenahalli</option>
-    </select><br><br>
+  <label>Register Number:</label><br>
+  <input type="text" id="register_number"><br>
 
-    <label>GitHub Token (Hidden in prod):</label><br>
-    <input type="password" id="token" required><br><br>
+  <label>Branch:</label><br>
+  <select id="branch">
+    <option value="">Select Branch</option>
+    <option value="Atturu">Atturu</option>
+    <option value="Bandikodigenahalli">Bandikodigenahalli</option>
+  </select><br>
 
-    <button type="submit">Register</button>
-  </form>
+  <button onclick="registerStudent()">Register</button>
 
-  <div id="message"></div>
+  <div class="status" id="status_msg"></div>
 
   <script>
-    document.getElementById("studentForm").addEventListener("submit", async function(e) {
-      e.preventDefault();
+    const repoOwner = 'Echoesofthe21stcentury';
+    const repoName = 'sjvm-schools';
+    const filePath = 'student_register.json';
 
-      const name = document.getElementById("name").value;
-      const studentClass = document.getElementById("class").value;
-      const register = document.getElementById("register").value;
-      const branch = document.getElementById("branch").value;
-      const token = document.getElementById("token").value;
+    async function registerStudent() {
+      const token = document.getElementById('github_token').value.trim();
+      const name = document.getElementById('student_name').value.trim();
+      const cls = document.getElementById('student_class').value;
+      const reg = document.getElementById('register_number').value.trim();
+      const branch = document.getElementById('branch').value;
 
-      const repoOwner = "Echoesofthe21stcentury";
-      const repoName = "sjvm-schools";
-      const filePath = "data/student_register.json";
-      const apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`;
+      const statusMsg = document.getElementById('status_msg');
+      statusMsg.innerHTML = '⏳ Registering...';
 
-      const newStudent = {
-        name: name,
-        class: studentClass,
-        register_number: register,
-        branch: branch
-      };
-
-      // Fetch existing content
-      const response = await fetch(apiUrl, {
-        headers: {
-          Authorization: `token ${token}`,
-          Accept: "application/vnd.github.v3+json"
-        }
-      });
-
-      if (!response.ok) {
-        document.getElementById("message").innerHTML = "❌ Failed to load existing student data.";
+      if (!token || !name || !cls || !reg || !branch) {
+        statusMsg.innerHTML = '❌ Please fill in all fields.';
         return;
       }
 
-      const fileData = await response.json();
-      const content = atob(fileData.content); // base64 decode
-      const students = JSON.parse(content);
+      try {
+        const apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`;
 
-      students.push(newStudent);
+        // Fetch existing content
+        const existing = await fetch(apiUrl, {
+          headers: { Authorization: `token ${token}` }
+        });
 
-      const updatedContent = btoa(JSON.stringify(students, null, 2)); // encode to base64
+        let content = [];
+        let sha = "";
 
-      const updateResponse = await fetch(apiUrl, {
-        method: "PUT",
-        headers: {
-          Authorization: `token ${token}`,
-          Accept: "application/vnd.github.v3+json"
-        },
-        body: JSON.stringify({
-          message: `Added student ${name}`,
-          content: updatedContent,
-          sha: fileData.sha
-        })
-      });
+        if (existing.ok) {
+          const json = await existing.json();
+          sha = json.sha;
+          content = JSON.parse(atob(json.content));
+        }
 
-      if (updateResponse.ok) {
-        document.getElementById("message").innerHTML = "✅ Student registered successfully!";
-        document.getElementById("studentForm").reset();
-      } else {
-        document.getElementById("message").innerHTML = "❌ Failed to register student.";
+        content.push({
+          name: name,
+          class: cls,
+          register_number: reg,
+          branch: branch
+        });
+
+        // Encode updated content
+        const updatedContent = btoa(JSON.stringify(content, null, 2));
+
+        const response = await fetch(apiUrl, {
+          method: "PUT",
+          headers: {
+            Authorization: `token ${token}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            message: `Register student ${name}`,
+            content: updatedContent,
+            sha: sha
+          })
+        });
+
+        if (response.ok) {
+          statusMsg.innerHTML = '✅ Student registered successfully!';
+        } else {
+          statusMsg.innerHTML = '❌ Failed to register student.';
+        }
+      } catch (err) {
+        console.error(err);
+        statusMsg.innerHTML = '❌ Error occurred.';
       }
-    });
+    }
   </script>
 </body>
 </html>
