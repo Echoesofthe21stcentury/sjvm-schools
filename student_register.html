@@ -53,7 +53,7 @@
 </head>
 <body>
 
-  <img src="SJVM logo empowering mankind without background.png" alt="SJVM Logo">
+  <img src="https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/assests/logo.png" alt="SJVM Logo">
   <h1>Student Registration</h1>
 
   <form id="studentForm">
@@ -78,6 +78,16 @@
       <option value="">Select Branch</option>
       <option value="Bandikodigenahalli">Bandikodigenahalli</option>
       <option value="Atturu Layout">Atturu Layout</option>
+    </select>
+
+    <select id="exam" required>
+      <option value="">Select Examination</option>
+      <option value="FA1">FA1</option>
+      <option value="FA2">FA2</option>
+      <option value="SA1">SA1</option>
+      <option value="FA3">FA3</option>
+      <option value="FA4">FA4</option>
+      <option value="SA2">SA2</option>
     </select>
 
     <button type="submit">📘 Register</button>
@@ -126,11 +136,12 @@
       const name = document.getElementById("name").value.trim();
       const classValue = document.getElementById("class").value;
       const branch = document.getElementById("branch").value;
+      const exam = document.getElementById("exam").value;
 
       const token = prompt("🔐 Enter your GitHub Personal Access Token:");
       if (!token) return alert("❌ Token is required!");
 
-      const newStudent = { regno, name, class: classValue, branch };
+      const newStudent = { regno, name, class: classValue, branch, exam };
 
       try {
         const response = await updateGitHubFile(
