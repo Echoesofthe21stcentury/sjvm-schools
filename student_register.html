@@ -1,118 +1,94 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Register Students - SJVM</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Student Register - SJVM</title>
   <style>
-    body {
-      font-family: Arial;
-      background: #f2f2f2;
-      padding: 40px;
-    }
-    form {
-      background: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      width: 400px;
-      margin: auto;
-      box-shadow: 0 0 10px #ccc;
-    }
-    input, select, button {
-      display: block;
-      width: 100%;
-      padding: 8px;
-      margin-top: 10px;
-    }
-    h2 {
-      text-align: center;
-      color: #333;
-    }
+    body { font-family: Arial; background: #f4f4f4; padding: 20px; }
+    input, select { margin: 5px; padding: 8px; }
+    button { padding: 10px 15px; }
+    #status { margin-top: 15px; font-weight: bold; }
   </style>
 </head>
 <body>
-  <form id="registerForm">
-    <h2>Register Student</h2>
-    <input type="text" id="name" placeholder="Student Name" required>
-    <input type="text" id="registerNumber" placeholder="Register Number" required>
-    <select id="class" required>
-      <option value="">Select Class</option>
-      <option value="Class 1">Class 1</option>
-      <option value="Class 2">Class 2</option>
-      <option value="Class 3">Class 3</option>
-      <option value="Class 4">Class 4</option>
-      <option value="Class 5">Class 5</option>
-      <option value="Class 6">Class 6</option>
-      <option value="Class 7">Class 7</option>
-      <option value="Class 8">Class 8</option>
-      <option value="Class 9">Class 9</option>
-      <option value="Class 10">Class 10</option>
-    </select>
-    <select id="branch" required>
-      <option value="">Select Branch</option>
-      <option value="Atturu">Atturu Layout</option>
-      <option value="Bandikodigenahalli">Bandikodigenahalli</option>
-    </select>
-    <button type="submit">Register</button>
-    <p id="msg"></p>
-  </form>
+  <h2>Register Student</h2>
+  <input type="text" id="studentName" placeholder="Student Name" required />
+  <input type="text" id="class" placeholder="Class (e.g. Class 4)" required />
+  <input type="text" id="regNumber" placeholder="Register Number (e.g. SBK-401)" required />
+  <select id="branch" required>
+    <option value="">-- Select Branch --</option>
+    <option value="Bandikodigenahalli">Bandikodigenahalli</option>
+    <option value="Atturu Layout">Atturu Layout</option>
+  </select>
+  <br />
+  <button onclick="registerStudent()">Register</button>
+
+  <div id="status"></div>
 
   <script>
-    const form = document.getElementById("registerForm");
-    const msg = document.getElementById("msg");
+    async function registerStudent() {
+      const name = document.getElementById('studentName').value.trim();
+      const cls = document.getElementById('class').value.trim();
+      const reg = document.getElementById('regNumber').value.trim();
+      const branch = document.getElementById('branch').value;
 
-    const GITHUB_TOKEN = "your_personal_access_token"; // replace
-    const REPO = "sjvm-schools";
-    const USERNAME = "Echoesofthe21stcentury";
-    const FILE_PATH = "student_register.json";
-
-    form.onsubmit = async (e) => {
-      e.preventDefault();
-      const student = {
-        name: form.name.value,
-        registerNumber: form.registerNumber.value,
-        class: form.class.value,
-        branch: form.branch.value,
-      };
-
-      const url = `https://api.github.com/repos/${USERNAME}/${REPO}/contents/${FILE_PATH}`;
-      const headers = {
-        Authorization: `Bearer ${GITHUB_TOKEN}`,
-        "Content-Type": "application/json",
-      };
-
-      // Fetch current student_register.json content
-      let currentData = [];
-      let sha;
-      try {
-        const res = await fetch(url, { headers });
-        const result = await res.json();
-        sha = result.sha;
-        currentData = JSON.parse(atob(result.content));
-      } catch (err) {
-        console.log("New file will be created.");
+      if (!name || !cls || !reg || !branch) {
+        document.getElementById('status').textContent = "❌ Fill all fields.";
+        return;
       }
 
-      currentData.push(student);
+      const repo = "Echoesofthe21stcentury/sjvm-schools";
+      const token = "ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxx"; // Replace with your real token
+      const filePath = "student_register.json";
 
-      const newContent = btoa(JSON.stringify(currentData, null, 2));
-      const body = {
-        message: `Add student ${student.registerNumber}`,
-        content: newContent,
-        sha,
+      const apiUrl = `https://api.github.com/repos/${repo}/contents/${filePath}`;
+
+      // Step 1: Get existing file (if any)
+      let existingData = {};
+      let sha = "";
+      try {
+        const res = await fetch(apiUrl, {
+          headers: { Authorization: `token ${token}` }
+        });
+        const json = await res.json();
+        if (json.content) {
+          existingData = JSON.parse(atob(json.content));
+          sha = json.sha;
+        }
+      } catch (e) {
+        existingData = {};
+      }
+
+      // Step 2: Add new student
+      if (!existingData[cls]) existingData[cls] = {};
+      existingData[cls][reg] = { name, class: cls, register: reg, branch };
+
+      // Step 3: Update file on GitHub
+      const updatedContent = btoa(JSON.stringify(existingData, null, 2));
+      const payload = {
+        message: `Add student ${reg}`,
+        content: updatedContent,
+        sha: sha || undefined
       };
 
-      const response = await fetch(url, {
+      const putRes = await fetch(apiUrl, {
         method: "PUT",
-        headers,
-        body: JSON.stringify(body),
+        headers: {
+          Authorization: `token ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
       });
 
-      if (response.ok) {
-        msg.textContent = "✅ Student registered!";
-        form.reset();
+      if (putRes.ok) {
+        document.getElementById('status').textContent = `✅ Student ${name} registered!`;
       } else {
-        msg.textContent = "❌ Failed to register student.";
+        const err = await putRes.json();
+        console.error(err);
+        document.getElementById('status').textContent = "❌ Failed to register student.";
       }
-    };
+    }
   </script>
 </body>
 </html>
