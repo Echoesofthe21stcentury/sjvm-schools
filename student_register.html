@@ -1,290 +1,171 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Teacher Result Upload - SJVM</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <title>Student Register - SJVM</title>
   <style>
     body {
+      background: linear-gradient(to right, #1e3c72, #2a5298);
       font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      padding: 0;
-      background: #f0f4ff;
-      color: #333;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px;
     }
-
-    .container {
-      max-width: 800px;
-      margin: auto;
+    h1 {
+      color: #fcd34d;
+      margin-bottom: 10px;
+    }
+    img {
+      width: 80px;
+      margin-bottom: 20px;
+    }
+    form {
+      background: #0f172a;
       padding: 20px;
-      background: #fff;
       border-radius: 15px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      box-shadow: 0 0 20px #00000088;
+      width: 320px;
     }
-
-    h2 {
-      text-align: center;
-      color: #003366;
-    }
-
-    select, input[type="text"], input[type="number"], button {
+    input, select, button {
       width: 100%;
       padding: 10px;
       margin: 10px 0;
       border-radius: 8px;
-      border: 1px solid #ccc;
-    }
-
-    button {
-      background-color: #0044cc;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
       border: none;
+      font-size: 14px;
     }
-
+    input, select {
+      background: #1e293b;
+      color: #fff;
+    }
+    button {
+      background: #22c55e;
+      color: #fff;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
     button:hover {
-      background-color: #002266;
-    }
-
-    .subject-pass {
-      background-color: #d2ffd2;
-    }
-
-    .subject-fail {
-      background-color: #ffd2d2;
-    }
-
-    table {
-      width: 100%;
-      margin-top: 15px;
-      border-collapse: collapse;
-    }
-
-    th, td {
-      padding: 10px;
-      text-align: center;
-      border: 1px solid #ddd;
-    }
-
-    th {
-      background-color: #0044cc;
-      color: white;
+      background: #16a34a;
     }
   </style>
 </head>
 <body>
-<div class="container">
-  <h2>Teacher Result Upload</h2>
 
-  <label>Branch:</label>
-  <select id="branch">
-    <option value="">-- Select Branch --</option>
-    <option value="Atturu Layout">Atturu Layout</option>
-    <option value="Bandikodigenahalli">Bandikodigenahalli</option>
-  </select>
+  <img src="https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/assests/logo.png" alt="SJVM Logo">
+  <h1>Student Registration</h1>
 
-  <label>Secret Code:</label>
-  <input type="text" id="code" placeholder="Enter Secret Code" />
+  <form id="studentForm">
+    <input type="text" id="regno" placeholder="Register Number" required />
+    <input type="text" id="name" placeholder="Full Name" required />
 
-  <button onclick="verifyCode()">🔓 Unlock</button>
+    <select id="class" required>
+      <option value="">Select Class</option>
+      <option value="Class 1">Class 1</option>
+      <option value="Class 2">Class 2</option>
+      <option value="Class 3">Class 3</option>
+      <option value="Class 4">Class 4</option>
+      <option value="Class 5">Class 5</option>
+      <option value="Class 6">Class 6</option>
+      <option value="Class 7">Class 7</option>
+      <option value="Class 8">Class 8</option>
+      <option value="Class 9">Class 9</option>
+      <option value="Class 10">Class 10</option>
+    </select>
 
-  <div id="resultForm" style="display:none;">
-    <label>Class:</label>
-    <select id="classSelect"></select>
+    <select id="branch" required>
+      <option value="">Select Branch</option>
+      <option value="Bandikodigenahalli">Bandikodigenahalli</option>
+      <option value="Atturu Layout">Atturu Layout</option>
+    </select>
 
-    <label>Student:</label>
-    <select id="studentSelect"></select>
+    <select id="exam" required>
+      <option value="">Select Examination</option>
+      <option value="FA1">FA1</option>
+      <option value="FA2">FA2</option>
+      <option value="SA1">SA1</option>
+      <option value="FA3">FA3</option>
+      <option value="FA4">FA4</option>
+      <option value="SA2">SA2</option>
+    </select>
 
-    <label>Examination:</label>
-    <input type="text" id="exam" placeholder="Eg: Midterm / Annual" />
+    <button type="submit">📘 Register</button>
+  </form>
 
-    <table id="subjectTable">
-      <thead>
-        <tr>
-          <th>Subject</th>
-          <th>Max Marks</th>
-          <th>Marks Obtained</th>
-          <th>Internal Max</th>
-          <th>Internal Obtained</th>
-          <th>Grade</th>
-          <th>Result</th>
-        </tr>
-      </thead>
-      <tbody id="subjectBody">
-        <!-- JS inserts subject rows here -->
-      </tbody>
-    </table>
+  <script>
+    const filePath = "data/student_register.json";
 
-    <h3>Final Summary</h3>
-    <label>Total Max Marks:</label>
-    <input type="number" id="totalMax" />
-    <label>Total Obtained:</label>
-    <input type="number" id="totalObtained" />
-    <label>Final Grade:</label>
-    <input type="text" id="finalGrade" />
-    <label>Percentage:</label>
-    <input type="text" id="percentage" />
-    <label>Final Result (Pass/Fail):</label>
-    <input type="text" id="finalResult" />
-    <label>Updater Name:</label>
-    <input type="text" id="updater" />
-
-    <label>GitHub Token:</label>
-    <input type="text" id="token" placeholder="Enter GitHub Personal Access Token" />
-
-    <button onclick="uploadResult()">📤 Upload Result</button>
-    <p id="status"></p>
-  </div>
-</div>
-
-<script>
-const secretCodes = {
-  "Atturu Layout": "0903",
-  "Bandikodigenahalli": "1103"
-};
-
-function verifyCode() {
-  const branch = document.getElementById("branch").value;
-  const code = document.getElementById("code").value;
-  if (secretCodes[branch] === code) {
-    document.getElementById("resultForm").style.display = "block";
-    loadStudentData(branch);
-  } else {
-    alert("❌ Incorrect secret code!");
-  }
-}
-
-let allStudents = [];
-
-function loadStudentData(branch) {
-  fetch('https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/data/student_register.json')
-    .then(response => response.json())
-    .then(data => {
-      allStudents = data.filter(s => s.branch === branch);
-      const classSet = new Set(allStudents.map(s => s.class));
-      const classSelect = document.getElementById("classSelect");
-      classSelect.innerHTML = '<option value="">-- Select Class --</option>';
-      classSet.forEach(cls => {
-        classSelect.innerHTML += `<option value="${cls}">${cls}</option>`;
+    async function updateGitHubFile(filePath, modifyCallback, commitMsg, token) {
+      const url = `https://api.github.com/repos/Echoesofthe21stcentury/sjvm-schools/contents/${filePath}`;
+      
+      const response = await fetch(url, {
+        headers: {
+          Authorization: `token ${token}`,
+          Accept: "application/vnd.github.v3+json"
+        }
       });
 
-      classSelect.onchange = () => {
-        const cls = classSelect.value;
-        const studentSelect = document.getElementById("studentSelect");
-        studentSelect.innerHTML = '<option value="">-- Select Student --</option>';
-        allStudents.filter(s => s.class === cls).forEach(stu => {
-          studentSelect.innerHTML += `<option value="${stu.register_number}">${stu.name}</option>`;
-        });
-      };
+      if (!response.ok) throw new Error("Failed to fetch file: " + response.status);
 
-      generateSubjectRows();
-    });
-}
+      const file = await response.json();
+      const sha = file.sha;
+      const content = atob(file.content || "");
+      const data = content.trim() ? JSON.parse(content) : [];
+      const updatedData = modifyCallback(data);
+      const newContent = btoa(JSON.stringify(updatedData, null, 2));
 
-function generateSubjectRows() {
-  const subjects = ["Kannada", "English", "Hindi", "Mathematics", "Science", "Social"];
-  const tbody = document.getElementById("subjectBody");
-  tbody.innerHTML = '';
-  subjects.forEach(subject => {
-    tbody.innerHTML += `
-      <tr>
-        <td>${subject}</td>
-        <td><input type="number" class="max" /></td>
-        <td><input type="number" class="obtain" oninput="checkPassFail(this)" /></td>
-        <td><input type="number" class="internalMax" /></td>
-        <td><input type="number" class="internalObtain" /></td>
-        <td><input type="text" class="grade" /></td>
-        <td class="result"></td>
-      </tr>
-    `;
-  });
-}
+      return await fetch(url, {
+        method: "PUT",
+        headers: {
+          Authorization: `token ${token}`,
+          Accept: "application/vnd.github.v3+json"
+        },
+        body: JSON.stringify({
+          message: commitMsg,
+          content: newContent,
+          sha
+        })
+      });
+    }
 
-function checkPassFail(input) {
-  const row = input.parentElement.parentElement;
-  const max = parseInt(row.querySelector('.max').value || 0);
-  const obtain = parseInt(input.value || 0);
-  const resultCell = row.querySelector('.result');
+    document.getElementById("studentForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
 
-  if (obtain >= max * 0.35) {
-    row.classList.add("subject-pass");
-    row.classList.remove("subject-fail");
-    resultCell.textContent = "Pass";
-  } else {
-    row.classList.add("subject-fail");
-    row.classList.remove("subject-pass");
-    resultCell.textContent = "Fail";
-  }
-}
+      const regno = document.getElementById("regno").value.trim();
+      const name = document.getElementById("name").value.trim();
+      const classValue = document.getElementById("class").value;
+      const branch = document.getElementById("branch").value;
+      const exam = document.getElementById("exam").value;
 
-function uploadResult() {
-  const branch = document.getElementById("branch").value;
-  const cls = document.getElementById("classSelect").value;
-  const register_number = document.getElementById("studentSelect").value;
-  const exam = document.getElementById("exam").value;
-  const token = document.getElementById("token").value;
-  const updater = document.getElementById("updater").value;
+      const token = prompt("🔐 Enter your GitHub Personal Access Token:");
+      if (!token) return alert("❌ Token is required!");
 
-  const totalMax = document.getElementById("totalMax").value;
-  const totalObtained = document.getElementById("totalObtained").value;
-  const finalGrade = document.getElementById("finalGrade").value;
-  const percentage = document.getElementById("percentage").value;
-  const finalResult = document.getElementById("finalResult").value;
+      const newStudent = { regno, name, class: classValue, branch, exam };
 
-  const rows = document.querySelectorAll("#subjectTable tbody tr");
-  const subjects = [];
+      try {
+        const response = await updateGitHubFile(
+          filePath,
+          (data) => {
+            data.push(newStudent);
+            return data;
+          },
+          `📘 Registered student: ${regno}`,
+          token
+        );
 
-  rows.forEach(row => {
-    const cells = row.querySelectorAll("td");
-    subjects.push({
-      subject: cells[0].textContent,
-      max: cells[1].querySelector("input").value,
-      obtained: cells[2].querySelector("input").value,
-      internal_max: cells[3].querySelector("input").value,
-      internal_obtained: cells[4].querySelector("input").value,
-      grade: cells[5].querySelector("input").value,
-      result: cells[6].textContent
-    });
-  });
-
-  const resultData = {
-    register_number,
-    class: cls,
-    branch,
-    exam,
-    updater,
-    subjects,
-    totalMax,
-    totalObtained,
-    finalGrade,
-    percentage,
-    finalResult
-  };
-
-  const fileName = `data/results/${branch.replace(/ /g, '_')}_${register_number}.json`;
-
-  fetch(`https://api.github.com/repos/Echoesofthe21stcentury/sjvm-schools/contents/${fileName}`, {
-    method: "PUT",
-    headers: {
-      "Authorization": `token ${token}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      message: `Result uploaded for ${register_number}`,
-      content: btoa(unescape(encodeURIComponent(JSON.stringify(resultData, null, 2)))),
-      committer: {
-        name: "SJVM System",
-        email: "admin@sjvmschools.org"
+        if (response.ok) {
+          alert("✅ Student registered successfully!");
+          document.getElementById("studentForm").reset();
+        } else {
+          const error = await response.json();
+          alert("❌ Error updating file: " + error.message);
+        }
+      } catch (err) {
+        alert("⚠️ Error: " + err.message);
       }
-    })
-  }).then(res => res.json())
-    .then(data => {
-      document.getElementById("status").textContent = "✅ Result uploaded successfully!";
-    }).catch(err => {
-      console.error(err);
-      document.getElementById("status").textContent = "❌ Failed to upload result.";
     });
-}
-</script>
+  </script>
+
 </body>
 </html>
