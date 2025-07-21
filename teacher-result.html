@@ -1,258 +1,294 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <title>SJVM - Teacher Result Upload</title>
+  <meta charset="UTF-8">
+  <title>Teacher Result Uploader - SJVM</title>
   <style>
     body {
-      font-family: Arial;
-      background: linear-gradient(to right, #4e54c8, #8f94fb);
-      color: white;
+      background: #f1f4fb;
+      font-family: 'Segoe UI', sans-serif;
       padding: 20px;
     }
-    .box {
-      background: rgba(0, 0, 0, 0.2);
-      padding: 20px;
-      border-radius: 10px;
-      max-width: 700px;
+
+    .container {
+      background: white;
+      max-width: 900px;
       margin: auto;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
     }
-    label, select, input {
+
+    img.logo {
+      height: 80px;
       display: block;
-      width: 100%;
-      margin: 10px 0;
-      padding: 8px;
+      margin: auto;
+      margin-bottom: 20px;
     }
-    .pass { background-color: #4CAF50; color: white; }
-    .fail { background-color: #F44336; color: white; }
-    .subject-block {
-      background: #ffffff10;
-      padding: 10px;
-      border-radius: 8px;
-      margin-bottom: 10px;
+
+    h2 {
+      color: #222;
+      text-align: center;
     }
-    button {
-      background: #ffffff;
-      color: #4e54c8;
-      border: none;
-      padding: 10px 20px;
+
+    label {
+      display: block;
+      margin: 12px 0 6px;
       font-weight: bold;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 12px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    .subject-block {
+      border-radius: 10px;
+      padding: 15px;
+      margin: 10px 0;
+      background: #f0f0f0;
+    }
+
+    .subject-pass {
+      background-color: #d4f4d4;
+    }
+
+    .subject-fail {
+      background-color: #f4d4d4;
+    }
+
+    button {
+      background-color: #0044cc;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 6px;
       cursor: pointer;
-      margin-top: 20px;
+    }
+
+    button:hover {
+      background-color: #002e99;
+    }
+
+    .error {
+      color: red;
+      font-weight: bold;
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
-  <div class="box">
-    <h1>SJVM Result Upload</h1>
 
-    <label>Branch</label>
-    <select id="branch">
-      <option value="">Select Branch</option>
-      <option value="Atturu Layout">Atturu Layout</option>
-      <option value="Bandikodigenahalli">Bandikodigenahalli</option>
+<div class="container">
+  <img class="logo" src="https://github.com/Echoesofthe21stcentury/sjvm-schools/blob/main/assests/logo.png?raw=true" />
+  <h2>SJVM Teacher Result Upload</h2>
+
+  <label>Branch</label>
+  <select id="branch">
+    <option value="">-- Select Branch --</option>
+    <option value="Atturu">Atturu Layout</option>
+    <option value="Bandikodigenahalli">Bandikodigenahalli</option>
+  </select>
+
+  <label>Enter Magical Code</label>
+  <input type="password" id="secretCode" placeholder="Enter Secret Code">
+
+  <button onclick="verifySecret()">Verify & Load</button>
+
+  <div id="resultForm" style="display:none;">
+    <label>GitHub PAT (write access)</label>
+    <input type="password" id="githubToken" placeholder="GitHub Personal Access Token">
+
+    <label>Class</label>
+    <select id="classSelect"></select>
+
+    <label>Student</label>
+    <select id="studentSelect"></select>
+
+    <label>Register Number</label>
+    <input type="text" id="registerNumber" readonly>
+
+    <label>Examination</label>
+    <input type="text" id="exam" value="FA1" readonly>
+
+    <div id="subjectsContainer"></div>
+
+    <label>Total Marks Obtained</label>
+    <input type="number" id="totalMarks">
+
+    <label>Total Max Marks</label>
+    <input type="number" id="totalMax">
+
+    <label>Percentage</label>
+    <input type="text" id="percentage">
+
+    <label>Final Grade</label>
+    <input type="text" id="finalGrade">
+
+    <label>Final Result</label>
+    <select id="finalResult">
+      <option value="Pass">Pass</option>
+      <option value="Fail">Fail</option>
     </select>
 
-    <label>Enter Magical Code</label>
-    <input type="password" id="magicCode" placeholder="Enter code to continue" />
-    <button onclick="verifyCode()">Enter</button>
+    <label>Result Uploader Name</label>
+    <input type="text" id="uploader">
 
-    <div id="resultForm" style="display:none;">
-      <label>Select Class</label>
-      <select id="classSelect" onchange="loadStudents()"></select>
-
-      <label>Select Student</label>
-      <select id="studentSelect" onchange="fillRegister()"></select>
-
-      <label>Register Number</label>
-      <input id="regNumber" disabled />
-
-      <label>Exam Type</label>
-      <select id="examType">
-        <option>FA1</option>
-        <option>FA2</option>
-        <option>SA1</option>
-        <option>FA3</option>
-        <option>FA4</option>
-        <option>SA2</option>
-      </select>
-
-      <h3>Subjects</h3>
-      <div id="subjectsContainer"></div>
-
-      <h3>Final Summary</h3>
-      <label>Total Marks Obtained</label>
-      <input id="totalMarksObtained" type="number" />
-
-      <label>Total Max Marks</label>
-      <input id="totalMaxMarks" type="number" />
-
-      <label>Total %</label>
-      <input id="percentage" type="text" />
-
-      <label>Final Grade</label>
-      <input id="finalGrade" type="text" />
-
-      <label>Final Result (Pass/Fail)</label>
-      <input id="finalResult" type="text" />
-
-      <label>Result Uploader Name</label>
-      <input id="uploader" placeholder="Enter your name" />
-
-      <label>GitHub Token</label>
-      <input id="pat" type="password" placeholder="Enter your GitHub PAT" />
-
-      <button onclick="uploadResult()">Upload Result</button>
-    </div>
+    <button onclick="submitResult()">Submit Result</button>
+    <div class="error" id="errorMsg"></div>
   </div>
+</div>
 
-  <script>
-    const correctCodes = {
-      "Atturu Layout": "0903",
-      "Bandikodigenahalli": "1103"
+<script>
+const secretCodes = {
+  "Atturu": "0903",
+  "Bandikodigenahalli": "1103"
+};
+
+function verifySecret() {
+  const branch = document.getElementById("branch").value;
+  const code = document.getElementById("secretCode").value;
+  if (secretCodes[branch] === code) {
+    document.getElementById("resultForm").style.display = 'block';
+    loadStudents(branch);
+  } else {
+    alert("❌ Invalid code for selected branch.");
+  }
+}
+
+async function loadStudents(branch) {
+  const res = await fetch("https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/student_register.json");
+  const data = await res.json();
+  const students = Object.values(data).filter(s => s.branch === branch);
+
+  const classes = [...new Set(students.map(s => s.class))];
+  const classSelect = document.getElementById("classSelect");
+  classSelect.innerHTML = "<option>-- Select Class --</option>";
+  classes.forEach(cls => {
+    const option = document.createElement("option");
+    option.value = cls;
+    option.text = cls;
+    classSelect.appendChild(option);
+  });
+
+  classSelect.addEventListener("change", () => {
+    const selectedClass = classSelect.value;
+    const filteredStudents = students.filter(s => s.class === selectedClass);
+    const studentSelect = document.getElementById("studentSelect");
+    studentSelect.innerHTML = "";
+    filteredStudents.forEach(stu => {
+      const opt = document.createElement("option");
+      opt.value = JSON.stringify(stu);
+      opt.text = stu.name;
+      studentSelect.appendChild(opt);
+    });
+  });
+
+  document.getElementById("studentSelect").addEventListener("change", () => {
+    const stu = JSON.parse(document.getElementById("studentSelect").value);
+    document.getElementById("registerNumber").value = stu.register_number;
+    generateSubjectInputs();
+  });
+}
+
+function generateSubjectInputs() {
+  const container = document.getElementById("subjectsContainer");
+  container.innerHTML = "";
+  const subjects = ["English", "Maths", "Science", "Social", "Kannada", "Hindi"];
+  subjects.forEach(sub => {
+    const block = document.createElement("div");
+    block.className = "subject-block";
+    block.innerHTML = `
+      <h4>${sub}</h4>
+      <label>Max Marks</label><input type="number" class="max">
+      <label>Marks Obtained</label><input type="number" class="obtained">
+      <label>Internal Max</label><input type="number" class="intmax">
+      <label>Internal Obtained</label><input type="number" class="intobt">
+      <label>Grade</label><input type="text" class="grade">
+      <label>Pass/Fail</label>
+      <select class="passfail">
+        <option value="Pass">Pass</option>
+        <option value="Fail">Fail</option>
+      </select>
+    `;
+    container.appendChild(block);
+  });
+}
+
+async function submitResult() {
+  const token = document.getElementById("githubToken").value;
+  const branch = document.getElementById("branch").value;
+  const className = document.getElementById("classSelect").value;
+  const stu = JSON.parse(document.getElementById("studentSelect").value);
+  const register = stu.register_number;
+  const exam = document.getElementById("exam").value;
+
+  const subjectsDiv = [...document.querySelectorAll(".subject-block")];
+  const subjects = subjectsDiv.map(div => {
+    const getVal = cls => div.querySelector(cls).value;
+    const result = getVal(".passfail") === "Pass";
+    div.className = `subject-block ${result ? "subject-pass" : "subject-fail"}`;
+    return {
+      subject: div.querySelector("h4").innerText,
+      max: +getVal(".max"),
+      obtained: +getVal(".obtained"),
+      internal_max: +getVal(".intmax"),
+      internal_obtained: +getVal(".intobt"),
+      grade: getVal(".grade"),
+      result: getVal(".passfail")
     };
+  });
 
-    const subjects = ["Kannada", "English", "Hindi"];
+  const resultData = {
+    student: stu.name,
+    register_number: register,
+    class: className,
+    branch,
+    exam,
+    subjects,
+    total: +document.getElementById("totalMarks").value,
+    max_total: +document.getElementById("totalMax").value,
+    percentage: document.getElementById("percentage").value,
+    final_grade: document.getElementById("finalGrade").value,
+    final_result: document.getElementById("finalResult").value,
+    uploader: document.getElementById("uploader").value
+  };
 
-    function verifyCode() {
-      const branch = document.getElementById("branch").value;
-      const code = document.getElementById("magicCode").value;
-      if (correctCodes[branch] === code) {
-        document.getElementById("resultForm").style.display = "block";
-        loadClasses(branch);
-        renderSubjects();
-      } else {
-        alert("❌ Incorrect Magical Code");
-      }
-    }
+  const fileName = `results/fa1/${branch}_${className}_${register}.json`;
+  const content = btoa(JSON.stringify(resultData, null, 2));
 
-    function loadClasses(branch) {
-      fetch('https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/data/student_register.json')
-        .then(res => res.json())
-        .then(data => {
-          const classes = new Set();
-          Object.values(data).forEach(student => {
-            if (student.branch === branch) {
-              classes.add(student.class);
-            }
-          });
-          const classSelect = document.getElementById("classSelect");
-          classSelect.innerHTML = [...classes].map(cls => `<option value="${cls}">${cls}</option>`).join("");
-        });
-    }
-
-    function loadStudents() {
-      const branch = document.getElementById("branch").value;
-      const classVal = document.getElementById("classSelect").value;
-
-      fetch('https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/data/student_register.json')
-        .then(res => res.json())
-        .then(data => {
-          const studentSelect = document.getElementById("studentSelect");
-          const filtered = Object.entries(data).filter(([_, s]) => s.class === classVal && s.branch === branch);
-          studentSelect.innerHTML = filtered.map(([reg, s]) =>
-            `<option value="${reg}" data-name="${s.name}">${s.name}</option>`
-          ).join("");
-        });
-    }
-
-    function fillRegister() {
-      const selected = document.getElementById("studentSelect").value;
-      document.getElementById("regNumber").value = selected;
-    }
-
-    function renderSubjects() {
-      const container = document.getElementById("subjectsContainer");
-      container.innerHTML = subjects.map(sub => `
-        <div class="subject-block" id="${sub}">
-          <h4>${sub}</h4>
-          <label>Max Marks</label>
-          <input type="number" id="${sub}-max" />
-          <label>Marks Obtained</label>
-          <input type="number" id="${sub}-obtain" />
-          <label>Internal Max</label>
-          <input type="number" id="${sub}-internal-max" />
-          <label>Internal Obtained</label>
-          <input type="number" id="${sub}-internal-obtain" />
-          <label>Final Grade</label>
-          <input id="${sub}-grade" />
-          <label>Status</label>
-          <select id="${sub}-status">
-            <option value="Pass" class="pass">Pass ✅</option>
-            <option value="Fail" class="fail">Fail ❌</option>
-          </select>
-        </div>
-      `).join("");
-    }
-
-    async function uploadResult() {
-      const resultData = {
-        studentName: document.getElementById("studentSelect").selectedOptions[0].text,
-        regNumber: document.getElementById("regNumber").value,
-        class: document.getElementById("classSelect").value,
-        branch: document.getElementById("branch").value,
-        exam: document.getElementById("examType").value,
-        uploader: document.getElementById("uploader").value,
-        totalMarksObtained: document.getElementById("totalMarksObtained").value,
-        totalMaxMarks: document.getElementById("totalMaxMarks").value,
-        percentage: document.getElementById("percentage").value,
-        finalGrade: document.getElementById("finalGrade").value,
-        finalResult: document.getElementById("finalResult").value,
-        subjects: {}
-      };
-
-      subjects.forEach(sub => {
-        resultData.subjects[sub] = {
-          max: document.getElementById(`${sub}-max`).value,
-          obtain: document.getElementById(`${sub}-obtain`).value,
-          internalMax: document.getElementById(`${sub}-internal-max`).value,
-          internalObtain: document.getElementById(`${sub}-internal-obtain`).value,
-          grade: document.getElementById(`${sub}-grade`).value,
-          status: document.getElementById(`${sub}-status`).value
-        };
-      });
-
-      const token = document.getElementById("pat").value;
-      const path = `data/student_results.json`;
-      const url = `https://api.github.com/repos/Echoesofthe21stcentury/sjvm-schools/contents/${path}`;
-
-      let sha = '';
-      let existing = {};
-
-      try {
-        const res = await fetch(url, {
-          headers: { Authorization: `token ${token}` }
-        });
-        const json = await res.json();
-        if (json.content) {
-          existing = JSON.parse(atob(json.content));
-          sha = json.sha;
+  try {
+    const res = await fetch(`https://api.github.com/repos/Echoesofthe21stcentury/sjvm-schools/contents/${fileName}`, {
+      method: "PUT",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        message: `Result upload for ${register}`,
+        content,
+        committer: {
+          name: "ResultUploader",
+          email: "upload@sjvm.edu"
         }
-      } catch (e) {
-        existing = {};
-      }
+      })
+    });
 
-      existing[resultData.regNumber + '-' + resultData.exam] = resultData;
-
-      const updateRes = await fetch(url, {
-        method: 'PUT',
-        headers: {
-          Authorization: `token ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          message: `Result updated for ${resultData.regNumber}`,
-          content: btoa(JSON.stringify(existing, null, 2)),
-          sha: sha || undefined
-        })
-      });
-
-      if (updateRes.ok) {
-        alert("✅ Result uploaded successfully!");
-      } else {
-        alert("❌ Failed to upload result.");
-      }
+    const result = await res.json();
+    if (res.ok) {
+      alert("✅ Result uploaded successfully!");
+      location.reload();
+    } else {
+      document.getElementById("errorMsg").innerText = result.message || "Upload failed.";
     }
-  </script>
+  } catch (err) {
+    document.getElementById("errorMsg").innerText = "Error: " + err.message;
+  }
+}
+</script>
+
 </body>
 </html>
