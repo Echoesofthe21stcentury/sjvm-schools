@@ -1,132 +1,178 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
   <title>Student Registration - SJVM</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #1b2a41;
-      color: white;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #3f87a6, #ebf8e1);
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: #fff;
       padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
     }
-    input, select, button {
+
+    h1 {
+      text-align: center;
+      color: #2a5d84;
+    }
+
+    img.logo {
+      display: block;
+      margin: 0 auto 20px;
+      width: 100px;
+    }
+
+    label {
+      display: block;
+      margin: 15px 0 5px;
+      font-weight: bold;
+    }
+
+    input, select {
+      width: 100%;
       padding: 10px;
-      margin: 8px;
-      width: 300px;
-      border-radius: 5px;
-      border: none;
+      border: 1px solid #ccc;
+      border-radius: 6px;
     }
+
     button {
-      background-color: #2980b9;
+      margin-top: 20px;
+      width: 100%;
+      padding: 12px;
+      background: #2a5d84;
       color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
       cursor: pointer;
     }
+
+    button:hover {
+      background: #184561;
+    }
+
     .status {
       margin-top: 15px;
       font-weight: bold;
+      text-align: center;
+    }
+
+    .success {
+      color: green;
+    }
+
+    .error {
+      color: red;
     }
   </style>
 </head>
 <body>
-  <h2>📘 SJVM Student Registration</h2>
+  <div class="container">
+    <img src="school-logo.png" alt="School Logo" class="logo">
+    <h1>Student Registration</h1>
 
-  <label>GitHub Token:</label><br>
-  <input type="password" id="github_token" placeholder="Paste your GitHub PAT"><br>
+    <label>GitHub Token</label>
+    <input type="password" id="token" placeholder="Enter GitHub PAT" required>
 
-  <label>Student Name:</label><br>
-  <input type="text" id="student_name"><br>
+    <label>Student Name</label>
+    <input type="text" id="name" required>
 
-  <label>Class:</label><br>
-  <select id="student_class">
-    <option value="">Select Class</option>
-    <option>Class 1</option><option>Class 2</option><option>Class 3</option>
-    <option>Class 4</option><option>Class 5</option><option>Class 6</option>
-    <option>Class 7</option><option>Class 8</option><option>Class 9</option>
-    <option>Class 10</option>
-  </select><br>
+    <label>Class</label>
+    <select id="class">
+      <option value="">-- Select Class --</option>
+      <option value="Class 1">Class 1</option>
+      <option value="Class 2">Class 2</option>
+      <option value="Class 3">Class 3</option>
+      <option value="Class 4">Class 4</option>
+      <option value="Class 5">Class 5</option>
+      <option value="Class 6">Class 6</option>
+      <option value="Class 7">Class 7</option>
+      <option value="Class 8">Class 8</option>
+      <option value="Class 9">Class 9</option>
+      <option value="Class 10">Class 10</option>
+    </select>
 
-  <label>Register Number:</label><br>
-  <input type="text" id="register_number"><br>
+    <label>Register Number</label>
+    <input type="text" id="reg" required>
 
-  <label>Branch:</label><br>
-  <select id="branch">
-    <option value="">Select Branch</option>
-    <option value="Atturu">Atturu</option>
-    <option value="Bandikodigenahalli">Bandikodigenahalli</option>
-  </select><br>
+    <label>Branch</label>
+    <select id="branch">
+      <option value="">-- Select Branch --</option>
+      <option value="Bandikodigenahalli">Bandikodigenahalli</option>
+      <option value="Atturu Layout">Atturu Layout</option>
+    </select>
 
-  <button onclick="registerStudent()">Register</button>
-
-  <div class="status" id="status_msg"></div>
+    <button onclick="registerStudent()">Register</button>
+    <div class="status" id="status"></div>
+  </div>
 
   <script>
-    const repoOwner = 'Echoesofthe21stcentury';
-    const repoName = 'sjvm-schools';
-    const filePath = 'student_register.json';
-
     async function registerStudent() {
-      const token = document.getElementById('github_token').value.trim();
-      const name = document.getElementById('student_name').value.trim();
-      const cls = document.getElementById('student_class').value;
-      const reg = document.getElementById('register_number').value.trim();
+      const token = document.getElementById('token').value;
+      const name = document.getElementById('name').value;
+      const cls = document.getElementById('class').value;
+      const reg = document.getElementById('reg').value;
       const branch = document.getElementById('branch').value;
-
-      const statusMsg = document.getElementById('status_msg');
-      statusMsg.innerHTML = '⏳ Registering...';
+      const status = document.getElementById('status');
 
       if (!token || !name || !cls || !reg || !branch) {
-        statusMsg.innerHTML = '❌ Please fill in all fields.';
+        status.innerHTML = '<span class="error">❌ Please fill in all fields.</span>';
         return;
       }
 
+      const repo = "Echoesofthe21stcentury/sjvm-schools";
+      const filePath = "student_register.json";
+      const apiUrl = `https://api.github.com/repos/${repo}/contents/${filePath}`;
+
+      // Get current JSON
+      const headers = {
+        Authorization: `token ${token}`,
+        Accept: "application/vnd.github.v3+json"
+      };
+
       try {
-        const apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`;
-
-        // Fetch existing content
-        const existing = await fetch(apiUrl, {
-          headers: { Authorization: `token ${token}` }
-        });
-
-        let content = [];
+        const response = await fetch(apiUrl, { headers });
+        let content = "[]";
         let sha = "";
 
-        if (existing.ok) {
-          const json = await existing.json();
-          sha = json.sha;
-          content = JSON.parse(atob(json.content));
+        if (response.ok) {
+          const data = await response.json();
+          content = atob(data.content);
+          sha = data.sha;
         }
 
-        content.push({
-          name: name,
-          class: cls,
-          register_number: reg,
-          branch: branch
-        });
+        const students = JSON.parse(content);
+        students.push({ name, class: cls, reg, branch });
 
-        // Encode updated content
-        const updatedContent = btoa(JSON.stringify(content, null, 2));
+        const updatedContent = btoa(JSON.stringify(students, null, 2));
 
-        const response = await fetch(apiUrl, {
+        const update = await fetch(apiUrl, {
           method: "PUT",
-          headers: {
-            Authorization: `token ${token}`,
-            "Content-Type": "application/json"
-          },
+          headers,
           body: JSON.stringify({
-            message: `Register student ${name}`,
+            message: `Register new student: ${name}`,
             content: updatedContent,
-            sha: sha
+            sha
           })
         });
 
-        if (response.ok) {
-          statusMsg.innerHTML = '✅ Student registered successfully!';
+        if (update.ok) {
+          status.innerHTML = '<span class="success">✅ Student registered successfully.</span>';
         } else {
-          statusMsg.innerHTML = '❌ Failed to register student.';
+          throw new Error();
         }
-      } catch (err) {
-        console.error(err);
-        statusMsg.innerHTML = '❌ Error occurred.';
+      } catch (error) {
+        status.innerHTML = '<span class="error">❌ Failed to register student.</span>';
       }
     }
   </script>
