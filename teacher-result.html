@@ -1,237 +1,246 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Teacher Result Upload</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Upload Student Result</title>
   <style>
-    body { font-family: 'Segoe UI', sans-serif; background: #f0f4ff; padding: 20px; color: #333; }
-    h2 { color: #002855; }
-    select, input, button {
-      padding: 10px; margin: 5px 0; width: 100%;
-      border: 1px solid #ccc; border-radius: 6px; font-size: 16px;
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f4f8;
+      padding: 20px;
+      margin: 0;
     }
-    .step { display: none; }
-    .step.active { display: block; animation: fadeIn 0.5s ease-in-out; }
-    @keyframes fadeIn { from {opacity: 0} to {opacity: 1} }
-    .subject-row { border-left: 5px solid #ccc; padding: 10px; margin: 10px 0; background: #fff; border-radius: 8px; }
-    .pass { border-left-color: green; }
-    .fail { border-left-color: red; }
-    .btn { background: #005bbb; color: white; border: none; cursor: pointer; }
-    .btn:hover { background: #004199; }
-    .hidden { display: none; }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .subject-container {
+      margin-top: 20px;
+    }
+    .subject-box {
+      border: 2px solid #ccc;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+    }
+    .pass {
+      background-color: #d4edda;
+    }
+    .fail {
+      background-color: #f8d7da;
+    }
   </style>
 </head>
 <body>
-  <h2>📚 Upload Student Result</h2>
+  <div class="container">
+    <h2>Upload Student Result</h2>
+    <div class="form-group">
+      <label for="branch">Select Branch</label>
+      <select id="branch">
+        <option value="">Select Branch</option>
+        <option value="Bandikodigenahalli">Bandikodigenahalli</option>
+        <option value="Atturu">Atturu</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="code">Enter Secret Code</label>
+      <input type="password" id="code" placeholder="Enter secret code">
+    </div>
+    <div class="form-group">
+      <label for="updater">Updater Name</label>
+      <input type="text" id="updater" placeholder="Enter your name">
+    </div>
+    <div class="form-group">
+      <button onclick="verifyCode()">Next</button>
+    </div>
 
-  <!-- Step 1: Branch & Code -->
-  <div class="step active" id="step1">
-    <label>Select Branch:</label>
-    <select id="branch">
-      <option value="">-- Select --</option>
-      <option value="Atturu Layout">Atturu Layout</option>
-      <option value="Bandikodigenahalli">Bandikodigenahalli</option>
-    </select>
-    <label>Enter Magical Code:</label>
-    <input type="password" id="code" placeholder="Enter Secret Code">
-    <button class="btn" onclick="checkCode()">Next</button>
-  </div>
+    <div id="classSelection" style="display:none;">
+      <div class="form-group">
+        <label for="classSelect">Select Class</label>
+        <select id="classSelect" onchange="loadStudents()"></select>
+      </div>
+      <div class="form-group">
+        <label for="studentSelect">Select Student</label>
+        <select id="studentSelect" onchange="populateStudentDetails()"></select>
+      </div>
+      <div class="form-group">
+        <label for="regNo">Register Number</label>
+        <input type="text" id="regNo" disabled>
+      </div>
+      <div class="form-group">
+        <label for="exam">Examination</label>
+        <input type="text" id="exam" disabled>
+      </div>
 
-  <!-- Step 2: Updater Info -->
-  <div class="step" id="step2">
-    <label>Updater Name:</label>
-    <input type="text" id="updater" placeholder="Enter your name">
-    <button class="btn" onclick="nextStep(3)">Next</button>
-  </div>
+      <div class="subject-container" id="subjects"></div>
 
-  <!-- Step 3: Class, Student -->
-  <div class="step" id="step3">
-    <label>Select Class:</label>
-    <select id="classSelect"></select>
+      <div class="form-group">
+        <label for="totalMax">Total Max Marks</label>
+        <input type="number" id="totalMax">
+      </div>
+      <div class="form-group">
+        <label for="totalObtained">Total Marks Obtained</label>
+        <input type="number" id="totalObtained">
+      </div>
+      <div class="form-group">
+        <label for="grade">Final Grade</label>
+        <input type="text" id="grade">
+      </div>
+      <div class="form-group">
+        <label for="percentage">Percentage</label>
+        <input type="number" id="percentage">
+      </div>
+      <div class="form-group">
+        <label for="result">Final Result (Pass/Fail)</label>
+        <select id="result">
+          <option value="Pass">Pass</option>
+          <option value="Fail">Fail</option>
+        </select>
+      </div>
 
-    <label>Select Student:</label>
-    <select id="studentSelect" onchange="fillExamAndReg()"></select>
-
-    <label>Register No:</label>
-    <input type="text" id="regno" disabled>
-
-    <label>Exam:</label>
-    <input type="text" id="exam" disabled>
-
-    <button class="btn" onclick="nextStep(4)">Next</button>
-  </div>
-
-  <!-- Step 4: Subject-wise Result -->
-  <div class="step" id="step4">
-    <h3>Enter Subject Marks</h3>
-    <div id="subjects"></div>
-    <button class="btn" onclick="nextStep(5)">Next</button>
-  </div>
-
-  <!-- Step 5: Overall Result -->
-  <div class="step" id="step5">
-    <h3>Final Result</h3>
-    <input placeholder="Total Max Marks" id="totalMax">
-    <input placeholder="Total Marks Obtained" id="totalObtained">
-    <input placeholder="Grade" id="finalGrade">
-    <input placeholder="Percentage" id="percentage">
-    <select id="finalResult">
-      <option value="Pass">Pass</option>
-      <option value="Fail">Fail</option>
-    </select>
-    <button class="btn" onclick="uploadResult()">📤 Upload Result</button>
+      <div class="form-group">
+        <button onclick="uploadResult()">Upload Result</button>
+      </div>
+    </div>
   </div>
 
   <script>
-    let step = 1;
-    const studentData = [];
+    const secretCodes = {
+      'Bandikodigenahalli': '1103',
+      'Atturu': '0903'
+    };
     const subjects = ["Kannada", "English", "Hindi", "Mathematics", "Science", "Social"];
+    let students = [];
 
-    function nextStep(num) {
-      document.getElementById(`step${step}`).classList.remove("active");
-      document.getElementById(`step${num}`).classList.add("active");
-      step = num;
-    }
-
-    function checkCode() {
+    function verifyCode() {
       const branch = document.getElementById('branch').value;
       const code = document.getElementById('code').value;
 
-      if ((branch === "Atturu Layout" && code === "0903") ||
-          (branch === "Bandikodigenahalli" && code === "1103")) {
-        nextStep(2);
+      if (secretCodes[branch] === code) {
+        fetch('data/student_register.json')
+          .then(res => res.json())
+          .then(data => {
+            students = data.filter(s => s.branch === branch);
+            const classSelect = document.getElementById('classSelect');
+            const uniqueClasses = [...new Set(students.map(s => s.class))];
+            classSelect.innerHTML = '<option value="">Select Class</option>' + uniqueClasses.map(c => `<option value="${c}">${c}</option>`).join('');
+            document.getElementById('classSelection').style.display = 'block';
+          });
       } else {
-        alert("❌ Invalid magical code!");
+        alert("Incorrect secret code for the selected branch.");
       }
     }
 
-    // Load student_register.json
-    fetch('data/student_register.json')
-      .then(res => res.json())
-      .then(data => {
-        studentData.push(...data);
-      });
-
-    // Populate class dropdown
-    document.getElementById('branch').addEventListener('change', () => {
-      const branch = document.getElementById('branch').value;
-      const classSelect = document.getElementById('classSelect');
-      classSelect.innerHTML = '';
-
-      const classes = [...new Set(studentData
-        .filter(s => s.branch === branch)
-        .map(s => s.class))];
-
-      classes.forEach(cls => {
-        const opt = document.createElement('option');
-        opt.value = cls;
-        opt.textContent = cls;
-        classSelect.appendChild(opt);
-      });
-    });
-
-    document.getElementById('classSelect').addEventListener('change', () => {
-      const branch = document.getElementById('branch').value;
-      const cls = document.getElementById('classSelect').value;
+    function loadStudents() {
+      const selectedClass = document.getElementById('classSelect').value;
+      const filteredStudents = students.filter(s => s.class === selectedClass);
       const studentSelect = document.getElementById('studentSelect');
-      studentSelect.innerHTML = '';
+      studentSelect.innerHTML = '<option value="">Select Student</option>' + filteredStudents.map(s => `<option value="${s.regno}">${s.name}</option>`).join('');
+    }
 
-      const filtered = studentData.filter(s => s.branch === branch && s.class === cls);
-      filtered.forEach(s => {
-        const opt = document.createElement('option');
-        opt.value = s.name;
-        opt.textContent = s.name;
-        opt.dataset.regno = s.regno;
-        opt.dataset.exam = s.exam;
-        studentSelect.appendChild(opt);
-      });
-    });
-
-    function fillExamAndReg() {
-      const selected = document.getElementById('studentSelect').selectedOptions[0];
-      if (selected) {
-        document.getElementById('regno').value = selected.dataset.regno;
-        document.getElementById('exam').value = selected.dataset.exam;
+    function populateStudentDetails() {
+      const regno = document.getElementById('studentSelect').value;
+      const student = students.find(s => s.regno === regno);
+      if (student) {
+        document.getElementById('regNo').value = student.regno;
+        document.getElementById('exam').value = student.exam;
+        const subjectContainer = document.getElementById('subjects');
+        subjectContainer.innerHTML = '';
+        subjects.forEach(sub => {
+          subjectContainer.innerHTML += `
+            <div class="subject-box" id="${sub}-box">
+              <h4>${sub}</h4>
+              <label>Max Marks: <input type="number" id="${sub}-max"></label>
+              <label>Marks Obtained: <input type="number" id="${sub}-obt"></label>
+              <label>Internal Max: <input type="number" id="${sub}-imax"></label>
+              <label>Internal Obtained: <input type="number" id="${sub}-iobt"></label>
+              <label>Total Marks: <input type="number" id="${sub}-total"></label>
+              <label>Grade: <input type="text" id="${sub}-grade"></label>
+              <label>Result:
+                <select id="${sub}-result">
+                  <option value="Pass">Pass</option>
+                  <option value="Fail">Fail</option>
+                </select>
+              </label>
+            </div>`;
+        });
       }
     }
-
-    // Subject input builder
-    function buildSubjects() {
-      const container = document.getElementById('subjects');
-      container.innerHTML = '';
-      subjects.forEach(sub => {
-        const div = document.createElement('div');
-        div.className = 'subject-row';
-        div.innerHTML = `
-          <h4>${sub}</h4>
-          <input placeholder="Max Marks" class="max">
-          <input placeholder="Obtained Marks" class="obt">
-          <input placeholder="Internal Max" class="intMax">
-          <input placeholder="Internal Obt" class="intObt">
-          <input placeholder="Grade" class="grade">
-          <select class="status" onchange="this.parentNode.className='subject-row ' + (this.value==='Pass'?'pass':'fail')">
-            <option>Pass</option><option>Fail</option>
-          </select>
-        `;
-        container.appendChild(div);
-      });
-    }
-
-    buildSubjects();
 
     function uploadResult() {
-      const regno = document.getElementById('regno').value;
-      const exam = document.getElementById('exam').value;
       const updater = document.getElementById('updater').value;
-      const totalMax = document.getElementById('totalMax').value;
-      const totalObtained = document.getElementById('totalObtained').value;
-      const finalGrade = document.getElementById('finalGrade').value;
-      const percentage = document.getElementById('percentage').value;
-      const finalResult = document.getElementById('finalResult').value;
-
-      const subjectElements = document.querySelectorAll('.subject-row');
-      const subjectResults = [];
-
-      subjectElements.forEach(row => {
-        subjectResults.push({
-          subject: row.querySelector('h4').textContent,
-          max: row.querySelector('.max').value,
-          obtained: row.querySelector('.obt').value,
-          internalMax: row.querySelector('.intMax').value,
-          internalObt: row.querySelector('.intObt').value,
-          grade: row.querySelector('.grade').value,
-          status: row.querySelector('.status').value
-        });
-      });
-
-      const resultData = {
-        regno, exam, updater,
-        subjects: subjectResults,
-        totalMax, totalObtained,
-        finalGrade, percentage, finalResult
+      const regNo = document.getElementById('regNo').value;
+      const exam = document.getElementById('exam').value;
+      const finalResult = {
+        updater,
+        regNo,
+        exam,
+        subjects: {},
+        totalMax: document.getElementById('totalMax').value,
+        totalObtained: document.getElementById('totalObtained').value,
+        grade: document.getElementById('grade').value,
+        percentage: document.getElementById('percentage').value,
+        result: document.getElementById('result').value
       };
 
-      const jsonContent = btoa(unescape(encodeURIComponent(JSON.stringify(resultData, null, 2))));
-      const filename = `data/results/${regno}_${exam}.json`;
+      subjects.forEach(sub => {
+        finalResult.subjects[sub] = {
+          max: document.getElementById(`${sub}-max`).value,
+          obtained: document.getElementById(`${sub}-obt`).value,
+          internalMax: document.getElementById(`${sub}-imax`).value,
+          internalObtained: document.getElementById(`${sub}-iobt`).value,
+          total: document.getElementById(`${sub}-total`).value,
+          grade: document.getElementById(`${sub}-grade`).value,
+          result: document.getElementById(`${sub}-result`).value
+        };
+        const box = document.getElementById(`${sub}-box`);
+        box.className = `subject-box ${finalResult.subjects[sub].result === 'Pass' ? 'pass' : 'fail'}`;
+      });
 
-      const token = prompt("Enter GitHub PAT:");
-      fetch(`https://api.github.com/repos/Echoesofthe21stcentury/sjvm-schools/contents/${filename}`, {
-        method: "PUT",
+      fetch('https://api.github.com/repos/YOUR_USERNAME/YOUR_REPO/contents/data/results.json', {
+        method: 'PUT',
         headers: {
-          "Content-Type": "application/json",
-          "Authorization": "token " + token
+          'Authorization': 'token YOUR_GITHUB_TOKEN',
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          message: `Result uploaded for ${regno} - ${exam}`,
-          content: jsonContent
+          message: `Uploaded result for ${regNo}`,
+          content: btoa(JSON.stringify(finalResult, null, 2)),
+          sha: ''
         })
-      }).then(res => {
-        if (res.ok) {
-          alert("✅ Result uploaded successfully!");
-        } else {
-          alert("❌ Failed to upload result.");
-        }
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.content) alert("✅ Result uploaded successfully.");
+        else alert("❌ Failed to upload result.");
       });
     }
   </script>
