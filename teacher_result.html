@@ -1,191 +1,199 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>SJVM - Secure Result Entry</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f3f3f3;
-      padding: 40px;
-      text-align: center;
-    }
-    input, select, button {
-      padding: 10px;
-      margin: 10px;
-      font-size: 16px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-      background: #fff;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 8px;
-      text-align: center;
-    }
-    th {
-      background-color: #007BFF;
-      color: white;
-    }
-    #resultForm {
-      display: none;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>SJVM School - FA1 Result Upload</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1e1e2f;
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #66ccff;
+        }
+        form {
+            max-width: 1200px;
+            margin: auto;
+            background-color: #2e2e42;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        input, select, button {
+            padding: 10px;
+            margin: 5px;
+            border-radius: 5px;
+            border: none;
+        }
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #666;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #444;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
 </head>
 <body>
+    <h1>SJVM SCHOOL - FA1 RESULT UPLOAD</h1>
 
-  <h2>🔒 Enter Magical Access Code</h2>
-  <input type="password" id="magicCode" placeholder="Enter secret code..." />
-  <button onclick="checkCode()">Unlock</button>
+    <div id="auth">
+        <label for="magic">Enter Magical Code:</label>
+        <input type="password" id="magic" placeholder="Enter code here">
+        <button onclick="checkCode()">Submit</button>
+    </div>
 
-  <div id="resultForm">
-    <h2>SJVM FA-1 Result Entry</h2>
+    <div id="formDiv" class="hidden">
+        <form>
+            <label>Result Uploader Name:</label>
+            <input type="text" name="uploader" required><br>
 
-    <label>Uploader Name: <input type="text" id="uploader" placeholder="Uploader's name" /></label><br>
-    <label>Branch: 
-      <select id="branch">
-        <option>Bandikodigenahalli</option>
-        <option>Atturu Layout</option>
-      </select>
-    </label>
-    <label>Class:
-      <select id="class">
-        <option>Class 1</option>
-        <option>Class 2</option>
-        <option>Class 3</option>
-        <option>Class 4</option>
-        <option>Class 5</option>
-        <option>Class 6</option>
-        <option>Class 7</option>
-        <option>Class 8</option>
-        <option>Class 9</option>
-        <option>Class 10</option>
-      </select>
-    </label><br>
-    <label>Student Name: <input type="text" id="studentName" /></label>
-    <label>Register Number: <input type="text" id="regNo" /></label>
+            <label>Student Name:</label>
+            <input type="text" name="studentName" required>
+            <label>Register Number:</label>
+            <input type="text" name="registerNumber" required><br>
 
-    <table>
-      <tr>
-        <th>Subject</th><th>Max Marks</th><th>Marks Obtained</th><th>Max Internal</th><th>Internal Obtained</th><th>Grade</th>
-      </tr>
-      <tbody id="subjectTable">
-        <!-- Rows added via JS -->
-      </tbody>
-      <tr>
-        <th>Total</th>
-        <td><input id="totalMax" type="number"></td>
-        <td><input id="totalObtained" type="number"></td>
-        <td colspan="2">Percentage: <input id="percentage" type="text"></td>
-        <td>
-          Final Grade:
-          <select id="finalGrade">
-            <option>A+</option><option>A</option><option>B+</option><option>B</option>
-            <option>C+</option><option>C</option><option>D+</option><option>D</option>
-          </select><br>
-          Result:
-          <select id="result">
-            <option>Pass</option><option>Fail</option>
-          </select>
-        </td>
-      </tr>
-    </table>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Subject</th>
+                        <th>Max Marks</th>
+                        <th>Marks Obtained</th>
+                        <th>Max Internal</th>
+                        <th>Internal Obtained</th>
+                        <th>Total Obtained</th>
+                        <th>Grade</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Kannada</td>
+                        <td><input type="number"></td>
+                        <td><input type="number"></td>
+                        <td><input type="number"></td>
+                        <td><input type="number"></td>
+                        <td><input type="number"></td>
+                        <td>
+                            <select>
+                                <option>A+</option><option>A</option><option>B+</option><option>B</option>
+                                <option>C+</option><option>C</option><option>D+</option><option>D</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>English</td>
+                        <td><input type="number"></td>
+                        <td><input type="number"></td>
+                        <td><input type="number"></td>
+                        <td><input type="number"></td>
+                        <td><input type="number"></td>
+                        <td>
+                            <select>
+                                <option>A+</option><option>A</option><option>B+</option><option>B</option>
+                                <option>C+</option><option>C</option><option>D+</option><option>D</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Hindi</td>
+                        <td><input type="number"></td>
+                        <td><input type="number"></td>
+                        <td><input type="number"></td>
+                        <td><input type="number"></td>
+                        <td><input type="number"></td>
+                        <td>
+                            <select>
+                                <option>A+</option><option>A</option><option>B+</option><option>B</option>
+                                <option>C+</option><option>C</option><option>D+</option><option>D</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Mathematics</td>
+                        <td><input type="number"></td>
+                        <td><input type="number"></td>
+                        <td><input type="number"></td>
+                        <td><input type="number"></td>
+                        <td><input type="number"></td>
+                        <td>
+                            <select>
+                                <option>A+</option><option>A</option><option>B+</option><option>B</option>
+                                <option>C+</option><option>C</option><option>D+</option><option>D</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Science</td>
+                        <td><input type="number"></td>
+                        <td><input type="number"></td>
+                        <td><input type="number"></td>
+                        <td><input type="number"></td>
+                        <td><input type="number"></td>
+                        <td>
+                            <select>
+                                <option>A+</option><option>A</option><option>B+</option><option>B</option>
+                                <option>C+</option><option>C</option><option>D+</option><option>D</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Social</td>
+                        <td><input type="number"></td>
+                        <td><input type="number"></td>
+                        <td><input type="number"></td>
+                        <td><input type="number"></td>
+                        <td><input type="number"></td>
+                        <td>
+                            <select>
+                                <option>A+</option><option>A</option><option>B+</option><option>B</option>
+                                <option>C+</option><option>C</option><option>D+</option><option>D</option>
+                            </select>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
 
-    <button onclick="submitResult()">Submit Result</button>
-  </div>
-
-  <script>
-    const subjects = ["Kannada", "English", "Hindi", "Mathematics", "Science", "Social"];
-
-    window.onload = function () {
-      let tableBody = document.getElementById("subjectTable");
-      subjects.forEach(subject => {
-        const row = `
-          <tr>
-            <td>${subject}</td>
-            <td><input type="number" class="maxMarks"></td>
-            <td><input type="number" class="obtMarks"></td>
-            <td><input type="number" class="maxInternal"></td>
-            <td><input type="number" class="obtInternal"></td>
-            <td>
-              <select class="grade">
+            <br>
+            <label>Total Max Marks:</label> <input type="number"><br>
+            <label>Total Marks Obtained:</label> <input type="number"><br>
+            <label>Percentage:</label> <input type="text"><br>
+            <label>Final Grade:</label>
+            <select>
                 <option>A+</option><option>A</option><option>B+</option><option>B</option>
                 <option>C+</option><option>C</option><option>D+</option><option>D</option>
-              </select>
-            </td>
-          </tr>`;
-        tableBody.insertAdjacentHTML("beforeend", row);
-      });
-    };
+            </select><br>
+            <label>Pass/Fail:</label>
+            <select>
+                <option>Pass</option>
+                <option>Fail</option>
+            </select><br><br>
 
-    function checkCode() {
-      const code = document.getElementById("magicCode").value;
-      if (code === "180609") {
-        document.getElementById("resultForm").style.display = "block";
-        document.getElementById("magicCode").style.display = "none";
-        event.target.style.display = "none";
-        document.querySelector("h2").textContent = "✅ Access Granted";
-      } else {
-        alert("❌ Incorrect code. Please try again.");
-      }
-    }
+            <button type="submit">Submit Result</button>
+        </form>
+    </div>
 
-    async function submitResult() {
-      const uploader = document.getElementById("uploader").value;
-      const branch = document.getElementById("branch").value;
-      const className = document.getElementById("class").value;
-      const studentName = document.getElementById("studentName").value;
-      const regNo = document.getElementById("regNo").value;
-
-      const rows = document.querySelectorAll("#subjectTable tr");
-      const subjects = [];
-      rows.forEach(row => {
-        const cols = row.querySelectorAll("input, select");
-        subjects.push({
-          subject: row.cells[0].innerText,
-          maxMarks: cols[0].value,
-          obtainedMarks: cols[1].value,
-          maxInternal: cols[2].value,
-          obtainedInternal: cols[3].value,
-          grade: cols[4].value
-        });
-      });
-
-      const data = {
-        uploader, branch, class: className, studentName, regNo,
-        subjects,
-        totalMax: document.getElementById("totalMax").value,
-        totalObtained: document.getElementById("totalObtained").value,
-        percentage: document.getElementById("percentage").value,
-        finalGrade: document.getElementById("finalGrade").value,
-        result: document.getElementById("result").value
-      };
-
-      const content = btoa(JSON.stringify(data, null, 2));
-      const fileName = `results/${branch}_${className}_${regNo}.json`;
-
-      const response = await fetch(`https://api.github.com/repos/YOUR_USERNAME/YOUR_REPO/contents/${fileName}`, {
-        method: "PUT",
-        headers: {
-          "Authorization": "token YOUR_GITHUB_TOKEN",
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          message: `Add result for ${regNo}`,
-          content: content
-        })
-      });
-
-      if (response.ok) {
-        alert("✅ Result successfully uploaded to GitHub!");
-      } else {
-        alert("❌ Failed to upload result");
-        console.error(await response.json());
-      }
-    }
-  </script>
-
+    <script>
+        function checkCode() {
+            const input = document.getElementById("magic").value;
+            if (input === "180609") {
+                document.getElementById("auth").classList.add("hidden");
+                document.getElementById("formDiv").classList.remove("hidden");
+            } else {
+                alert("❌ Invalid code. Access denied.");
+            }
+        }
+    </script>
 </body>
 </html>
