@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Student Register - SJVM</title>
   <style>
     body {
@@ -15,6 +15,11 @@
     }
     h1 {
       color: #fcd34d;
+      margin-bottom: 10px;
+    }
+    img {
+      width: 80px;
+      margin-bottom: 20px;
     }
     form {
       background: #0f172a;
@@ -48,25 +53,34 @@
 </head>
 <body>
 
+  <img src="https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/assests/logo.png" alt="SJVM Logo">
   <h1>Student Registration</h1>
+
   <form id="studentForm">
     <input type="text" id="regno" placeholder="Register Number" required />
     <input type="text" id="name" placeholder="Full Name" required />
-    <input type="text" id="father" placeholder="Father's Name" required />
-    <input type="text" id="mobile" placeholder="Mobile Number" required />
-    <input type="text" id="address" placeholder="Address" required />
+
     <select id="class" required>
       <option value="">Select Class</option>
       <option value="Class 1">Class 1</option>
       <option value="Class 2">Class 2</option>
-      <!-- Add more classes as needed -->
+      <option value="Class 3">Class 3</option>
+      <option value="Class 4">Class 4</option>
+      <option value="Class 5">Class 5</option>
+      <option value="Class 6">Class 6</option>
+      <option value="Class 7">Class 7</option>
+      <option value="Class 8">Class 8</option>
+      <option value="Class 9">Class 9</option>
+      <option value="Class 10">Class 10</option>
     </select>
+
     <select id="branch" required>
       <option value="">Select Branch</option>
       <option value="Bandikodigenahalli">Bandikodigenahalli</option>
       <option value="Atturu Layout">Atturu Layout</option>
     </select>
-    <button type="submit">Register</button>
+
+    <button type="submit">📘 Register</button>
   </form>
 
   <script>
@@ -82,14 +96,12 @@
         }
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch file: " + response.status);
-      }
+      if (!response.ok) throw new Error("Failed to fetch file: " + response.status);
 
       const file = await response.json();
       const sha = file.sha;
-      const content = atob(file.content);
-      const data = JSON.parse(content);
+      const content = atob(file.content || "");
+      const data = content.trim() ? JSON.parse(content) : [];
       const updatedData = modifyCallback(data);
       const newContent = btoa(JSON.stringify(updatedData, null, 2));
 
@@ -112,24 +124,13 @@
 
       const regno = document.getElementById("regno").value.trim();
       const name = document.getElementById("name").value.trim();
-      const father = document.getElementById("father").value.trim();
-      const mobile = document.getElementById("mobile").value.trim();
-      const address = document.getElementById("address").value.trim();
       const classValue = document.getElementById("class").value;
       const branch = document.getElementById("branch").value;
 
-      const token = prompt("🔐 Enter your GitHub OTT (Personal Access Token):");
+      const token = prompt("🔐 Enter your GitHub Personal Access Token:");
       if (!token) return alert("❌ Token is required!");
 
-      const newStudent = {
-        regno,
-        name,
-        father,
-        mobile,
-        address,
-        class: classValue,
-        branch
-      };
+      const newStudent = { regno, name, class: classValue, branch };
 
       try {
         const response = await updateGitHubFile(
@@ -138,7 +139,7 @@
             data.push(newStudent);
             return data;
           },
-          `📘 New student registered: ${regno}`,
+          `📘 Registered student: ${regno}`,
           token
         );
 
