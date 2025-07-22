@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Student Result Viewer</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f4f8;
+      padding: 20px;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+    }
+    #resultContainer {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      max-width: 900px;
+      margin: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: center;
+    }
+    .download-btn {
+      display: block;
+      margin: 20px auto;
+      padding: 10px 20px;
+      font-size: 16px;
+      background: #0066cc;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Student Result Viewer</h1>
+  <div id="resultContainer"></div>
+  <button class="download-btn" onclick="downloadPDF()">Download PDF</button>
+
+  <script>
+    // Load result JSON (from GitHub raw URL)
+    const jsonURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/data/student_register.json";
+
+    fetch(jsonURL)
+      .then(res => res.json())
+      .then(data => {
+        const student = data.find(s => s.regno === "202225"); // Change this dynamically as needed
+        if (student) showResult(student);
+        else document.getElementById("resultContainer").innerText = "Result not found.";
+      });
+
+    function showResult(data) {
+      let html = `
+        <h2>Result: ${data.exam}</h2>
+        <p><strong>Name:</strong> ${data.name} &nbsp;&nbsp;&nbsp; <strong>Reg No:</strong> ${data.regno}</p>
+        <p><strong>Class:</strong> ${data.class} &nbsp;&nbsp;&nbsp; <strong>Branch:</strong> ${data.branch}</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Subject</th>
+              <th>Obt</th>
+              <th>Max</th>
+              <th>Int Obt</th>
+              <th>Int Max</th>
+              <th>Total</th>
+              <th>Grade</th>
+              <th>Result</th>
+            </tr>
+          </thead>
+          <tbody>`;
+
+      for (const subject in data.subjects) {
+        const s = data.subjects[subject];
+        html += `
+          <tr>
+            <td>${subject}</td>
+            <td>${s.obt || "-"}</td>
+            <td>${s.max || "-"}</td>
+            <td>${s.intObt || "-"}</td>
+            <td>${s.intMax || "-"}</td>
+            <td>${s.total || "-"}</td>
+            <td>${s.grade || "-"}</td>
+            <td>${s.result || "-"}</td>
+          </tr>`;
+      }
+
+      html += `
+          </tbody>
+        </table>
+        <br/>
+        <h3>Final Summary</h3>
+        <p><strong>Total Obtained:</strong> ${data.final.totalObtained || "-"} / ${data.final.totalMax || "-"}</p>
+        <p><strong>Percentage:</strong> ${data.final.percentage || "-"}%</p>
+        <p><strong>Grade:</strong> ${data.final.grade || "-"}</p>
+        <p><strong>Final Result:</strong> ${data.final.result}</p>
+      `;
+
+      document.getElementById("resultContainer").innerHTML = html;
+    }
+
+    function downloadPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.html(document.getElementById('resultContainer'), {
+        callback: function (pdf) {
+          pdf.save("Student_Result.pdf");
+        },
+        x: 10,
+        y: 10
+      });
+    }
+  </script>
+</body>
+</html>
