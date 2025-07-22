@@ -1,0 +1,71 @@
+{
+  "updater": "Chaithan",
+  "branch": "Bandikodigenahalli",
+  "class": "Class 8",
+  "regno": "202225",
+  "name": "Prajwal",
+  "exam": "FA1",
+  "subjects": {
+    "Kannada": {
+      "obt": "",
+      "max": "",
+      "intObt": "",
+      "intMax": "",
+      "total": "",
+      "grade": "",
+      "result": "Pass"
+    },
+    "English": {
+      "obt": "",
+      "max": "",
+      "intObt": "",
+      "intMax": "",
+      "total": "",
+      "grade": "",
+      "result": "Pass"
+    },
+    "Hindi": {
+      "obt": "",
+      "max": "",
+      "intObt": "",
+      "intMax": "",
+      "total": "",
+      "grade": "",
+      "result": "Pass"
+    },
+    "Math": {
+      "obt": "",
+      "max": "",
+      "intObt": "",
+      "intMax": "",
+      "total": "",
+      "grade": "",
+      "result": "Pass"
+    },
+    "Science": {
+      "obt": "",
+      "max": "",
+      "intObt": "",
+      "intMax": "",
+      "total": "",
+      "grade": "",
+      "result": "Pass"
+    },
+    "Social": {
+      "obt": "",
+      "max": "",
+      "intObt": "",
+      "intMax": "",
+      "total": "",
+      "grade": "",
+      "result": "Pass"
+    }
+  },
+  "final": {
+    "totalMax": "",
+    "totalObtained": "",
+    "grade": "",
+    "percentage": "",
+    "result": "Pass"
+  }
+}
