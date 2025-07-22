@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>View Student Result</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #eef2f5;
+      padding: 20px;
+    }
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #ccc;
+      max-width: 800px;
+      margin: auto;
+    }
+    input, button {
+      padding: 10px;
+      margin: 5px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    th, td {
+      border: 1px solid #999;
+      padding: 8px;
+      text-align: center;
+    }
+    #downloadBtn {
+      background: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <h2>Fetch Student Result</h2>
+  <input type="text" id="regNo" placeholder="Enter Reg No (e.g., 202225)" />
+  <input type="text" id="exam" placeholder="Enter Exam Name (e.g., FA1)" />
+  <button onclick="fetchResult()">Fetch Result</button>
+
+  <div id="resultContainer" style="display:none;">
+    <h3>Result Details</h3>
+    <p><strong>Name:</strong> <span id="name"></span></p>
+    <p><strong>Reg No:</strong> <span id="reg"></span></p>
+    <p><strong>Class:</strong> <span id="class"></span></p>
+    <p><strong>Examination:</strong> <span id="examName"></span></p>
+
+    <table id="marksTable">
+      <thead>
+        <tr>
+          <th>Subject</th>
+          <th>Obt</th>
+          <th>Max</th>
+          <th>Int Obt</th>
+          <th>Int Max</th>
+          <th>Total</th>
+          <th>Grade</th>
+          <th>Result</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <p><strong>Total Obtained:</strong> <span id="totalObt"></span></p>
+    <p><strong>Total Max:</strong> <span id="totalMax"></span></p>
+    <p><strong>Percentage:</strong> <span id="percentage"></span>%</p>
+    <p><strong>Grade:</strong> <span id="grade"></span></p>
+    <p><strong>Final Result:</strong> <span id="finalResult"></span></p>
+    <p><strong>Updated By:</strong> <span id="updatedBy"></span></p>
+
+    <button id="downloadBtn" onclick="downloadPDF()">Download Result as PDF</button>
+  </div>
+</div>
+
+<script>
+  async function fetchResult() {
+    const reg = document.getElementById('regNo').value.trim();
+    const exam = document.getElementById('exam').value.trim();
+    if (!reg || !exam) {
+      alert("Enter both Reg No and Exam Name");
+      return;
+    }
+
+    const url = `https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/data/results/${reg}_${exam}.json`;
+    
+    try {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error("Result not found");
+
+      const data = await response.json();
+
+      // Fill data
+      document.getElementById('name').innerText = data.name;
+      document.getElementById('reg').innerText = data.regno;
+      document.getElementById('class').innerText = data.class;
+      document.getElementById('examName').innerText = data.exam;
+      document.getElementById('updatedBy').innerText = data.updater;
+      document.getElementById('totalObt').innerText = data.final.totalObtained || "-";
+      document.getElementById('totalMax').innerText = data.final.totalMax || "-";
+      document.getElementById('percentage').innerText = data.final.percentage || "-";
+      document.getElementById('grade').innerText = data.final.grade || "-";
+      document.getElementById('finalResult').innerText = data.final.result;
+
+      // Fill table
+      const tbody = document.querySelector("#marksTable tbody");
+      tbody.innerHTML = "";
+      for (const [sub, marks] of Object.entries(data.subjects)) {
+        const row = `<tr>
+          <td>${sub}</td>
+          <td>${marks.obt}</td>
+          <td>${marks.max}</td>
+          <td>${marks.intObt}</td>
+          <td>${marks.intMax}</td>
+          <td>${marks.total}</td>
+          <td>${marks.grade}</td>
+          <td>${marks.result}</td>
+        </tr>`;
+        tbody.innerHTML += row;
+      }
+
+      document.getElementById('resultContainer').style.display = 'block';
+
+    } catch (err) {
+      alert("Result not found or error loading file.");
+      document.getElementById('resultContainer').style.display = 'none';
+    }
+  }
+
+  function downloadPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    let content = document.querySelector('.card').innerText;
+    doc.text(content, 10, 10);
+    doc.save("Student_Result.pdf");
+  }
+</script>
+
+</body>
+</html>
