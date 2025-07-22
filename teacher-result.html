@@ -181,7 +181,7 @@
       const content = btoa(JSON.stringify(results, null, 2));
       const filePath = `results/${branch}_${cls}_${students[0].exam}.json`;
 
-      const apiUrl = `https://api.github.com/repos/YOUR_USERNAME/YOUR_REPO/contents/${filePath}`;
+      const apiUrl = `https://api.github.com/repos/Echoesofthe21tcentury/sjvm-schools/contents/${filePath}`;
       const response = await fetch(apiUrl, {
         method: 'PUT',
         headers: {
