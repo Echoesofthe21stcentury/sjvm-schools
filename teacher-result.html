@@ -6,7 +6,7 @@
   <title>Teacher Result Upload</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', sans-serif;
       background: #e6f2ff;
       padding: 20px;
     }
@@ -14,9 +14,9 @@
       max-width: 900px;
       margin: auto;
       background: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
     label, select, input, button {
       display: block;
@@ -31,6 +31,7 @@
       color: white;
       font-weight: bold;
       cursor: pointer;
+      transition: 0.3s;
     }
     button:hover {
       background: #0056b3;
@@ -38,14 +39,15 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 15px;
+      margin-top: 20px;
     }
     th, td {
       border: 1px solid #ddd;
       padding: 8px;
+      text-align: center;
     }
     th {
-      background: #333;
+      background: #004080;
       color: white;
     }
     td input {
@@ -54,7 +56,7 @@
     }
     .status {
       font-weight: bold;
-      margin-top: 15px;
+      margin-top: 20px;
     }
   </style>
 </head>
@@ -63,12 +65,19 @@
     <h2>Upload Student Results</h2>
 
     <label for="branch">Select Branch</label>
-    <select id="branch"></select>
+    <select id="branch">
+      <option value="" disabled selected>Select Branch</option>
+    </select>
 
     <label for="class">Select Class</label>
-    <select id="class"></select>
+    <select id="class">
+      <option value="" disabled selected>Select Class</option>
+    </select>
 
-    <label for="pat">GitHub PAT (Personal Access Token)</label>
+    <label for="exam">Enter Exam Name</label>
+    <input type="text" id="exam" placeholder="e.g., FA1, FA2, SA1" />
+
+    <label for="pat">GitHub Personal Access Token (PAT)</label>
     <input type="password" id="pat" placeholder="Enter your GitHub PAT" />
 
     <div id="studentTableContainer"></div>
@@ -81,20 +90,25 @@
     let studentData = [];
 
     async function loadStudents() {
-      const res = await fetch('/data/student_register.json');
-      studentData = await res.json();
+      try {
+        const res = await fetch('/data/student_register.json');
+        studentData = await res.json();
 
-      const branches = [...new Set(studentData.map(s => s.branch))];
-      const branchSelect = document.getElementById('branch');
-      branches.forEach(branch => {
-        const opt = document.createElement('option');
-        opt.value = branch;
-        opt.textContent = branch;
-        branchSelect.appendChild(opt);
-      });
+        const branchSelect = document.getElementById('branch');
+        const branches = [...new Set(studentData.map(s => s.branch))];
+        branches.forEach(branch => {
+          const opt = document.createElement('option');
+          opt.value = branch;
+          opt.textContent = branch;
+          branchSelect.appendChild(opt);
+        });
 
-      branchSelect.addEventListener('change', updateClassOptions);
-      document.getElementById('class').addEventListener('change', showStudents);
+        branchSelect.addEventListener('change', updateClassOptions);
+        document.getElementById('class').addEventListener('change', showStudents);
+      } catch (err) {
+        document.getElementById('status').textContent = '❌ Failed to load student data.';
+        document.getElementById('status').style.color = 'red';
+      }
     }
 
     function updateClassOptions() {
@@ -103,7 +117,7 @@
       const classes = [...new Set(filtered.map(s => s.class))];
 
       const classSelect = document.getElementById('class');
-      classSelect.innerHTML = '';
+      classSelect.innerHTML = '<option value="" disabled selected>Select Class</option>';
       classes.forEach(cls => {
         const opt = document.createElement('option');
         opt.value = cls;
@@ -119,8 +133,8 @@
       const cls = document.getElementById('class').value;
 
       const students = studentData.filter(s => s.branch === branch && s.class === cls);
-      if (students.length === 0) {
-        document.getElementById('studentTableContainer').innerHTML = 'No students found.';
+      if (!branch || !cls || students.length === 0) {
+        document.getElementById('studentTableContainer').innerHTML = '<p>No students found.</p>';
         return;
       }
 
@@ -129,7 +143,6 @@
           <tr>
             <th>Reg No</th>
             <th>Name</th>
-            <th>Exam</th>
             <th>Kannada</th>
             <th>English</th>
             <th>Maths</th>
@@ -142,7 +155,6 @@
           <tr>
             <td>${s.regno}</td>
             <td>${s.name}</td>
-            <td>${s.exam}</td>
             <td><input type="number" id="kannada-${s.regno}" /></td>
             <td><input type="number" id="english-${s.regno}" /></td>
             <td><input type="number" id="maths-${s.regno}" /></td>
@@ -157,50 +169,61 @@
 
     async function uploadResults() {
       const pat = document.getElementById('pat').value;
-      if (!pat) return alert('Please enter GitHub PAT');
-
+      const exam = document.getElementById('exam').value.trim();
       const branch = document.getElementById('branch').value;
       const cls = document.getElementById('class').value;
+      const status = document.getElementById('status');
+
+      if (!pat || !branch || !cls || !exam) {
+        status.textContent = '⚠️ Please fill all required fields.';
+        status.style.color = 'orange';
+        return;
+      }
+
       const students = studentData.filter(s => s.branch === branch && s.class === cls);
 
       const results = students.map(s => ({
         regno: s.regno,
         name: s.name,
-        exam: s.exam,
+        exam: exam,
         class: s.class,
         branch: s.branch,
         marks: {
-          kannada: document.getElementById(`kannada-${s.regno}`).value,
-          english: document.getElementById(`english-${s.regno}`).value,
-          maths: document.getElementById(`maths-${s.regno}`).value,
-          science: document.getElementById(`science-${s.regno}`).value,
-          social: document.getElementById(`social-${s.regno}`).value
+          kannada: document.getElementById(`kannada-${s.regno}`).value || "0",
+          english: document.getElementById(`english-${s.regno}`).value || "0",
+          maths: document.getElementById(`maths-${s.regno}`).value || "0",
+          science: document.getElementById(`science-${s.regno}`).value || "0",
+          social: document.getElementById(`social-${s.regno}`).value || "0"
         }
       }));
 
       const content = btoa(JSON.stringify(results, null, 2));
-      const filePath = `results/${branch}_${cls}_${students[0].exam}.json`;
+      const filePath = `results/${branch}_${cls}_${exam}.json`;
 
-      const apiUrl = `https://api.github.com/repos/Echoesofthe21tcentury/sjvm-schools/contents/${filePath}`;
-      const response = await fetch(apiUrl, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `token ${pat}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          message: `Uploaded ${cls} ${branch} result`,
-          content: content
-        })
-      });
+      try {
+        const apiUrl = `https://api.github.com/repos/Echoesofthe21tcentury/sjvm-schools/contents/${filePath}`;
+        const response = await fetch(apiUrl, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `token ${pat}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            message: `Uploaded ${cls} ${branch} ${exam} result`,
+            content: content
+          })
+        });
 
-      const status = document.getElementById('status');
-      if (response.ok) {
-        status.textContent = '✅ Result uploaded successfully!';
-        status.style.color = 'green';
-      } else {
-        const data = await response.json();
-        status.textContent = `❌ Failed to upload: ${data.message}`;
+        if (response.ok) {
+          status.textContent = '✅ Results uploaded successfully!';
+          status.style.color = 'green';
+        } else {
+          const data = await response.json();
+          status.textContent = `❌ Upload failed: ${data.message}`;
+          status.style.color = 'red';
+        }
+      } catch (err) {
+        status.textContent = `❌ Error uploading: ${err.message}`;
         status.style.color = 'red';
       }
     }
