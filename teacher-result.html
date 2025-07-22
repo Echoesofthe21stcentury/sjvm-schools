@@ -1,225 +1,230 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Upload Student Result</title>
+  <meta charset="UTF-8">
+  <title>Upload Student Results</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #eef2f5;
+      background: #f1f4f7;
       padding: 20px;
+    }
+    select, input, button {
+      margin: 10px;
+      padding: 8px;
     }
     .section {
       margin-bottom: 20px;
+    }
+    .subject-box {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 10px;
       background: #fff;
-      padding: 15px;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    input, select, button {
-      display: block;
-      width: 100%;
-      padding: 8px;
-      margin-top: 5px;
-      margin-bottom: 15px;
-    }
-    label {
-      font-weight: bold;
     }
   </style>
 </head>
 <body>
-
-  <h2>Upload Student Result</h2>
+  <h2>Student Result Upload</h2>
 
   <div class="section">
-    <label for="branch">Select Branch:</label>
+    <label>Branch:</label>
     <select id="branch">
-      <option value="">--Select--</option>
+      <option value="">Select Branch</option>
       <option value="Bandikodigenahalli">Bandikodigenahalli</option>
       <option value="Atturu Layout">Atturu Layout</option>
     </select>
-
-    <label for="updater">Updater Name:</label>
-    <input type="text" id="updater" placeholder="Enter teacher/updater name">
-    
-    <label for="studentClass">Select Class:</label>
-    <select id="studentClass">
-      <option value="">--Select--</option>
-      <option value="Class 6">Class 6</option>
-      <option value="Class 7">Class 7</option>
-      <option value="Class 8">Class 8</option>
-      <!-- Add more -->
-    </select>
-
-    <label for="studentName">Select Student:</label>
-    <select id="studentName"></select>
-
-    <div id="autoDetails" style="display: none;">
-      <p><strong>Register No:</strong> <span id="regno"></span></p>
-      <p><strong>Exam:</strong> FA1</p>
-    </div>
   </div>
 
-  <div class="section" id="marksSection" style="display:none;">
-    <h3>Enter Subject-wise Marks</h3>
-    <div id="subjectInputs"></div>
-    
-    <label for="finalGrade">Final Grade:</label>
-    <input type="text" id="finalGrade" placeholder="Enter final grade">
+  <div class="section" id="step2" style="display:none;">
+    <label>Teacher/Updater Name:</label>
+    <input type="text" id="updaterName" />
+  </div>
 
-    <label for="finalPassFail">Final Result:</label>
-    <select id="finalPassFail">
-      <option value="Pass">Pass</option>
-      <option value="Fail">Fail</option>
+  <div class="section" id="step3" style="display:none;">
+    <label>Class:</label>
+    <select id="studentClass">
+      <option value="">Select Class</option>
+      <option>Class 1</option><option>Class 2</option><option>Class 3</option>
+      <option>Class 4</option><option>Class 5</option><option>Class 6</option>
+      <option>Class 7</option><option>Class 8</option><option>Class 9</option>
+      <option>Class 10</option>
     </select>
+  </div>
 
-    <button onclick="uploadToGitHub()">Upload Result</button>
+  <div class="section" id="step4" style="display:none;">
+    <label>Select Student:</label>
+    <select id="studentName"></select>
+  </div>
+
+  <div class="section" id="step5" style="display:none;">
+    <p><strong>Register No:</strong> <span id="regno"></span></p>
+    <p><strong>Exam:</strong> <span id="exam">FA1</span></p>
+  </div>
+
+  <div id="marksForm" style="display:none;">
+    <h3>Enter Subject Marks</h3>
+    <div id="subjects"></div>
+
+    <div>
+      <label>Total Max Marks:</label>
+      <input type="number" id="totalMax" />
+      <label>Total Obtained:</label>
+      <input type="number" id="totalObtained" />
+      <label>Final Grade:</label>
+      <input type="text" id="finalGrade" />
+      <label>Percentage:</label>
+      <input type="text" id="percentage" />
+      <label>Final Result:</label>
+      <select id="finalResult">
+        <option>Pass</option>
+        <option>Fail</option>
+      </select>
+    </div>
+
+    <button onclick="askPAT()">Upload Result</button>
   </div>
 
   <script>
     const studentListUrl = 'https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/data/student_register.json';
     let selectedStudent = null;
-    const subjects = ["Kannada", "English", "Hindi", "Maths", "Science", "Social"];
+    const subjects = ['Kannada', 'English', 'Hindi', 'Math', 'Science', 'Social'];
 
-    document.getElementById("studentClass").addEventListener("change", fetchStudents);
-    document.getElementById("branch").addEventListener("change", fetchStudents);
-    
-    async function fetchStudents() {
+    document.getElementById("branch").addEventListener("change", () => {
+      document.getElementById("step2").style.display = "block";
+    });
+
+    document.getElementById("updaterName").addEventListener("input", () => {
+      document.getElementById("step3").style.display = "block";
+    });
+
+    document.getElementById("studentClass").addEventListener("change", async () => {
+      const cls = document.getElementById("studentClass").value;
       const branch = document.getElementById("branch").value;
-      const studentClass = document.getElementById("studentClass").value;
-      const studentName = document.getElementById("studentName");
-      studentName.innerHTML = "";
+      const studentDropdown = document.getElementById("studentName");
 
-      if (!branch || !studentClass) return;
+      let res = await fetch(studentListUrl);
+      let data = await res.json();
 
-      const res = await fetch(studentListUrl);
-      const students = await res.json();
-      const filtered = students.filter(s => s.class === studentClass && s.branch === branch);
-
-      studentName.innerHTML = `<option value="">--Select--</option>`;
-      filtered.forEach(s => {
-        const option = document.createElement("option");
-        option.value = s.name;
-        option.text = s.name;
-        option.dataset.regno = s.regno;
-        studentName.appendChild(option);
+      let students = data.filter(st => st.class === cls && st.branch === branch);
+      studentDropdown.innerHTML = `<option value="">Select Student</option>`;
+      students.forEach(st => {
+        studentDropdown.innerHTML += `<option value="${st.regno}">${st.name}</option>`;
       });
 
-      studentName.onchange = () => {
-        selectedStudent = filtered.find(s => s.name === studentName.value);
-        if (selectedStudent) {
-          document.getElementById("regno").textContent = selectedStudent.regno;
-          document.getElementById("autoDetails").style.display = "block";
-          document.getElementById("marksSection").style.display = "block";
-          showSubjectInputs();
-        }
-      };
-    }
+      document.getElementById("step4").style.display = "block";
+    });
 
-    function showSubjectInputs() {
-      const container = document.getElementById("subjectInputs");
-      container.innerHTML = "";
-      subjects.forEach(subject => {
-        container.innerHTML += `
-          <h4>${subject}</h4>
-          <label>Marks Obtained</label>
-          <input type="number" id="${subject}-mo">
-          <label>Max Marks</label>
-          <input type="number" id="${subject}-mm">
-          <label>Internal Marks Obtained</label>
-          <input type="number" id="${subject}-im">
-          <label>Internal Max Marks</label>
-          <input type="number" id="${subject}-imm">
-          <label>Total Marks</label>
-          <input type="number" id="${subject}-total">
-          <label>Grade</label>
-          <input type="text" id="${subject}-grade">
-          <label>Result</label>
-          <select id="${subject}-passfail">
-            <option>Pass</option>
-            <option>Fail</option>
-          </select>
+    document.getElementById("studentName").addEventListener("change", async () => {
+      const reg = document.getElementById("studentName").value;
+      let res = await fetch(studentListUrl);
+      let data = await res.json();
+      selectedStudent = data.find(st => st.regno === reg);
+      if (selectedStudent) {
+        document.getElementById("regno").innerText = selectedStudent.regno;
+        document.getElementById("step5").style.display = "block";
+        showSubjects();
+      }
+    });
+
+    function showSubjects() {
+      const div = document.getElementById("subjects");
+      div.innerHTML = "";
+      subjects.forEach(sub => {
+        div.innerHTML += `
+          <div class="subject-box">
+            <h4>${sub}</h4>
+            <input placeholder="Marks Obtained" type="number" id="${sub}_obt" />
+            <input placeholder="Max Marks" type="number" id="${sub}_max" />
+            <input placeholder="Internal Marks Obtained" type="number" id="${sub}_intObt" />
+            <input placeholder="Internal Max Marks" type="number" id="${sub}_intMax" />
+            <input placeholder="Total" type="number" id="${sub}_total" />
+            <input placeholder="Grade" id="${sub}_grade" />
+            <select id="${sub}_result">
+              <option>Pass</option>
+              <option>Fail</option>
+            </select>
+          </div>
         `;
       });
+      document.getElementById("marksForm").style.display = "block";
     }
 
-    async function uploadToGitHub() {
-      const updater = document.getElementById("updater").value;
-      const finalGrade = document.getElementById("finalGrade").value;
-      const finalPassFail = document.getElementById("finalPassFail").value;
+    function askPAT() {
+      const pat = prompt("Enter your GitHub Personal Access Token:");
+      if (pat) {
+        uploadToGitHub(pat);
+      }
+    }
 
-      let resultEntry = {
+    async function uploadToGitHub(pat) {
+      const allData = {
+        updater: document.getElementById("updaterName").value,
+        branch: document.getElementById("branch").value,
+        class: selectedStudent.class,
         regno: selectedStudent.regno,
         name: selectedStudent.name,
-        class: selectedStudent.class,
-        branch: selectedStudent.branch,
         exam: "FA1",
-        updated_by: updater,
         subjects: {},
-        finalGrade,
-        finalResult: finalPassFail
+        final: {
+          totalMax: document.getElementById("totalMax").value,
+          totalObtained: document.getElementById("totalObtained").value,
+          grade: document.getElementById("finalGrade").value,
+          percentage: document.getElementById("percentage").value,
+          result: document.getElementById("finalResult").value
+        }
       };
 
-      subjects.forEach(subject => {
-        resultEntry.subjects[subject] = {
-          marks_obtained: +document.getElementById(`${subject}-mo`).value,
-          max_marks: +document.getElementById(`${subject}-mm`).value,
-          internal_obtained: +document.getElementById(`${subject}-im`).value,
-          internal_max: +document.getElementById(`${subject}-imm`).value,
-          total: +document.getElementById(`${subject}-total`).value,
-          grade: document.getElementById(`${subject}-grade`).value,
-          result: document.getElementById(`${subject}-passfail`).value
+      subjects.forEach(sub => {
+        allData.subjects[sub] = {
+          obt: document.getElementById(`${sub}_obt`).value,
+          max: document.getElementById(`${sub}_max`).value,
+          intObt: document.getElementById(`${sub}_intObt`).value,
+          intMax: document.getElementById(`${sub}_intMax`).value,
+          total: document.getElementById(`${sub}_total`).value,
+          grade: document.getElementById(`${sub}_grade`).value,
+          result: document.getElementById(`${sub}_result`).value
         };
       });
 
-      // Step 1: Get existing results
-      const dataFileUrl = 'https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/data/student_results.json';
-      let existingData = [];
+      const filename = `data/results/${selectedStudent.regno}_FA1.json`;
+      const apiURL = `https://api.github.com/repos/Echoesofthe21stcentury/sjvm-schools/contents/${filename}`;
+
+      const content = btoa(JSON.stringify(allData, null, 2));
+
+      let sha = null;
+
       try {
-        const res = await fetch(dataFileUrl);
-        existingData = await res.json();
+        const check = await fetch(apiURL, {
+          headers: {
+            Authorization: `token ${pat}`
+          }
+        });
+        const json = await check.json();
+        if (json.sha) sha = json.sha;
       } catch (e) {
-        existingData = [];
+        console.log("File does not exist. Will create new.");
       }
 
-      // Add or replace student result
-      const idx = existingData.findIndex(e => e.regno === selectedStudent.regno && e.exam === "FA1");
-      if (idx > -1) existingData[idx] = resultEntry;
-      else existingData.push(resultEntry);
-
-      const updatedContent = JSON.stringify(existingData, null, 2);
-      const filePath = 'data/student_results.json';
-      const token = 'YOUR_GITHUB_PAT'; // Replace with your GitHub PAT
-
-      // Step 2: Get file SHA
-      const shaRes = await fetch(`https://api.github.com/repos/Echoesofthe21stcentury/sjvm-schools/contents/${filePath}`, {
-        headers: { Authorization: `token ${token}` }
-      });
-      const shaJson = await shaRes.json();
-      const sha = shaJson.sha;
-
-      // Step 3: Push updated file
-      const pushRes = await fetch(`https://api.github.com/repos/Echoesofthe21stcentury/sjvm-schools/contents/${filePath}`, {
+      const res = await fetch(apiURL, {
         method: "PUT",
         headers: {
-          "Authorization": `token ${token}`,
+          Authorization: `token ${pat}`,
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          message: `Result updated for ${selectedStudent.name}`,
-          content: btoa(unescape(encodeURIComponent(updatedContent))),
+          message: `Result uploaded for ${selectedStudent.name}`,
+          content,
           sha
         })
       });
 
-      if (pushRes.ok) {
-        alert("Result uploaded successfully!");
+      if (res.ok) {
+        alert("✅ Result uploaded successfully!");
       } else {
-        alert("Error uploading result!");
+        alert("❌ Upload failed. Check PAT or permissions.");
       }
     }
   </script>
-
 </body>
 </html>
