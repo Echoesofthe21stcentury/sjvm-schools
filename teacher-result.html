@@ -3,489 +3,209 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Upload Student Result</title>
+  <title>Teacher Result Upload</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f0f4f8;
+      background: #e6f2ff;
       padding: 20px;
     }
     .container {
-      max-width: 700px;
+      max-width: 900px;
       margin: auto;
       background: #fff;
       padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-    .form-group {
-      margin-bottom: 15px;
-    }
-    label {
+    label, select, input, button {
       display: block;
-      font-weight: bold;
-      margin-bottom: 5px;
-    }
-    input, select, button {
       width: 100%;
+      margin-bottom: 15px;
       padding: 10px;
       border-radius: 6px;
       border: 1px solid #ccc;
     }
     button {
-      background-color: #007bff;
+      background: #007bff;
       color: white;
       font-weight: bold;
+      cursor: pointer;
     }
     button:hover {
-      background-color: #0056b3;
-    }
-    .subject-container {
-      margin-top: 20px;
-    }
-    .subject-box {
-      border: 2px solid #ccc;
-      padding: 10px;
-      border-radius: 10px;
-      margin-bottom: 10px;
-    }
-    .pass {
-      background: #d4edda;
-    }
-    .fail {
-      background: #f8d7da;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h2>Upload Student Result</h2>
-    <div class="form-group">
-      <label for="branch">Select Branch</label>
-      <select id="branch">
-        <option value="">-- Select Branch --</option>
-        <option value="Bandikodigenahalli">Bandikodigenahalli</option>
-        <option value="Atturu">Atturu</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label for="code">Enter Secret Code</label>
-      <input type="password" id="code" placeholder="Secret Code">
-    </div>
-    <div class="form-group">
-      <label for="updater">Updater Name</label>
-      <input type="text" id="updater" placeholder="Enter your name">
-    </div>
-    <div class="form-group">
-      <button onclick="verifyCode()">Next</button>
-    </div>
-
-    <div id="classSelection" style="display:none;">
-      <div class="form-group">
-        <label for="classSelect">Select Class</label>
-        <select id="classSelect" onchange="loadStudents()"></select>
-      </div>
-      <div class="form-group">
-        <label for="studentSelect">Select Student</label>
-        <select id="studentSelect" onchange="populateStudentDetails()"></select>
-      </div>
-      <div class="form-group">
-        <label for="regNo">Register Number</label>
-        <input type="text" id="regNo" disabled>
-      </div>
-      <div class="form-group">
-        <label for="exam">Examination</label>
-        <input type="text" id="exam" disabled>
-      </div>
-
-      <div class="subject-container" id="subjects"></div>
-
-      <div class="form-group">
-        <label for="totalMax">Total Max Marks</label>
-        <input type="number" id="totalMax">
-      </div>
-      <div class="form-group">
-        <label for="totalObtained">Total Marks Obtained</label>
-        <input type="number" id="totalObtained">
-      </div>
-      <div class="form-group">
-        <label for="grade">Final Grade</label>
-        <input type="text" id="grade">
-      </div>
-      <div class="form-group">
-        <label for="percentage">Percentage</label>
-        <input type="number" id="percentage">
-      </div>
-      <div class="form-group">
-        <label for="result">Final Result (Pass/Fail)</label>
-        <select id="result">
-          <option value="Pass">Pass</option>
-          <option value="Fail">Fail</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <button onclick="uploadResult()">Upload Result</button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    const secretCodes = {
-      'Bandikodigenahalli': '1103',
-      'Atturu': '0903'
-    };
-    const subjects = ["Kannada", "English", "Hindi", "Mathematics", "Science", "Social"];
-    let students = [];
-
-    function verifyCode() {
-      const branch = document.getElementById('branch').value;
-      const code = document.getElementById('code').value;
-
-      if (secretCodes[branch] === code) {
-        fetch('data/student_register.json')
-          .then(res => res.json())
-          .then(data => {
-            students = data.filter(s => s.branch === branch);
-            const classSelect = document.getElementById('classSelect');
-            const uniqueClasses = [...new Set(students.map(s => s.class))];
-            classSelect.innerHTML = '<option value="">Select Class</option>' + uniqueClasses.map(c => `<option value="${c}">${c}</option>`).join('');
-            document.getElementById('classSelection').style.display = 'block';
-          });
-      } else {
-        alert("❌ Incorrect secret code.");
-      }
-    }
-
-    function loadStudents() {
-      const selectedClass = document.getElementById('classSelect').value;
-      const filteredStudents = students.filter(s => s.class === selectedClass);
-      const studentSelect = document.getElementById('studentSelect');
-      studentSelect.innerHTML = '<option value="">Select Student</option>' + filteredStudents.map(s => `<option value="${s.regno}">${s.name}</option>`).join('');
-    }
-
-    function populateStudentDetails() {
-      const regno = document.getElementById('studentSelect').value;
-      const student = students.find(s => s.regno === regno);
-      if (student) {
-        document.getElementById('regNo').value = student.regno;
-        document.getElementById('exam').value = student.exam;
-        const subjectContainer = document.getElementById('subjects');
-        subjectContainer.innerHTML = '';
-        subjects.forEach(sub => {
-          subjectContainer.innerHTML += `
-            <div class="subject-box" id="${sub}-box">
-              <h4>${sub}</h4>
-              <label>Max Marks: <input type="number" id="${sub}-max"></label>
-              <label>Marks Obtained: <input type="number" id="${sub}-obt"></label>
-              <label>Internal Max: <input type="number" id="${sub}-imax"></label>
-              <label>Internal Obtained: <input type="number" id="${sub}-iobt"></label>
-              <label>Total Marks: <input type="number" id="${sub}-total"></label>
-              <label>Grade: <input type="text" id="${sub}-grade"></label>
-              <label>Result:
-                <select id="${sub}-result">
-                  <option value="Pass">Pass</option>
-                  <option value="Fail">Fail</option>
-                </select>
-              </label>
-            </div>`;
-        });
-      }
-    }
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Teacher Result Upload</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
-      margin: 0;
-      padding: 20px;
-    }
-    .container {
-      max-width: 800px;
-      margin: auto;
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-    h2 {
-      text-align: center;
-    }
-    .form-group {
-      margin-bottom: 15px;
-    }
-    label {
-      display: block;
-      margin-bottom: 5px;
-    }
-    input, select, button {
-      width: 100%;
-      padding: 8px;
-      box-sizing: border-box;
+      background: #0056b3;
     }
     table {
       width: 100%;
-      margin-top: 20px;
       border-collapse: collapse;
+      margin-top: 15px;
     }
     th, td {
       border: 1px solid #ddd;
       padding: 8px;
-      text-align: center;
     }
     th {
-      background-color: #333;
+      background: #333;
       color: white;
     }
-    .pass {
-      background-color: #c8f7c5;
+    td input {
+      width: 100%;
+      padding: 5px;
     }
-    .fail {
-      background-color: #f7c5c5;
-    }
-    .hidden {
-      display: none;
+    .status {
+      font-weight: bold;
+      margin-top: 15px;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>Upload Student Result</h2>
+    <h2>Upload Student Results</h2>
 
-    <div id="step1">
-      <div class="form-group">
-        <label for="branch">Select Branch</label>
-        <select id="branch">
-          <option value="">--Select Branch--</option>
-          <option value="Atturu">Atturu</option>
-          <option value="Bandikodigenahalli">Bandikodigenahalli</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="code">Enter Secret Code</label>
-        <input type="password" id="code" />
-      </div>
-      <button onclick="validateBranch()">Next</button>
-    </div>
+    <label for="branch">Select Branch</label>
+    <select id="branch"></select>
 
-    <div id="step2" class="hidden">
-      <div class="form-group">
-        <label for="updater">Updater Name</label>
-        <input type="text" id="updater" />
-      </div>
-      <div class="form-group">
-        <label for="class">Select Class</label>
-        <select id="class" onchange="loadStudents()"></select>
-      </div>
-      <div class="form-group">
-        <label for="student">Select Student</label>
-        <select id="student" onchange="loadStudentInfo()"></select>
-      </div>
-      <div class="form-group">
-        <label for="regno">Register Number</label>
-        <input type="text" id="regno" readonly />
-      </div>
-      <div class="form-group">
-        <label for="exam">Examination</label>
-        <input type="text" id="exam" readonly />
-      </div>
-      <div id="marks-entry">
-        <table>
-          <thead>
-            <tr>
-              <th>Subject</th>
-              <th>Max Marks</th>
-              <th>Obtained</th>
-              <th>Internal Max</th>
-              <th>Internal Obtained</th>
-              <th>Total</th>
-              <th>Grade</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody id="marks-body"></tbody>
-        </table>
-      </div>
+    <label for="class">Select Class</label>
+    <select id="class"></select>
 
-      <div id="final-section" class="hidden">
-        <div class="form-group">
-          <label for="total-max">Total Max Marks</label>
-          <input type="number" id="total-max" />
-        </div>
-        <div class="form-group">
-          <label for="total-obtained">Total Marks Obtained</label>
-          <input type="number" id="total-obtained" />
-        </div>
-        <div class="form-group">
-          <label for="percentage">Percentage</label>
-          <input type="number" id="percentage" step="0.01" />
-        </div>
-        <div class="form-group">
-          <label for="final-grade">Final Grade</label>
-          <input type="text" id="final-grade" />
-        </div>
-        <div class="form-group">
-          <label for="final-status">Final Result (Pass/Fail)</label>
-          <select id="final-status">
-            <option value="Pass">Pass</option>
-            <option value="Fail">Fail</option>
-          </select>
-        </div>
-        <button onclick="submitResult()">Upload Result</button>
-      </div>
+    <label for="pat">GitHub PAT (Personal Access Token)</label>
+    <input type="password" id="pat" placeholder="Enter your GitHub PAT" />
 
-      <div class="form-group">
-        <label for="pat">GitHub Personal Access Token</label>
-        <input type="password" id="pat" placeholder="Enter GitHub PAT" />
-      </div>
-      <div id="upload-status"></div>
-    </div>
+    <div id="studentTableContainer"></div>
+
+    <button onclick="uploadResults()">Upload Results</button>
+    <p class="status" id="status"></p>
   </div>
 
   <script>
-    const dataUrl = "data/student_register.json";
-    const subjects = ["Kannada", "English", "Hindi", "Mathematics", "Science", "Social"];
     let studentData = [];
-    let selectedBranch = "";
 
-    async function fetchStudentData() {
-      const res = await fetch(dataUrl);
+    async function loadStudents() {
+      const res = await fetch('/data/student_register.json');
       studentData = await res.json();
+
+      const branches = [...new Set(studentData.map(s => s.branch))];
+      const branchSelect = document.getElementById('branch');
+      branches.forEach(branch => {
+        const opt = document.createElement('option');
+        opt.value = branch;
+        opt.textContent = branch;
+        branchSelect.appendChild(opt);
+      });
+
+      branchSelect.addEventListener('change', updateClassOptions);
+      document.getElementById('class').addEventListener('change', showStudents);
     }
 
-    function validateBranch() {
-      const branch = document.getElementById("branch").value;
-      const code = document.getElementById("code").value;
-      if ((branch === "Atturu" && code === "0903") || (branch === "Bandikodigenahalli" && code === "1103")) {
-        selectedBranch = branch;
-        document.getElementById("step1").classList.add("hidden");
-        document.getElementById("step2").classList.remove("hidden");
-        loadClasses();
-      } else {
-        alert("Incorrect code for the selected branch");
-      }
-    }
+    function updateClassOptions() {
+      const branch = document.getElementById('branch').value;
+      const filtered = studentData.filter(s => s.branch === branch);
+      const classes = [...new Set(filtered.map(s => s.class))];
 
-    function loadClasses() {
-      const classSelect = document.getElementById("class");
-      classSelect.innerHTML = "<option value=''>--Select Class--</option>";
-      const classes = [...new Set(studentData.filter(s => s.branch === selectedBranch).map(s => s.class))];
+      const classSelect = document.getElementById('class');
+      classSelect.innerHTML = '';
       classes.forEach(cls => {
-        const opt = document.createElement("option");
+        const opt = document.createElement('option');
         opt.value = cls;
-        opt.innerText = cls;
+        opt.textContent = cls;
         classSelect.appendChild(opt);
       });
+
+      showStudents();
     }
 
-    function loadStudents() {
-      const classValue = document.getElementById("class").value;
-      const studentSelect = document.getElementById("student");
-      studentSelect.innerHTML = "<option value=''>--Select Student--</option>";
-      studentData.filter(s => s.class === classValue && s.branch === selectedBranch).forEach(s => {
-        const opt = document.createElement("option");
-        opt.value = s.regno;
-        opt.innerText = s.name;
-        studentSelect.appendChild(opt);
+    function showStudents() {
+      const branch = document.getElementById('branch').value;
+      const cls = document.getElementById('class').value;
+
+      const students = studentData.filter(s => s.branch === branch && s.class === cls);
+      if (students.length === 0) {
+        document.getElementById('studentTableContainer').innerHTML = 'No students found.';
+        return;
+      }
+
+      let html = `
+        <table>
+          <tr>
+            <th>Reg No</th>
+            <th>Name</th>
+            <th>Exam</th>
+            <th>Kannada</th>
+            <th>English</th>
+            <th>Maths</th>
+            <th>Science</th>
+            <th>Social</th>
+          </tr>
+      `;
+      students.forEach(s => {
+        html += `
+          <tr>
+            <td>${s.regno}</td>
+            <td>${s.name}</td>
+            <td>${s.exam}</td>
+            <td><input type="number" id="kannada-${s.regno}" /></td>
+            <td><input type="number" id="english-${s.regno}" /></td>
+            <td><input type="number" id="maths-${s.regno}" /></td>
+            <td><input type="number" id="science-${s.regno}" /></td>
+            <td><input type="number" id="social-${s.regno}" /></td>
+          </tr>
+        `;
       });
+      html += '</table>';
+      document.getElementById('studentTableContainer').innerHTML = html;
     }
 
-    function loadStudentInfo() {
-      const regno = document.getElementById("student").value;
-      const student = studentData.find(s => s.regno === regno);
-      document.getElementById("regno").value = student.regno;
-      document.getElementById("exam").value = student.exam;
+    async function uploadResults() {
+      const pat = document.getElementById('pat').value;
+      if (!pat) return alert('Please enter GitHub PAT');
 
-      const tbody = document.getElementById("marks-body");
-      tbody.innerHTML = "";
-      subjects.forEach(sub => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${sub}</td>
-          <td><input type='number' class='max' /></td>
-          <td><input type='number' class='obt' /></td>
-          <td><input type='number' class='int-max' /></td>
-          <td><input type='number' class='int-obt' /></td>
-          <td><input type='number' class='total' /></td>
-          <td><input type='text' class='grade' /></td>
-          <td>
-            <select class='status'>
-              <option value='Pass'>Pass</option>
-              <option value='Fail'>Fail</option>
-            </select>
-          </td>`;
-        tbody.appendChild(row);
-      });
-      document.getElementById("final-section").classList.remove("hidden");
-    }
+      const branch = document.getElementById('branch').value;
+      const cls = document.getElementById('class').value;
+      const students = studentData.filter(s => s.branch === branch && s.class === cls);
 
-    async function submitResult() {
-      const result = {
-        regno: document.getElementById("regno").value,
-        name: document.getElementById("student").selectedOptions[0].innerText,
-        class: document.getElementById("class").value,
-        branch: selectedBranch,
-        exam: document.getElementById("exam").value,
-        updater: document.getElementById("updater").value,
-        subjects: [],
-        totalMax: document.getElementById("total-max").value,
-        totalObtained: document.getElementById("total-obtained").value,
-        percentage: document.getElementById("percentage").value,
-        finalGrade: document.getElementById("final-grade").value,
-        finalResult: document.getElementById("final-status").value,
-        date: new Date().toLocaleString()
-      };
+      const results = students.map(s => ({
+        regno: s.regno,
+        name: s.name,
+        exam: s.exam,
+        class: s.class,
+        branch: s.branch,
+        marks: {
+          kannada: document.getElementById(`kannada-${s.regno}`).value,
+          english: document.getElementById(`english-${s.regno}`).value,
+          maths: document.getElementById(`maths-${s.regno}`).value,
+          science: document.getElementById(`science-${s.regno}`).value,
+          social: document.getElementById(`social-${s.regno}`).value
+        }
+      }));
 
-      document.querySelectorAll("#marks-body tr").forEach((row, i) => {
-        const subject = subjects[i];
-        result.subjects.push({
-          subject,
-          max: row.querySelector(".max").value,
-          obtained: row.querySelector(".obt").value,
-          intMax: row.querySelector(".int-max").value,
-          intObt: row.querySelector(".int-obt").value,
-          total: row.querySelector(".total").value,
-          grade: row.querySelector(".grade").value,
-          status: row.querySelector(".status").value
-        });
-      });
+      const content = btoa(JSON.stringify(results, null, 2));
+      const filePath = `results/${branch}_${cls}_${students[0].exam}.json`;
 
-      const pat = document.getElementById("pat").value;
-      const filename = `data/results/${result.regno}_${result.exam}.json`;
-      const content = btoa(unescape(encodeURIComponent(JSON.stringify(result, null, 2))));
-
-      const res = await fetch(`https://api.github.com/repos/YOUR_USERNAME/YOUR_REPO/contents/${filename}`, {
-        method: "PUT",
+      const apiUrl = `https://api.github.com/repos/YOUR_USERNAME/YOUR_REPO/contents/${filePath}`;
+      const response = await fetch(apiUrl, {
+        method: 'PUT',
         headers: {
-          "Authorization": `Bearer ${pat}`,
-          "Content-Type": "application/json"
+          'Authorization': `token ${pat}`,
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          message: `Upload result for ${result.regno}`,
+          message: `Uploaded ${cls} ${branch} result`,
           content: content
         })
       });
 
-      if (res.ok) {
-        document.getElementById("upload-status").innerText = "✅ Result uploaded successfully!";
+      const status = document.getElementById('status');
+      if (response.ok) {
+        status.textContent = '✅ Result uploaded successfully!';
+        status.style.color = 'green';
       } else {
-        document.getElementById("upload-status").innerText = "❌ Failed to upload result.";
+        const data = await response.json();
+        status.textContent = `❌ Failed to upload: ${data.message}`;
+        status.style.color = 'red';
       }
     }
 
-    fetchStudentData();
-  </script>
-</body>
-</html>
-
-
-    }
+    loadStudents();
   </script>
 </body>
 </html>
