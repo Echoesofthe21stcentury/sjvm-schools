@@ -2,17 +2,22 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Upload Student Result</title>
+  <title>FA1 Result Uploader</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #e9f0f8;
+      background: #f0f2f5;
       padding: 20px;
+      max-width: 800px;
+      margin: auto;
     }
     .step {
-      display: none;
       margin-bottom: 20px;
+      padding: 15px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #ccc;
+      display: none;
     }
     .step.active {
       display: block;
@@ -21,210 +26,198 @@
       display: block;
       margin-top: 10px;
     }
-    input, select {
-      width: 100%;
+    input, select, button {
       padding: 8px;
-    }
-    button {
-      margin-top: 15px;
-      padding: 10px 15px;
-      background: #007BFF;
-      color: #fff;
-      border: none;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #0056b3;
-    }
-    .subject-box {
-      margin-bottom: 20px;
-      border: 1px solid #ccc;
-      padding: 15px;
-      background: #fff;
+      margin-top: 5px;
+      width: 100%;
+      box-sizing: border-box;
     }
   </style>
 </head>
 <body>
+  <h2>📄 Upload FA1 Result</h2>
 
-<h2>Upload Student Result</h2>
+  <div id="step1" class="step active">
+    <label>Select Branch Magic Code:</label>
+    <select id="branchCode">
+      <option value="">-- Select Branch --</option>
+      <option value="Bandikodigenahalli">Bandikodigenahalli</option>
+      <option value="Atturu Layout">Atturu Layout</option>
+    </select>
+    <button onclick="nextStep(1)">Next</button>
+  </div>
 
-<div id="step-1" class="step active">
-  <label>Select Branch</label>
-  <select id="branch-select">
-    <option value="">-- Choose Branch --</option>
-    <option value="Bandikodigenahalli">Bandikodigenahalli</option>
-    <option value="Atturu Layout">Atturu Layout</option>
-  </select>
-  <button onclick="nextStep(2)">Next</button>
-</div>
+  <div id="step2" class="step">
+    <label>Updater Name:</label>
+    <input type="text" id="updater" />
+    <button onclick="nextStep(2)">Next</button>
+  </div>
 
-<div id="step-2" class="step">
-  <label>Enter Updater Name</label>
-  <input type="text" id="updater-name" placeholder="Updater Name" />
-  <button onclick="nextStep(3)">Next</button>
-</div>
+  <div id="step3" class="step">
+    <label>Select Class:</label>
+    <select id="classSelect">
+      <option value="">-- Select Class --</option>
+      <option>Class 8</option>
+      <option>Class 9</option>
+      <option>Class 10</option>
+    </select>
 
-<div id="step-3" class="step">
-  <label>Select Class</label>
-  <select id="class-select"></select>
+    <label>Select Student:</label>
+    <select id="studentSelect" onchange="fillStudentDetails()">
+      <option value="">-- Select Student --</option>
+    </select>
+    <button onclick="nextStep(3)">Next</button>
+  </div>
 
-  <label>Select Student</label>
-  <select id="student-select" onchange="fillStudentDetails()"></select>
+  <div id="step4" class="step">
+    <label>Register Number:</label>
+    <input type="text" id="regno" readonly />
 
-  <div id="student-info" style="margin-top: 10px;"></div>
+    <label>Exam:</label>
+    <input type="text" id="exam" readonly />
+    <button onclick="nextStep(4)">Next</button>
+  </div>
 
-  <button onclick="nextStep(4)">Next</button>
-</div>
+  <div id="step5" class="step">
+    <h3>📚 Enter Marks</h3>
+    <div id="subjects"></div>
+    <button onclick="nextStep(5)">Next</button>
+  </div>
 
-<div id="step-4" class="step">
-  <h3>Enter Subject Marks</h3>
-  <div id="subjects"></div>
-  <button onclick="nextStep(5)">Next</button>
-</div>
+  <div id="step6" class="step">
+    <h3>📊 Final Totals</h3>
+    <label>Total Marks Obtained:</label>
+    <input type="number" id="totalObtained" />
 
-<div id="step-5" class="step">
-  <h3>Overall Summary</h3>
-  <label>Total Marks Obtained</label>
-  <input type="number" id="total-obtained" readonly />
+    <label>Total Max Marks:</label>
+    <input type="number" id="totalMax" />
 
-  <label>Total Max Marks</label>
-  <input type="number" id="total-max" readonly />
+    <label>Grade:</label>
+    <input type="text" id="grade" />
 
-  <label>Final Grade</label>
-  <input type="text" id="final-grade" readonly />
+    <label>Result:</label>
+    <select id="result">
+      <option>Pass</option>
+      <option>Fail</option>
+    </select>
 
-  <label>Pass/Fail</label>
-  <input type="text" id="pass-fail" readonly />
+    <label>Percentage:</label>
+    <input type="text" id="percentage" />
 
-  <label>Percentage</label>
-  <input type="text" id="percentage" readonly />
+    <button onclick="uploadResult()">Upload</button>
+  </div>
 
-  <button onclick="submitResult()">Upload Result</button>
-</div>
+  <div id="output" class="step active"></div>
 
-<script>
-let studentData = [];
-let selectedStudent = null;
-const subjects = ["Kannada", "English", "Hindi", "Math", "Science", "Social"];
+  <script>
+    const subjectNames = ["Kannada", "English", "Hindi", "Math", "Science", "Social"];
+    let studentData = [];
 
-async function loadStudents() {
-  try {
-    const res = await fetch('data/student_register.json');
-    studentData = await res.json();
-    const classSelect = document.getElementById('class-select');
-    const studentSelect = document.getElementById('student-select');
-    const uniqueClasses = [...new Set(studentData.map(s => s.class))];
-    classSelect.innerHTML = '<option value="">-- Select Class --</option>';
-    uniqueClasses.forEach(cls => {
-      const opt = document.createElement('option');
-      opt.value = cls;
-      opt.textContent = cls;
-      classSelect.appendChild(opt);
-    });
+    async function loadStudentData() {
+      try {
+        const res = await fetch('data/student_register.json');
+        studentData = await res.json();
+      } catch (err) {
+        document.getElementById("output").textContent = "❌ Failed to load student data.";
+      }
+    }
 
-    classSelect.addEventListener("change", () => {
-      const selectedClass = classSelect.value;
-      const filtered = studentData.filter(s => s.class === selectedClass);
+    function nextStep(current) {
+      const currentStep = document.getElementById("step" + current);
+      const nextStep = document.getElementById("step" + (current + 1));
+      if (currentStep && nextStep) {
+        currentStep.classList.remove("active");
+        nextStep.classList.add("active");
+
+        if (current === 1) loadStudentList(); // after branch
+        if (current === 4) generateSubjectBoxes(); // before subject entry
+      }
+    }
+
+    function loadStudentList() {
+      const selectedBranch = document.getElementById("branchCode").value;
+      const selectedClass = document.getElementById("classSelect");
+      const studentSelect = document.getElementById("studentSelect");
       studentSelect.innerHTML = '<option value="">-- Select Student --</option>';
-      filtered.forEach(s => {
-        const opt = document.createElement('option');
-        opt.value = s.name;
-        opt.textContent = s.name;
-        studentSelect.appendChild(opt);
+
+      selectedClass.onchange = function () {
+        studentSelect.innerHTML = '<option value="">-- Select Student --</option>';
+        studentData
+          .filter(s => s.branch === selectedBranch && s.class === selectedClass.value)
+          .forEach(s => {
+            const opt = document.createElement("option");
+            opt.value = s.regno;
+            opt.textContent = s.name;
+            studentSelect.appendChild(opt);
+          });
+      };
+    }
+
+    function fillStudentDetails() {
+      const reg = document.getElementById("studentSelect").value;
+      const student = studentData.find(s => s.regno === reg);
+      if (student) {
+        document.getElementById("regno").value = student.regno;
+        document.getElementById("exam").value = student.exam;
+      }
+    }
+
+    function generateSubjectBoxes() {
+      const div = document.getElementById("subjects");
+      div.innerHTML = "";
+      subjectNames.forEach(sub => {
+        const html = `
+          <div style="margin-top:10px;">
+            <strong>${sub}</strong><br/>
+            <label>Marks Obtained:</label><input type="number" id="${sub}_obtain">
+            <label>Max Marks:</label><input type="number" id="${sub}_max">
+            <label>Internal Marks:</label><input type="number" id="${sub}_internal_obtain">
+            <label>Internal Max:</label><input type="number" id="${sub}_internal_max">
+            <label>Total:</label><input type="number" id="${sub}_total">
+            <label>Grade:</label><input type="text" id="${sub}_grade">
+            <label>Result:</label>
+            <select id="${sub}_result">
+              <option>Pass</option>
+              <option>Fail</option>
+            </select>
+          </div>`;
+        div.innerHTML += html;
       });
-    });
-  } catch (e) {
-    alert("❌ Failed to load student data.");
-    console.error(e);
-  }
-}
+    }
 
-function fillStudentDetails() {
-  const studentName = document.getElementById('student-select').value;
-  selectedStudent = studentData.find(s => s.name === studentName);
-  if (selectedStudent) {
-    document.getElementById('student-info').innerHTML = `
-      <strong>Reg No:</strong> ${selectedStudent.regno}<br>
-      <strong>Exam:</strong> ${selectedStudent.exam}
-    `;
-  }
-}
+    function uploadResult() {
+      const resultObj = {
+        branch: document.getElementById("branchCode").value,
+        updater: document.getElementById("updater").value,
+        regno: document.getElementById("regno").value,
+        exam: document.getElementById("exam").value,
+        subjects: {},
+        total: {
+          obtained: document.getElementById("totalObtained").value,
+          max: document.getElementById("totalMax").value,
+          grade: document.getElementById("grade").value,
+          result: document.getElementById("result").value,
+          percentage: document.getElementById("percentage").value
+        }
+      };
 
-function nextStep(stepNum) {
-  document.querySelectorAll('.step').forEach(div => div.classList.remove('active'));
-  document.getElementById('step-' + stepNum).classList.add('active');
+      subjectNames.forEach(sub => {
+        resultObj.subjects[sub] = {
+          obtained: document.getElementById(`${sub}_obtain`).value,
+          max: document.getElementById(`${sub}_max`).value,
+          internal_obtained: document.getElementById(`${sub}_internal_obtain`).value,
+          internal_max: document.getElementById(`${sub}_internal_max`).value,
+          total: document.getElementById(`${sub}_total`).value,
+          grade: document.getElementById(`${sub}_grade`).value,
+          result: document.getElementById(`${sub}_result`).value
+        };
+      });
 
-  if (stepNum === 3) loadStudents();
-  if (stepNum === 4) showSubjectsForm();
-  if (stepNum === 5) calculateSummary();
-}
+      document.getElementById("output").innerHTML =
+        `<h3>✅ Result Ready to Upload:</h3><pre>${JSON.stringify(resultObj, null, 2)}</pre>`;
+    }
 
-function showSubjectsForm() {
-  const container = document.getElementById('subjects');
-  container.innerHTML = '';
-  subjects.forEach(sub => {
-    const box = document.createElement('div');
-    box.className = 'subject-box';
-    box.innerHTML = `
-      <strong>${sub}</strong>
-      <label>Marks Obtained</label><input type="number" class="obtained" data-sub="${sub}" />
-      <label>Max Marks</label><input type="number" class="max" data-sub="${sub}" />
-      <label>Internal Marks Obtained</label><input type="number" class="internal-obtained" data-sub="${sub}" />
-      <label>Internal Max Marks</label><input type="number" class="internal-max" data-sub="${sub}" />
-    `;
-    container.appendChild(box);
-  });
-}
-
-function calculateSummary() {
-  const obtainedInputs = document.querySelectorAll('.obtained');
-  const maxInputs = document.querySelectorAll('.max');
-  let totalObtained = 0, totalMax = 0;
-  for (let i = 0; i < obtainedInputs.length; i++) {
-    totalObtained += parseInt(obtainedInputs[i].value || 0);
-    totalMax += parseInt(maxInputs[i].value || 0);
-  }
-  const percentage = ((totalObtained / totalMax) * 100).toFixed(2);
-  const grade = percentage >= 90 ? 'A+' :
-                percentage >= 80 ? 'A' :
-                percentage >= 70 ? 'B' :
-                percentage >= 60 ? 'C' :
-                percentage >= 50 ? 'D' : 'F';
-  const result = grade === 'F' ? 'Fail' : 'Pass';
-
-  document.getElementById('total-obtained').value = totalObtained;
-  document.getElementById('total-max').value = totalMax;
-  document.getElementById('final-grade').value = grade;
-  document.getElementById('pass-fail').value = result;
-  document.getElementById('percentage').value = percentage + '%';
-}
-
-function submitResult() {
-  const updater = document.getElementById('updater-name').value;
-  const result = {
-    updater,
-    student: selectedStudent,
-    subjects: {},
-    totalObtained: document.getElementById('total-obtained').value,
-    totalMax: document.getElementById('total-max').value,
-    finalGrade: document.getElementById('final-grade').value,
-    percentage: document.getElementById('percentage').value,
-    passOrFail: document.getElementById('pass-fail').value
-  };
-
-  subjects.forEach(sub => {
-    result.subjects[sub] = {
-      marksObtained: document.querySelector(`.obtained[data-sub="${sub}"]`).value,
-      maxMarks: document.querySelector(`.max[data-sub="${sub}"]`).value,
-      internalObtained: document.querySelector(`.internal-obtained[data-sub="${sub}"]`).value,
-      internalMax: document.querySelector(`.internal-max[data-sub="${sub}"]`).value
-    };
-  });
-
-  // 🔄 Replace this with GitHub API POST if needed
-  console.log("Uploading Result:", result);
-  alert("✅ Result Uploaded (simulated). Check console for details.");
-}
-</script>
+    loadStudentData(); // initial load
+  </script>
 </body>
 </html>
