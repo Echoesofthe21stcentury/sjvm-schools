@@ -2,35 +2,480 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SJVM School</title>
-  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500&family=Roboto&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body class="dark-theme">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
 
-  <header class="site-header">
-    <div class="container">
-      <h1 class="logo">SJVM School</h1>
-      <nav>
-        <a href="index.html" class="nav-btn active">Home</a>
-        <a href="about.html" class="nav-btn">About Us</a>
-        <a href="shop.html" class="nav-btn">Shop</a>
-        <a href="login.html" class="nav-btn">Login</a>
-        <a href="admission.html" class="nav-btn highlight-btn">Apply for Admission</a>
-      </nav>
+    body {
+      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+      color: white;
+    }
+
+    header {
+      background-color: #1b2d3b;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      flex-wrap: wrap;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      font-size: 1.6rem;
+      font-weight: bold;
+    }
+
+    .logo img {
+      height: 40px;
+      margin-right: 10px;
+    }
+
+    .hamburger {
+      display: none;
+      font-size: 24px;
+      background: none;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    .nav-links {
+      list-style: none;
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    .nav-links li a {
+      color: #eee;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .nav-links li a:hover {
+      color: #ffd700;
+    }
+
+    .login-btn {
+      background-color: #ffd700;
+      color: black;
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 4rem 2rem;
+    }
+
+    .hero img {
+      width: 100%;
+      max-height: 400px;
+      object-fit: cover;
+      border-radius: 12px;
+      margin-bottom: 1rem;
+    }
+
+    .hero h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      color: #ccc;
+    }
+
+    section {
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .gallery-images {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .gallery-images img {
+      width: 250px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.4);
+    }
+
+    .btn {
+      display: inline-block;
+      margin-top: 1rem;
+      background-color: #ffd700;
+      color: black;
+      padding: 0.6rem 1.2rem;
+      border-radius: 5px;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .branches, .founder {
+      background-color: rgba(255,255,255,0.05);
+      border-radius: 10px;
+      margin: 1rem auto;
+      max-width: 600px;
+      padding: 1.5rem;
+    }
+
+    .founder p {
+      font-style: italic;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1rem;
+      background-color: #111;
+      color: #bbb;
+    }
+
+    /* --- Floating AI Assistant Button --- */
+    .ai-float {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #ffd700;
+      color: black;
+      border: none;
+      border-radius: 30px;
+      padding: 0.7rem 1.2rem;
+      font-size: 1rem;
+      cursor: pointer;
+      font-weight: bold;
+      z-index: 1000;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    }
+
+    .chat-box {
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      width: 300px;
+      max-height: 400px;
+      background-color: #1b2d3b;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.5);
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      z-index: 1000;
+    }
+
+    .chat-header {
+      background-color: #ffd700;
+      color: black;
+      padding: 0.7rem 1rem;
+      font-weight: bold;
+    }
+
+    .chat-body {
+      flex: 1;
+      padding: 1rem;
+      overflow-y: auto;
+      font-size: 0.9rem;
+      color: #eee;
+    }
+
+    .chat-question {
+      margin: 0.3rem 0;
+    }
+
+    .chat-question button {
+      width: 100%;
+      background-color: #334a5e;
+      border: none;
+      color: white;
+      padding: 0.5rem;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 500;
+      text-align: left;
+    }
+
+    .chat-question button:hover {
+      background-color: #44697c;
+    }
+
+    /* 📢 Notice Bar */
+    .notice-bar {
+      background-color: #ffd700;
+      color: #000;
+      text-align: center;
+      padding: 0.8rem;
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+
+    .notice-bar a {
+      color: #003366;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    /* 🎉 Confetti */
+    .blast {
+      position: fixed;
+      width: 100vw;
+      height: 100vh;
+      background: url('https://cdn.pixabay.com/photo/2021/03/03/11/14/confetti-6067525_1280.png') center/cover no-repeat;
+      z-index: 3000;
+      pointer-events: none;
+      animation: blastEffect 1s ease-out forwards;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @keyframes blastEffect {
+      0% { opacity: 1; transform: scale(1); }
+      100% { opacity: 0; transform: scale(2); }
+    }
+
+    /* 🪪 Popup Invitation */
+    .popup-container {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+    }
+
+    .popup {
+      background: white;
+      color: #222;
+      border-radius: 12px;
+      padding: 20px;
+      width: 90%;
+      max-width: 500px;
+      position: relative;
+      box-shadow: 0 0 20px rgba(0,0,0,0.4);
+      animation: fadeIn 0.4s ease;
+    }
+
+    .popup img.invite-img {
+      width: 100%;
+      border-radius: 10px;
+      margin-bottom: 15px;
+    }
+
+    .popup h2 {
+      margin-top: 0;
+      font-size: 1.5rem;
+    }
+
+    .popup ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .popup ul li {
+      margin: 8px 0;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 8px;
+      right: 12px;
+      background: #ff3333;
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      font-weight: bold;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.8); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+        flex-direction: column;
+        width: 100%;
+        background-color: #1b2d3b;
+        padding: 1rem 0;
+      }
+
+      .nav-links.show {
+        display: flex;
+      }
+
+      .hamburger {
+        display: block;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 📢 NOTICE BAR -->
+  <div class="notice-bar">
+    📢 School Sports Day! You're invited – <a href="#" id="openNotice">Click for more details</a>
+  </div>
+
+  <!-- 🎉 Confetti Blast -->
+  <div id="blast" class="blast hidden"></div>
+
+  <!-- 🪪 POPUP INVITATION -->
+  <div class="popup-container" id="popup">
+    <div class="popup">
+      <button class="close-btn" id="closeNotice">✖</button>
+      <img src="images/invitation.jpg" alt="Invitation" class="invite-img" />
+      <h2>Annual Sports Day Invitation</h2>
+      <p>We warmly invite you to our Annual Sports Day celebration. Join us in a day filled with talent, teamwork, and triumph.</p>
+      <ul>
+        <li><strong>📍 Location:</strong> SJVM School Ground, Bandikodigenahalli</li>
+        <li><strong>⏰ Time:</strong> 9:00 AM – 4:00 PM, August 15, 2025</li>
+        <li><strong>📞 Contact:</strong> +91-9876543210</li>
+        <li><strong>✉️ Email:</strong> info@sjvm.org</li>
+      </ul>
     </div>
+  </div>
+
+  <header>
+    <div class="logo">
+      <img src="images/logo.png" alt="SJVM Logo" />
+      SJVM
+    </div>
+    <button class="hamburger" onclick="toggleMenu()">☰</button>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#">Home</a></li>
+      <li><a href="#admission">Admission</a></li>
+      <li><a href="#gallery">Gallery</a></li>
+      <li><a href="#branches">Branches</a></li>
+      <li><a href="#founder">Founder</a></li>
+      <li><a href="#contact">Contact</a></li>
+      <li><a href="login.html" class="login-btn">Login</a></li>
+    </ul>
   </header>
 
-  <main class="hero-section">
-    <h2>Welcome to SJVM</h2>
-    <p>Empowering education through values, technology, and creativity.</p>
-    <a href="admission.html" class="cta-btn">Apply Now</a>
-  </main>
+  <section class="hero">
+    <img src="images/school-building.jpg" alt="SJVM Building" />
+    <h1>Welcome to SJVM School</h1>
+    <p>Empowering students through excellence in education</p>
+  </section>
 
-  <footer class="site-footer">
-    <p>&copy; 2025 SJVM School. All rights reserved.</p>
+  <section id="admission" class="admission">
+    <h2>Admission Open</h2>
+    <p>Enroll now for the academic year 2025–26.</p>
+    <a href="#" class="btn">Apply Now</a>
+  </section>
+
+  <section id="gallery" class="gallery">
+    <h2>Gallery</h2>
+    <div class="gallery-images">
+      <img src="images/1.jpg" alt="School 1">
+      <img src="images/2.jpg" alt="School 2">
+      <img src="images/3.jpg" alt="School 3">
+    </div>
+  </section>
+
+  <section id="branches" class="branches">
+    <h2>Our Branches</h2>
+    <p>SJVM Bandikodigenahalli</p>
+    <p>SJVM Atturu Layout</p>
+  </section>
+
+  <section id="founder" class="founder">
+    <h2>Message from the Founder</h2>
+    <p>"At SJVM, we strive to build strong values and academic excellence among our students. Join us in shaping the future!"</p>
+    <p><strong>– Shri XYZ, Founder</strong></p>
+  </section>
+
+  <section id="contact" class="contact">
+    <h2>Contact Us</h2>
+    <p>Email: info@sjvm.org | Phone: +91-9876543210</p>
+  </section>
+
+  <footer>
+    <p>© 2025 SJVM School. All rights reserved.</p>
   </footer>
 
+  <!-- AI Assistant Button -->
+  <button class="ai-float" onclick="toggleChat()">I'm here to help 👋</button>
+
+  <div class="chat-box" id="chatBox">
+    <div class="chat-header">SJVM Assistant 🤖</div>
+    <div class="chat-body" id="chatBody">
+      <p>Hello! Choose a question below:</p>
+      <div class="chat-question"><button onclick="showAnswer('admission')">📝 What are the admission procedures?</button></div>
+      <div class="chat-question"><button onclick="showAnswer('timings')">⏰ What are the school timings?</button></div>
+      <div class="chat-question"><button onclick="showAnswer('facilities')">🏫 What facilities are available?</button></div>
+    </div>
+  </div>
+
+  <script>
+    function toggleChat() {
+      const chat = document.getElementById('chatBox');
+      chat.style.display = chat.style.display === 'flex' ? 'none' : 'flex';
+      chat.style.flexDirection = 'column';
+    }
+
+    function showAnswer(type) {
+      const body = document.getElementById('chatBody');
+      const answers = {
+        admission: "Admissions for the AY 2025-26 are open! You can apply online or visit our campus.",
+        timings: "School starts at 8:30 AM and ends at 3:40 PM. Office hours are 9:00 AM to 5:00 PM.",
+        facilities: "We offer a library, smart classrooms, science & computer labs, sports grounds, and transport."
+      };
+
+      const userMsg = document.createElement('p');
+      userMsg.innerHTML = `<strong>You:</strong> ${document.querySelector(`[onclick="showAnswer('${type}')"]`).innerText}`;
+      body.appendChild(userMsg);
+
+      const botMsg = document.createElement('p');
+      botMsg.innerHTML = `<strong>SJVM Assistant:</strong> ${answers[type]}`;
+      body.appendChild(botMsg);
+
+      body.scrollTop = body.scrollHeight;
+    }
+
+    function toggleMenu() {
+      document.getElementById("navLinks").classList.toggle("show");
+    }
+
+    // 🚀 Notice Pop-up and Blast
+    const openNotice = document.getElementById("openNotice");
+    const closeNotice = document.getElementById("closeNotice");
+    const popup = document.getElementById("popup");
+    const blast = document.getElementById("blast");
+
+    openNotice.addEventListener("click", function(e) {
+      e.preventDefault();
+      blast.classList.remove("hidden");
+      setTimeout(() => blast.classList.add("hidden"), 1000);
+      setTimeout(() => popup.style.display = "flex", 300);
+    });
+
+    closeNotice.addEventListener("click", function() {
+      popup.style.display = "none";
+    });
+  </script>
 </body>
 </html>
