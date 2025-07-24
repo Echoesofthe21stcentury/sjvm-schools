@@ -346,7 +346,7 @@
   <div class="popup-container" id="popup">
     <div class="popup">
       <button class="close-btn" id="closeNotice">✖</button>
-      <img src="assests/Sports Day.jpg" alt="Invitation" class="invite-img" />
+      <img src="assests/sports day (2).jpg" alt="Invitation" class="invite-img" />
       <h2>Annual Sports Day Invitation</h2>
       <p>We warmly invite you to our Annual Sports Day celebration. Join us in a day filled with talent, teamwork, and triumph.</p>
       <ul>
@@ -355,6 +355,18 @@
         <li><strong>📞 Contact:</strong> +91-7090233666</li>
         <li><strong>✉️ Email:</strong> info@sjvmschools.org</li>
       </ul>
+        <h3>🎟 Download Your Invitation</h3>
+      <label for="title">Title:</label>
+      <select id="title">
+        <option>Mr</option>
+        <option>Mrs</option>
+        <option>Shri</option>
+        <option>Smt</option>
+      </select>
+      <input type="text" id="guestName" placeholder="Enter your name" style="margin-left:5px;padding:5px;">
+      <button onclick="downloadInvitation()" style="margin-top:10px;">Download Invitation</button>
+    </div>
+  </div>
     </div>
   </div>
 
@@ -429,7 +441,7 @@
       <div class="chat-question"><button onclick="showAnswer('facilities')">🏫 What facilities are available?</button></div>
     </div>
   </div>
-
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script>
     function toggleChat() {
       const chat = document.getElementById('chatBox');
@@ -476,6 +488,38 @@
     closeNotice.addEventListener("click", function() {
       popup.style.display = "none";
     });
-  </script>
+    // 📥 Invitation Download
+  function downloadInvitation() {
+    const title = document.getElementById("title").value;
+    const name = document.getElementById("guestName").value.trim();
+    if (!name) return alert("Please enter your name.");
+
+    const canvasContainer = document.createElement("div");
+    canvasContainer.style.position = "absolute";
+    canvasContainer.style.left = "-9999px";
+    canvasContainer.innerHTML = `
+      <div style="width:500px;height:700px;padding:20px;background:white;color:black;text-align:center;font-family:'Poppins',sans-serif;border:2px solid #000;">
+        <img src="SJVM logo empowering mankind without background.png" style="height:60px;margin-bottom:10px;" alt="Logo" />
+        <h2>Annual Sports Day Invitation</h2>
+        <p>We are delighted to invite</p>
+        <h1>${title}. ${name}</h1>
+        <p>to join us on <strong>26 July 2025</strong><br>at SJVM School Ground</p>
+        <p>Come cheer, celebrate, and enjoy the spirit of sports!</p>
+        <p style="margin-top:50px;font-size:0.9rem;">With warm regards,<br><strong>Principal & Management, SJVM</strong></p>
+        <p style="margin-top:30px;font-size:0.8rem;">Contact: +91 7090233666 | info@sjvmschools.org</p>
+      </div>
+    `;
+    document.body.appendChild(canvasContainer);
+
+    html2canvas(canvasContainer.firstElementChild).then(canvas => {
+      const link = document.createElement('a');
+      link.download = `${title}_${name.replace(/\s+/g, '_')}_Invitation.png`;
+      link.href = canvas.toDataURL();
+      link.click();
+      document.body.removeChild(canvasContainer);
+    });
+  }
+</script>
 </body>
 </html>
+
