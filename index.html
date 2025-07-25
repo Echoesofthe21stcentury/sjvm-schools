@@ -78,13 +78,52 @@
       text-align: center;
       padding: 4rem 2rem;
     }
+    
+    .two-column-layout {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      padding: 1rem;
+      background-color: #111;
+      color: white;
+  }
 
-    .hero img {
-      max-width: 100%;
-      height: auto;
-      border: none;
-      display: block;
-      box-shadow: none;
+  .column {
+    flex: 1 1 50%;
+    box-sizing: border-box;
+    padding: 1rem;
+  }
+
+  .hero img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border: none;
+  }
+
+  .live-stream h2 {
+    color: #ffd700;
+    margin-bottom: 0.5rem;
+  }
+
+  .video-wrapper {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    height: 0;
+    overflow: hidden;
+  }
+
+  .video-wrapper iframe {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Responsive (stack on small screens) */
+  @media (max-width: 768px) {
+    .two-column-layout {
+      flex-direction: column;
     }
 
     .hero h1 {
@@ -387,24 +426,25 @@
     </ul>
 </header>
 
-<!-- 🖼️ Hero Section -->
-<section class="hero">
-  <img src="assests/ezgif-30d1746ab4c192.gif" alt="Animated Background" />
-</section>
+<!-- 🌟 Two-Column Layout -->
+<section class="two-column-layout">
+  <!-- 🖼️ Hero Section -->
+  <div class="column hero">
+    <img src="assets/ezgif-30d1746ab4c192.gif" alt="Animated Background" />
+  </div>
 
-<!-- 🎥 Live Broadcast Section -->
-<section id="live" class="live-stream" style="padding: 2rem; text-align: center;">
-  <h2 style="color: #ffd700;">🎥 Live Broadcast</h2>
-  <p>Watch our events live here!</p>
-  <div style="margin-top: 1rem;">
-    <iframe 
-      width="100%" 
-      height="500" 
-      src="https://www.youtube.com/embed/qv45KVLVpC0?autoplay=1" 
-      frameborder="0" 
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-      allowfullscreen>
-    </iframe>
+  <!-- 🎥 Live Broadcast Section -->
+  <div class="column live-stream">
+    <h2>🎥 Live Broadcast</h2>
+    <p>Watch our events live here!</p>
+    <div class="video-wrapper">
+      <iframe 
+        src="https://www.youtube.com/embed/qv45KVLVpC0?autoplay=1" 
+        frameborder="0" 
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+        allowfullscreen>
+      </iframe>
+    </div>
   </div>
 </section>
 
