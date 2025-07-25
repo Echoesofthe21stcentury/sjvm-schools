@@ -1,398 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- ✅ Correct favicon setup -->
+  <link rel="icon" href="assets/favicon.png" type="image/png" />
+
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SJVM School</title>
+
+  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet" />
+
+  <!-- ✨ Your CSS styles here -->
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Poppins', sans-serif;
-    }
-
-    body {
-      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
-      color: white;
-    }
-
-    header {
-      background-color: #1b2d3b;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1rem 2rem;
-      flex-wrap: wrap;
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      font-size: 1.6rem;
-      font-weight: bold;
-    }
-
-    .logo img {
-      height: 40px;
-      margin-right: 10px;
-    }
-
-    .hamburger {
-      display: none;
-      font-size: 24px;
-      background: none;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-
-    .nav-links {
-      list-style: none;
-      display: flex;
-      gap: 1.5rem;
-    }
-
-    .nav-links li a {
-      color: #eee;
-      text-decoration: none;
-      font-weight: 500;
-    }
-
-    .nav-links li a:hover {
-      color: #ffd700;
-    }
-
-    .login-btn {
-      background-color: #ffd700;
-      color: black;
-      padding: 0.5rem 1rem;
-      border: none;
-      border-radius: 5px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .hero {
-      text-align: center;
-      padding: 4rem 2rem;
-    }
-    
-    .two-column-layout {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-      padding: 1rem;
-      background-color: #111;
-      color: white;
-  }
-
-  .column {
-    flex: 1 1 50%;
-    box-sizing: border-box;
-    padding: 1rem;
-  }
-
-  .hero img {
-    width: 100%;
-    height: auto;
-    display: block;
-    border: none;
-  }
-
-  .live-stream h2 {
-    color: #ffd700;
-    margin-bottom: 0.5rem;
-  }
-
-  .video-wrapper {
-    position: relative;
-    padding-bottom: 56.25%; /* 16:9 aspect ratio */
-    height: 0;
-    overflow: hidden;
-  }
-
-  .video-wrapper iframe {
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%;
-    height: 100%;
-  }
-
-  /* Responsive (stack on small screens) */
-  @media (max-width: 768px) {
-    .two-column-layout {
-      flex-direction: column;
-    }
-
-    .hero h1 {
-      font-size: 2.5rem;
-      margin-bottom: 1rem;
-    }
-
-    .hero p {
-      font-size: 1.2rem;
-      color: #ccc;
-    }
-
-    section {
-      padding: 2rem;
-      text-align: center;
-    }
-
-    .gallery-images {
-      display: flex;
-      justify-content: center;
-      gap: 1rem;
-      margin-top: 1rem;
-      flex-wrap: wrap;
-    }
-
-    .gallery-images img {
-      width: 250px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.4);
-    }
-
-    .btn {
-      display: inline-block;
-      margin-top: 1rem;
-      background-color: #ffd700;
-      color: black;
-      padding: 0.6rem 1.2rem;
-      border-radius: 5px;
-      font-weight: bold;
-      text-decoration: none;
-    }
-
-    .branches, .founder {
-      background-color: rgba(255,255,255,0.05);
-      border-radius: 10px;
-      margin: 1rem auto;
-      max-width: 600px;
-      padding: 1.5rem;
-    }
-
-    .founder p {
-      font-style: italic;
-    }
-
-    footer {
-      text-align: center;
-      padding: 1rem;
-      background-color: #111;
-      color: #bbb;
-    }
-
-    /* --- Floating AI Assistant Button --- */
-    .ai-float {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background-color: #ffd700;
-      color: black;
-      border: none;
-      border-radius: 30px;
-      padding: 0.7rem 1.2rem;
-      font-size: 1rem;
-      cursor: pointer;
-      font-weight: bold;
-      z-index: 1000;
-      box-shadow: 0 0 10px rgba(0,0,0,0.3);
-    }
-
-    .chat-box {
-      position: fixed;
-      bottom: 80px;
-      right: 20px;
-      width: 300px;
-      max-height: 400px;
-      background-color: #1b2d3b;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.5);
-      display: none;
-      flex-direction: column;
-      overflow: hidden;
-      z-index: 1000;
-    }
-
-    .chat-header {
-      background-color: #ffd700;
-      color: black;
-      padding: 0.7rem 1rem;
-      font-weight: bold;
-    }
-
-    .chat-body {
-      flex: 1;
-      padding: 1rem;
-      overflow-y: auto;
-      font-size: 0.9rem;
-      color: #eee;
-    }
-
-    .chat-question {
-      margin: 0.3rem 0;
-    }
-
-    .chat-question button {
-      width: 100%;
-      background-color: #334a5e;
-      border: none;
-      color: white;
-      padding: 0.5rem;
-      border-radius: 5px;
-      cursor: pointer;
-      font-weight: 500;
-      text-align: left;
-    }
-
-    .chat-question button:hover {
-      background-color: #44697c;
-    }
-
-    /* 📢 Notice Bar */
-    .notice-bar {
-      background-color: #ffd700;
-      color: #000;
-      text-align: center;
-      padding: 0.8rem;
-      font-weight: bold;
-      font-size: 1.1rem;
-    }
-
-    .notice-bar a {
-      color: #003366;
-      text-decoration: underline;
-      cursor: pointer;
-    }
-
-    /* 🎉 Confetti */
-    .blast {
-      position: fixed;
-      width: 100vw;
-      height: 100vh;
-      background: url('https://cdn.pixabay.com/photo/2021/03/03/11/14/confetti-6067525_1280.png') center/cover no-repeat;
-      z-index: 3000;
-      pointer-events: none;
-      animation: blastEffect 1s ease-out forwards;
-    }
-
-    .hidden {
-      display: none;
-    }
-
-    @keyframes blastEffect {
-      0% { opacity: 1; transform: scale(1); }
-      100% { opacity: 0; transform: scale(2); }
-    }
-
-    /* 🪪 Popup Invitation */
-    .popup-container {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.7);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 2000;
-    }
-
-    .popup {
-      background: white;
-      color: #222;
-      border-radius: 12px;
-      padding: 20px;
-      width: 90%;
-      max-width: 500px;
-      position: relative;
-      box-shadow: 0 0 20px rgba(0,0,0,0.4);
-      animation: fadeIn 0.4s ease;
-    }
-
-    .popup img.invite-img {
-      width: 100%;
-      border-radius: 10px;
-      margin-bottom: 15px;
-    }
-
-    .popup h2 {
-      margin-top: 0;
-      font-size: 1.5rem;
-    }
-
-    .popup ul {
-      list-style: none;
-      padding: 0;
-    }
-
-    .popup ul li {
-      margin: 8px 0;
-    }
-
-    .close-btn {
-      position: absolute;
-      top: 8px;
-      right: 12px;
-      background: #ff3333;
-      color: #fff;
-      border: none;
-      border-radius: 50%;
-      width: 28px;
-      height: 28px;
-      font-weight: bold;
-      font-size: 16px;
-      cursor: pointer;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.8); }
-      to { opacity: 1; transform: scale(1); }
-    }
-
-    @media (max-width: 768px) {
-      .nav-links {
-        display: none;
-        flex-direction: column;
-        width: 100%;
-        background-color: #1b2d3b;
-        padding: 1rem 0;
-      }
-
-      .nav-links.show {
-        display: flex;
-      }
-
-      .hamburger {
-        display: block;
-      }
-    }
+    /* ✅ Add your full CSS here — no changes needed */
+    /* ... [your existing CSS] ... */
   </style>
 </head>
 <body>
 
-  <!-- 📢 NOTICE BAR -->
-  <div class="notice-bar">
-    📢 TODAY ANNUAL SPORTSS MEET! 
-  </div>
+<!-- 📢 NOTICE BAR -->
+<div class="notice-bar">
+  📢 TODAY ANNUAL SPORTS MEET!
+</div>
 
-  <header>
-    <div class="logo">
-      <img src="SJVM logo empowering mankind without background.png" alt="SJVM Logo" />
-      SJVM
-    </div>
-    <button class="hamburger" onclick="toggleMenu()">☰</button>
-    <ul class="nav-links" id="navLinks">
-      <li><a href="#">Home</a></li>
-      <li><a href="#admission">Admission</a></li>
-      <li><a href="#gallery">Gallery</a></li>
-      <li><a href="#branches">Branches</a></li>
-      <li><a href="#founder">Founder</a></li>
-      <li><a href="#contact">Contact</a></li>
-      <li><a href="login.html" class="login-btn">Login</a></li>
-    </ul>
+<header>
+  <div class="logo">
+    <img src="SJVM logo empowering mankind without background.png" alt="SJVM Logo" />
+    SJVM
+  </div>
+  <button class="hamburger" onclick="toggleMenu()">☰</button>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#">Home</a></li>
+    <li><a href="#admission">Admission</a></li>
+    <li><a href="#gallery">Gallery</a></li>
+    <li><a href="#branches">Branches</a></li>
+    <li><a href="#founder">Founder</a></li>
+    <li><a href="#contact">Contact</a></li>
+    <li><a href="login.html" class="login-btn">Login</a></li>
+  </ul>
 </header>
 
 <!-- 🌟 Two-Column Layout -->
@@ -416,7 +62,6 @@
     </div>
   </div>
 </section>
-
 <!-- 🏫 Welcome Section -->
 <section class="welcome" style="padding: 2rem; text-align: center;">
   <h1>Welcome to SJVM School</h1>
