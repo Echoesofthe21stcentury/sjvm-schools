@@ -229,28 +229,49 @@
       background-color: #44697c;
     }
 
-    /* Responsive Nav */
-    @media (max-width: 768px) {
-      .two-column-layout {
-        flex-direction: column;
-      }
+    /* ✅ Responsive Styles */
+img {
+  max-width: 100%;
+  height: auto;
+}
 
-      .nav-links {
-        display: none;
-        flex-direction: column;
-        width: 100%;
-        background-color: #1b2d3b;
-        padding: 1rem 0;
-      }
+section {
+  max-width: 900px;
+  margin: auto;
+  padding: 2rem;
+  text-align: center;
+}
 
-      .nav-links.show {
-        display: flex;
-      }
+@media (max-width: 768px) {
+  body, section {
+    padding: 1rem;
+  }
 
-      .hamburger {
-        display: block;
-      }
-    }
+  .two-column-layout {
+    flex-direction: column;
+  }
+
+  .nav-links {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    background-color: #1b2d3b;
+    padding: 1rem 0;
+  }
+
+  .nav-links.show {
+    display: flex;
+  }
+
+  .hamburger {
+    display: block;
+  }
+
+  .gallery-images img {
+    width: 100%;
+    max-width: 300px;
+  }
+}
   </style>
 </head>
 
@@ -377,7 +398,7 @@
     body.appendChild(userMsg);
 
     const botMsg = document.createElement('p');
-    botMsg.innerHTML = `<strong>SJVM Assistant:</strong> ${answers[type]}`;
+    botMsg.innerHTML = `<strong>Assistant Chaithan:</strong> ${answers[type]}`;
     body.appendChild(botMsg);
 
     body.scrollTop = body.scrollHeight;
