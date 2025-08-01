@@ -132,16 +132,21 @@
       box-shadow: 0 0 10px rgba(0,0,0,0.4);
     }
 
-    .btn {
-      display: inline-block;
-      margin-top: 1rem;
-      background-color: #ffd700;
-      color: black;
-      padding: 0.6rem 1.2rem;
-      border-radius: 5px;
-      font-weight: bold;
-      text-decoration: none;
-    }
+  .btn {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.6rem 1.2rem;
+    border-radius: 5px;
+    font-weight: bold;
+    text-decoration: none;
+    background: none;
+    color: #eee;
+    border: 1px solid transparent;
+  }
+
+  .btn:hover {
+    color: #ffd700;
+  }
 
     .branches, .founder {
       background-color: rgba(255,255,255,0.05);
@@ -160,73 +165,6 @@
       padding: 1rem;
       background-color: #111;
       color: #bbb;
-    }
-
-    /* Chatbot Button */
-    .ai-float {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background-color: #ffd700;
-      color: black;
-      border: none;
-      border-radius: 30px;
-      padding: 0.7rem 1.2rem;
-      font-size: 1rem;
-      cursor: pointer;
-      font-weight: bold;
-      z-index: 1000;
-      box-shadow: 0 0 10px rgba(0,0,0,0.3);
-    }
-
-    .chat-box {
-      position: fixed;
-      bottom: 80px;
-      right: 20px;
-      width: 300px;
-      max-height: 400px;
-      background-color: #1b2d3b;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.5);
-      display: none;
-      flex-direction: column;
-      overflow: hidden;
-      z-index: 1000;
-    }
-
-    .chat-header {
-      background-color: #ffd700;
-      color: black;
-      padding: 0.7rem 1rem;
-      font-weight: bold;
-    }
-
-    .chat-body {
-      flex: 1;
-      padding: 1rem;
-      overflow-y: auto;
-      font-size: 0.9rem;
-      color: #eee;
-    }
-
-    .chat-question {
-      margin: 0.3rem 0;
-    }
-
-    .chat-question button {
-      width: 100%;
-      background-color: #334a5e;
-      border: none;
-      color: white;
-      padding: 0.5rem;
-      border-radius: 5px;
-      cursor: pointer;
-      font-weight: 500;
-      text-align: left;
-    }
-
-    .chat-question button:hover {
-      background-color: #44697c;
     }
 
     /* ✅ Responsive Styles */
@@ -286,11 +224,11 @@ section {
   <button class="hamburger" onclick="toggleMenu()">☰</button>
   <ul class="nav-links" id="navLinks">
     <li><a href="#">Home</a></li>
-    <a href="/admissions" class="btn">Admissions</a>
-    <a href="/gallery" class="btn">gallery</a>
-    <a href="/branches" class="btn">branches</a>
-    <a href="/founders" class="btn">Founder</a>
-    <a href="/contact" class="btn">Contact</a>
+    <li><a href="/admissions">Admissions</a></li>
+    <li><a href="/gallery">Gallery</a></li>
+    <li><a href="/branches">Branches</a></li>
+    <li><a href="/founders">Founder</a></li>
+    <li><a href="/contact">Contact</a></li>
     <li><a href="login.html" class="login-btn">Login</a></li>
   </ul>
 </header>
@@ -323,21 +261,21 @@ section {
 <section id="admission">
   <h2>Admission Open</h2>
   <p>Enroll now for the academic year 2025–26.</p>
-  <a href="#" class="btn">Apply Now</a>
+  <a href="admissions.html" class="btn">Apply Now</a>
 </section>
 
 <!-- 🖼️ Gallery -->
 <section id="gallery">
   <h2>Gallery</h2>
   <div class="gallery-images">
-    <img src="assets/1.jpg" alt="School 1" />
-    <img src="assets/2.jpg" alt="School 2" />
-    <img src="assets/3.jpg" alt="School 3" />
+    <a href="gallery.html"><img src="assets/1.jpg" alt="School 1" /></a>
+    <a href="gallery.html"><img src="assets/2.jpg" alt="School 2" /></a>
+    <a href="gallery.html"><img src="assets/3.jpg" alt="School 3" /></a>
   </div>
 </section>
 
 <!-- 🏫 Branches -->
-<section id="branches" class="branches">
+<section id="branches" class="branches" onclick="window.location.href='branches.html'" style="cursor: pointer;">
   <h2>Our Branches</h2>
   <p>SJVM Bandikodigenahalli</p>
   <p>SJVM Atturu Layout</p>
@@ -351,7 +289,7 @@ section {
 </section>
 
 <!-- 📞 Contact -->
-<section id="contact">
+<section id="contact" onclick="window.location.href='contact.html'" style="cursor: pointer;">
   <h2>Contact Us</h2>
   <p>Email: info@sjvmschools.org | Phone: +91-7090233666</p>
 </section>
@@ -361,48 +299,171 @@ section {
   <p>© 2025 SJVM School. All rights reserved.</p>
 </footer>
 
-<!-- 🤖 AI Assistant -->
+<!-- 👇 Floating Button -->
 <button class="ai-float" onclick="toggleChat()">I'm here to help 👋</button>
+
+<!-- 👇 Chat Box -->
 <div class="chat-box" id="chatBox">
-  <div class="chat-header">SJVM Assistant 🤖</div>
+  <div class="chat-header">AI Chaithan 🤖</div>
   <div class="chat-body" id="chatBody">
-    <p>Hello! Choose a question below:</p>
-    <div class="chat-question"><button onclick="showAnswer('admission')">📝 What are the admission procedures?</button></div>
-    <div class="chat-question"><button onclick="showAnswer('timings')">⏰ What are the school timings?</button></div>
-    <div class="chat-question"><button onclick="showAnswer('facilities')">🏫 What facilities are available?</button></div>
+    <p>Hello! Choose a question or type your own:</p>
+    
+    <div class="chat-question">
+      <button onclick="showAnswer('admission')">📝 What are the admission procedures?</button>
+    </div>
+    <div class="chat-question">
+      <button onclick="showAnswer('timings')">⏰ What are the school timings?</button>
+    </div>
+    <div class="chat-question">
+      <button onclick="showAnswer('facilities')">🏫 What facilities are available?</button>
+    </div>
+  </div>
+
+  <div class="chat-input">
+    <input type="text" id="userInput" placeholder="Type your question..." onkeydown="handleKey(event)">
+    <button onclick="submitUserQuestion()">Send</button>
   </div>
 </div>
 
+<!-- ✅ Styling -->
+<style>
+.ai-float {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #0056b3;
+  color: white;
+  border: none;
+  border-radius: 30px;
+  padding: 12px 18px;
+  font-size: 16px;
+  cursor: pointer;
+  z-index: 1000;
+}
+
+.chat-box {
+  display: none;
+  flex-direction: column;
+  width: 300px;
+  height: 400px;
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  background: #f9f9f9;
+  border: 2px solid #0056b3;
+  border-radius: 10px;
+  box-shadow: 0 0 10px #aaa;
+  z-index: 999;
+}
+
+.chat-header {
+  background: #0056b3;
+  color: white;
+  padding: 10px;
+  font-weight: bold;
+  text-align: center;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.chat-body {
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
+  font-size: 14px;
+}
+
+.chat-question {
+  margin-bottom: 10px;
+}
+
+.chat-question button {
+  background: #e0e0e0;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.chat-input {
+  display: flex;
+  padding: 8px;
+  border-top: 1px solid #ccc;
+}
+
+.chat-input input {
+  flex: 1;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.chat-input button {
+  margin-left: 5px;
+  padding: 5px 10px;
+  background: #0056b3;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+</style>
+
 <!-- ✅ JavaScript -->
 <script>
-  function toggleMenu() {
-    document.getElementById("navLinks").classList.toggle("show");
+function toggleChat() {
+  const chat = document.getElementById('chatBox');
+  chat.style.display = chat.style.display === 'flex' ? 'none' : 'flex';
+}
+
+function showAnswer(type) {
+  const answers = {
+    admission: "Admissions for AY 2025-26 are open. Apply online or visit the campus.",
+    timings: "School starts at 8:30 AM and ends at 3:40 PM. Office: 9:00 AM to 5:00 PM.",
+    facilities: "Facilities include smart classrooms, labs, library, sports ground, and transport."
+  };
+
+  appendChat("You", document.querySelector(`[onclick="showAnswer('${type}')"]`).innerText);
+  appendChat("SJVM Assistant", answers[type]);
+}
+
+function handleKey(event) {
+  if (event.key === "Enter") {
+    submitUserQuestion();
   }
+}
 
-  function toggleChat() {
-    const chat = document.getElementById('chatBox');
-    chat.style.display = chat.style.display === 'flex' ? 'none' : 'flex';
-    chat.style.flexDirection = 'column';
-  }
+function submitUserQuestion() {
+  const input = document.getElementById("userInput");
+  const question = input.value.trim();
+  if (question === "") return;
 
-  function showAnswer(type) {
-    const body = document.getElementById('chatBody');
-    const answers = {
-      admission: "Admissions for the AY 2025-26 are open! You can apply online or visit our campus.",
-      timings: "School starts at 8:30 AM and ends at 3:40 PM. Office hours are 9:00 AM to 5:00 PM.",
-      facilities: "We offer a library, smart classrooms, science & computer labs, sports grounds, and transport."
-    };
+  appendChat("You", question);
+  respondToUser(question.toLowerCase());
+  input.value = "";
+}
 
-    const userMsg = document.createElement('p');
-    userMsg.innerHTML = `<strong>You:</strong> ${document.querySelector(`[onclick="showAnswer('${type}')"]`).innerText}`;
-    body.appendChild(userMsg);
+function appendChat(sender, message) {
+  const body = document.getElementById("chatBody");
+  const msg = document.createElement("p");
+  msg.innerHTML = `<strong>${sender}:</strong> ${message}`;
+  body.appendChild(msg);
+  body.scrollTop = body.scrollHeight;
+}
 
-    const botMsg = document.createElement('p');
-    botMsg.innerHTML = `<strong>Assistant Chaithan:</strong> ${answers[type]}`;
-    body.appendChild(botMsg);
+function respondToUser(msg) {
+  let reply = "Sorry, I didn't understand. Please contact the office for more info.";
 
-    body.scrollTop = body.scrollHeight;
-  }
+  if (msg.includes("fee")) reply = "Our fee structure varies by class. Please contact the office.";
+  else if (msg.includes("uniform")) reply = "Uniform details are available at the school office.";
+  else if (msg.includes("principal")) reply = "Our Principal is available between 10:30 AM to 1 PM.";
+  else if (msg.includes("holiday")) reply = "School holidays follow the academic calendar.";
+  else if (msg.includes("transport")) reply = "Transport covers nearby villages and towns.";
+  else if (msg.includes("lunch")) reply = "Students should carry lunch. We promote healthy eating.";
+  else if (msg.includes("exam")) reply = "Exams are held every term. Schedules are on the notice board.";
+
+  setTimeout(() => appendChat("SJVM Assistant", reply), 500);
+}
 </script>
 
 </body>
