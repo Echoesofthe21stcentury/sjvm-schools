@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Apply for Admission</title>
+  <link rel="stylesheet" href="style.css"/>
+  <script>
+    function sendMail() {
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const phone = document.getElementById('phone').value;
+      const grade = document.getElementById('grade').value;
+      const message = document.getElementById('message').value;
+
+      const subject = `Admission Request - ${name}`;
+      const body = `Student Name: ${name}%0D%0AEmail: ${email}%0D%0APhone: ${phone}%0D%0AGrade: ${grade}%0D%0AMessage: ${message}`;
+
+      const mailLink = `mailto:YOUR_EMAIL@example.com?subject=${subject}&body=${body}`;
+      window.location.href = mailLink;
+
+      setTimeout(() => {
+        window.location.href = 'thankyou.html'; // Redirect to thank-you page after 5 seconds
+      }, 5000);
+
+      return false; // Prevent form reload
+    }
+  </script>
+</head>
+<body class="dark-theme">
+
+  <header>
+    <h1>Apply for Admission</h1>
+    <nav>
+      <a href="index.html" class="btn">Home</a>
+      <a href="about.html" class="btn">About Us</a>
+      <a href="shop.html" class="btn">Shop</a>
+      <a href="login.html" class="btn">Login</a>
+    </nav>
+  </header>
+
+  <main>
+    <form onsubmit="return sendMail()" class="form-box">
+      <label for="name">Full Name:</label>
+      <input type="text" id="name" required />
+
+      <label for="email">Email Address:</label>
+      <input type="email" id="email" required />
+
+      <label for="phone">Phone Number:</label>
+      <input type="tel" id="phone" required />
+
+      <label for="grade">Applying for Grade:</label>
+      <input type="text" id="grade" required />
+
+      <label for="message">Message:</label>
+      <textarea id="message" rows="4"></textarea>
+
+      <button type="submit" class="btn">Submit Application</button>
+    </form>
+  </main>
+
+  <footer>
+    <p>© 2025 SJVM School. All rights reserved.</p>
+  </footer>
+
+</body>
+</html>
