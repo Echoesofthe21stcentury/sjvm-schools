@@ -543,7 +543,7 @@ function showSummary(){
 }
 
 function submitEmail(){
-  emailjs.send('service_c1uox1o','Contact Us', chatData)
+  emailjs.send('service_c1uox1o','template_xeol1mo', chatData)
   .then(()=>alert("✅ Your query has been sent! Our team will reply soon."))
   .catch(err=>alert("❌ Error sending query."));
   chatData={}; chatStep=0;
