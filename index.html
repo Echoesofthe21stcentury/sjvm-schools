@@ -342,20 +342,12 @@
 
 <body>
   
-<!-- 🎉 First-time Popup -->
-<div id="popup" class="popup">
-  <div class="popup-content">
-    <img src="indep.jpg" alt="Independence Day" />
-    <div class="popup-text">
-      <button id="closePopup">Close ✨</button>
-    </div>
-  </div>
-</div>
+
 
 <!-- 🌐 Header -->
 <header>
   <div class="logo">
-    <img src="gif (1).gif" alt="SJVM Logo" />
+    <img src="SJVM logo empowering mankind without background.png" alt="SJVM Logo" />
     SJVM
   </div>
   <button class="hamburger" onclick="toggleMenu()">☰</button>
@@ -402,9 +394,9 @@
 <section id="gallery">
   <h2>Gallery</h2>
   <div class="gallery-images">
-    <a href="gallery.html"><img src="assets/1.jpg" alt="School 1" /></a>
-    <a href="gallery.html"><img src="assets/2.jpg" alt="School 2" /></a>
-    <a href="gallery.html"><img src="assets/3.jpg" alt="School 3" /></a>
+    <a href="gallery.html"><img src="gif (1).gif" alt="School 1" /></a>
+    <a href="gallery.html"><img src="ATTUR SCHOOL BLDG.jpg" alt="School 2" /></a>
+    <a href="gallery.html"><img src="bk scl.jpg" alt="School 3" /></a>
   </div>
 </section>
 
@@ -418,6 +410,7 @@
 <!-- 🧑‍🏫 Founder Message -->
 <section id="founder" class="founder">
   <h2>Message from the Founder</h2>
+  <div>img src="sir.jpg" alt="Founder"</div>
   <p>"At SJVM, we strive to build strong values and academic excellence among our students. Join us in shaping the future!"</p>
   <p><strong>– Shri Late Dr. Narendra Kummara K R, Founder</strong></p>
 </section>
@@ -433,65 +426,143 @@
   <p>© 2025 SJVM School. All rights reserved.</p>
 </footer>
 
-<!-- 🤖 AI Assistant -->
+<!-- 🤖 SJVM Assistant -->
 <button class="ai-float" onclick="toggleChat()">I'm here to help 👋</button>
+
 <div class="chat-box" id="chatBox">
   <div class="chat-header">
     SJVM Assistant 🤖
     <button class="close-btn" onclick="toggleChat()">❌</button>
   </div>
   <div class="chat-body" id="chatBody">
-    <p>Hello! How can I help you today? Choose a question:</p>
-    <div class="chat-question">
-      <button onclick="showAnswer('admission')">📝 What are the admission procedures?</button>
-      <button onclick="showAnswer('timings')">⏰ What are the school timings?</button>
-      <button onclick="showAnswer('facilities')">🏫 What facilities are available?</button>
-    </div>
-    <div class="chat-answer" id="answerBox"></div>
+    <div id="chatMessages"></div>
+    <div id="chatInputArea"></div>
   </div>
 </div>
 
-<!-- Script -->
+<script src="https://cdn.emailjs.com/dist/email.min.js"></script>
 <script>
-  function toggleMenu() {
-    document.getElementById("navLinks").classList.toggle("show");
+emailjs.init("RYSpcySfYE9jFWhKI"); // Your EmailJS public key
+
+let chatData = {};
+let chatStep = 0;
+
+// Predefined questions with answers
+const fixedQA = [
+  {q: "📝 Admission", a: "Admissions are open April–June. Visit the office with required documents."},
+  {q: "⏰ Timings", a: "School timings: 8:30 AM - 3:30 PM, Monday to Friday."},
+  {q: "🏫 Facilities", a: "We offer smart classrooms, labs, library, sports ground, and transport."},
+  {q: "💰 Fees", a: "Fee details are available on our admissions page or office."},
+  {q: "Other Queries", a: ""}
+];
+
+function toggleChat(){
+  const chat=document.getElementById("chatBox");
+  chat.style.display=chat.style.display==="flex"?"none":"flex";
+  if(chat.style.display==="flex" && chatStep===0) showFixedQuestions();
+}
+
+function showFixedQuestions(){
+  const chatArea=document.getElementById("chatInputArea");
+  const messages=document.getElementById("chatMessages");
+  messages.innerHTML+=`<div><strong>Assistant:</strong> Please select your query:</div>`;
+  chatArea.innerHTML = fixedQA.map(q=>`<button onclick="selectQuery('${q.q}')">${q.q}</button>`).join('');
+}
+
+function selectQuery(query){
+  const messages=document.getElementById("chatMessages");
+  messages.innerHTML+=`<div><strong>You:</strong> ${query}</div>`;
+  if(query!=="Other Queries"){
+    const ans=fixedQA.find(f=>f.q===query).a;
+    messages.innerHTML+=`<div><strong>Assistant:</strong> ${ans}</div>`;
+    document.getElementById("chatInputArea").innerHTML='';
+  } else {
+    chatData={}; chatStep=1; nextStep();
   }
+}
 
-  function toggleChat() {
-    const chat = document.getElementById("chatBox");
-    chat.style.display = chat.style.display === "flex" ? "none" : "flex";
-  }
+function nextStep(){
+  const chatArea=document.getElementById("chatInputArea");
+  const messages=document.getElementById("chatMessages");
+  const steps=[
+    { key:"topic", label:"Please describe your query topic:" },
+    { key:"name", label:"Your full name?" },
+    { key:"email", label:"Email address?" },
+    { key:"mobile", label:"Mobile number?" },
+    { key:"pincode", label:"Pincode?" },
+    { key:"village", label:"Village?" }
+  ];
+  if(chatStep-1 < steps.length){
+    const step=steps[chatStep-1];
+    messages.innerHTML+=`<div><strong>Assistant:</strong> ${step.label}</div>`;
+    chatArea.innerHTML=`<input type="text" id="chatInput" placeholder="${step.label}" />
+                        <button onclick="submitAnswer()">Send</button>`;
+    document.getElementById("chatInput").focus();
+  } else { showSummary(); }
+}
 
-  function showAnswer(type) {
-    const answerBox = document.getElementById("answerBox");
-    let answer = "";
+function submitAnswer(){
+  const input=document.getElementById("chatInput");
+  const val=input.value.trim(); if(!val) return;
+  const messages=document.getElementById("chatMessages");
+  messages.innerHTML+=`<div><strong>You:</strong> ${val}</div>`;
+  const stepsKeys=["topic","name","email","mobile","pincode","village"];
+  const key=stepsKeys[chatStep-1];
+  chatData[key]=val;
 
-    switch(type) {
-      case 'admission':
-        answer = "Admissions are open from April to June. Visit the office with necessary documents.";
-        break;
-      case 'timings':
-        answer = "School timings are 8:30 AM to 3:30 PM, Monday to Friday.";
-        break;
-      case 'facilities':
-        answer = "We offer smart classrooms, labs, library, sports ground, and transport facilities.";
-        break;
-    }
+  if(key==="pincode"){
+    fetch(`https://api.postalpincode.in/pincode/${val}`)
+    .then(res=>res.json())
+    .then(data=>{
+      if(data[0].Status==="Success"){
+        chatData.state=data[0].PostOffice[0].State;
+        chatData.district=data[0].PostOffice[0].District;
+        messages.innerHTML+=`<div><strong>Assistant:</strong> Auto-detected State: ${chatData.state}, District: ${chatData.district}</div>`;
+        chatStep++; nextStep();
+      } else {
+        messages.innerHTML+=`<div><strong>Assistant:</strong> Invalid pincode. Please enter correct pincode.</div>`;
+      }
+    }).catch(err=>{
+      messages.innerHTML+=`<div><strong>Assistant:</strong> Could not fetch state/district. Please enter manually.</div>`;
+      chatStep++; nextStep();
+    });
+  } else { chatStep++; nextStep(); }
 
-    answerBox.innerHTML = answer;
-  }
+  input.value="";
+  document.getElementById("chatBody").scrollTop=document.getElementById("chatBody").scrollHeight;
+}
 
-  // Show popup only on first visit
-  if(!localStorage.getItem('visited')) {
-    document.getElementById('popup').style.display = 'flex';
-    localStorage.setItem('visited', 'true');
-  }
+function showSummary(){
+  const messages=document.getElementById("chatMessages");
+  const chatArea=document.getElementById("chatInputArea");
+  messages.innerHTML+=`<div><strong>Assistant:</strong> Please review your details before submission:</div>`;
+  let summaryHTML="<ul>";
+  for(let k in chatData){ summaryHTML+=`<li><strong>${k}:</strong> ${chatData[k]}</li>`; }
+  summaryHTML+="</ul>";
+  chatArea.innerHTML=`<div>${summaryHTML}</div><button onclick="submitEmail()">Submit</button>`;
+}
 
-  // Close popup
-  document.getElementById('closePopup').onclick = function() {
-    document.getElementById('popup').style.display = 'none';
-  };
+function submitEmail(){
+  emailjs.send('service_c1uox1o','Contact Us', chatData)
+  .then(()=>alert("✅ Your query has been sent! Our team will reply soon."))
+  .catch(err=>alert("❌ Error sending query."));
+  chatData={}; chatStep=0;
+  document.getElementById("chatMessages").innerHTML="";
+  document.getElementById("chatInputArea").innerHTML="";
+}
 </script>
+
+<style>
+.ai-float{position:fixed;bottom:20px;right:20px;background:#ffd700;color:#000;border:none;padding:12px 18px;border-radius:50px;cursor:pointer;z-index:9999;box-shadow:0 4px 8px rgba(0,0,0,0.3);}
+.chat-box{position:fixed;bottom:70px;right:20px;width:340px;max-height:450px;background:#1b2d3b;color:white;display:none;flex-direction:column;padding:10px;z-index:9998;border-radius:10px;overflow:auto;font-family:'Poppins',sans-serif;}
+.chat-header{background:#ffd700;color:black;padding:10px;font-weight:bold;display:flex;justify-content:space-between;align-items:center;border-radius:5px;}
+.chat-body{margin-top:10px;overflow-y:auto;flex-grow:1;}
+.chat-body input{width:70%;padding:6px;margin-right:5px;border-radius:5px;border:none;}
+.chat-body button{padding:6px 10px;border-radius:5px;border:none;background:#ffd700;color:black;cursor:pointer;margin-top:5px;}
+.chat-body button:hover{background:#e6c200;}
+.chat-body button:focus{outline:none;}
+.chat-body div{margin:5px 0;}
+</style>
 
 </body>
 </html>
