@@ -1,57 +1,146 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SJVM Schools - Shop</title>
-  <link rel="icon" href="favicon.png" type="image/png">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SJVM School - Shop</title>
+  
+  <link rel="icon" href="favicon.png" type="image/png" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet" />
 
   <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      height: 100vh;
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+    body { 
+      background: linear-gradient(to right, #0f2027, #203a43, #2c5364); 
+      color: white; 
       display: flex;
       flex-direction: column;
+      min-height: 100vh;
     }
+
+    /* Header */
     header {
-      background: #003366;
-      color: white;
-      padding: 15px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      background-color: #1b2d3b;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1rem 2rem; flex-wrap: wrap;
     }
-    header nav a {
-      color: white;
-      text-decoration: none;
-      margin-left: 20px;
-      font-weight: bold;
+    .logo { display: flex; align-items: center; font-size: 1.6rem; font-weight: bold; }
+    .logo img { height: 40px; margin-right: 10px; }
+    .hamburger { display: none; font-size: 24px; background: none; color: white; border: none; cursor: pointer; }
+    .nav-links { list-style: none; display: flex; gap: 1.5rem; }
+    .nav-links li a { color: #eee; text-decoration: none; font-weight: 500; }
+    .nav-links li a:hover { color: #ffd700; }
+    .login-btn { background: #ffd700; color: black; padding: 0.5rem 1rem; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; }
+
+    /* Products */
+    h1 { text-align: center; margin: 30px 0; color: #ffd700; }
+    .products { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; padding: 20px; flex-grow: 1; }
+    .product { background: #fff; color: #000; border-radius: 12px; padding: 15px; width: 220px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.2); transition: 0.3s; }
+    .product:hover { transform: translateY(-5px); }
+    .product img { width: 100%; border-radius: 10px; }
+    .btn { display: inline-block; margin-top: 10px; padding: 10px 15px; background: #007bff; color: white; border-radius: 8px; cursor: pointer; text-decoration: none; }
+    .btn:hover { background: #0056b3; }
+
+    /* Popup */
+    .popup { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; z-index: 9999; }
+    .popup-content { background: #fff; color: #000; border-radius: 15px; max-width: 500px; width: 90%; padding: 20px; animation: fadeIn 0.5s ease; text-align: center; }
+    .popup-content h2 { color: #d32f2f; margin-bottom: 15px; }
+    .popup-content p { margin-bottom: 10px; line-height: 1.5; }
+    .popup-content button { margin: 10px; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+    .confirm { background: #28a745; color: white; }
+    .cancel { background: #dc3545; color: white; }
+    @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+
+    /* Footer */
+    footer { 
+      text-align: center; 
+      padding: 1rem; 
+      background-color: #111; 
+      color: #bbb; 
+      margin-top: auto;
     }
-    header nav a:hover {
-      text-decoration: underline;
-    }
-    iframe {
-      flex-grow: 1; /* take remaining height */
-      width: 100%;
-      border: none;
+
+    @media (max-width: 768px) {
+      .nav-links { display: none; flex-direction: column; width: 100%; background-color: #1b2d3b; padding: 1rem 0; }
+      .nav-links.show { display: flex; }
+      .hamburger { display: block; }
     }
   </style>
 </head>
 <body>
-  <header>
-    <div class="logo">
-      <h2>SJVM Schools</h2>
-    </div>
-    <nav>
-      <a href="index.html">Home</a>
-      <a href="about.html">About</a>
-      <a href="contact.html">Contact</a>
-      <a href="shop.html" style="color:#ffd700;">Shop</a> <!-- Highlighted -->
-    </nav>
-  </header>
 
-  <!-- ✅ Odoo shop inside -->
-  <iframe src="https://shopatsjvm.odoo.com/shop"></iframe>
+<!-- 🌐 Header -->
+<header>
+  <div class="logo">
+    <img src="SJVM logo empowering mankind without background.png" alt="SJVM Logo" />
+    SJVM
+  </div>
+  <button class="hamburger" onclick="toggleMenu()">☰</button>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="admissions.html">Admissions</a></li>
+    <li><a href="shop.html" style="color:#ffd700;">Shop</a></li>
+    <li><a href="gallery.html">Gallery</a></li>
+    <li><a href="branches.html">Branches</a></li>
+    <li><a href="founders.html">Founder</a></li>
+    <li><a href="contact.html">Contact</a></li>
+    <li><a href="login.html" class="login-btn">Login</a></li>
+  </ul>
+</header>
+
+<!-- 🛒 Shop Section -->
+<h1>Welcome to SJVM Shop</h1>
+<div class="products">
+  <div class="product">
+    <img src="https://shopatsjvm.odoo.com/web/image/product.product/1/image_512" alt="Product 1">
+    <h3>School Bag</h3>
+    <a class="btn" onclick="redirectConfirm('https://shopatsjvm.odoo.com/shop/product/school-bag-1')">Buy Now</a>
+  </div>
+  <div class="product">
+    <img src="https://shopatsjvm.odoo.com/web/image/product.product/2/image_512" alt="Product 2">
+    <h3>School Diary</h3>
+    <a class="btn" onclick="redirectConfirm('https://shopatsjvm.odoo.com/shop/product/school-diary-2')">Buy Now</a>
+  </div>
+  <div class="product">
+    <img src="https://shopatsjvm.odoo.com/web/image/product.product/3/image_512" alt="Product 3">
+    <h3>Uniform Set</h3>
+    <a class="btn" onclick="redirectConfirm('https://shopatsjvm.odoo.com/shop/product/uniform-set-3')">Buy Now</a>
+  </div>
+</div>
+
+<!-- Popup -->
+<div id="popup" class="popup">
+  <div class="popup-content">
+    <h2>Redirect Notice</h2>
+    <p>⚠️ Our official shopping platform is <b>shopatsjvm.odoo.com</b>.</p>
+    <p>From here onwards you will <b>NOT</b> be able to view delivery status on <b>sjvmschools.org</b>.</p>
+    <p>👉 Please login at <b>shopatsjvm.odoo.com</b> with your email & password to track your order.</p>
+    <button class="confirm" onclick="confirmRedirect()">Yes, Continue</button>
+    <button class="cancel" onclick="closePopup()">Cancel</button>
+  </div>
+</div>
+
+<!-- 🌐 Footer -->
+<footer>
+  <p>© 2025 SJVM School. All rights reserved. | Powered by SJVM Digital</p>
+</footer>
+
+<script>
+  let redirectUrl = "";
+  function toggleMenu() {
+    document.getElementById("navLinks").classList.toggle("show");
+  }
+  function redirectConfirm(url) {
+    redirectUrl = url;
+    document.getElementById("popup").style.display = "flex";
+  }
+  function confirmRedirect() {
+    window.location.href = redirectUrl;
+  }
+  function closePopup() {
+    document.getElementById("popup").style.display = "none";
+  }
+</script>
+
 </body>
 </html>
