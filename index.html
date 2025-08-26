@@ -433,13 +433,149 @@
 <div class="chat-box" id="chatBox">
   <div class="chat-header">
     SJVM Assistant 🤖
-    <button class="close-btn" onclick="toggleChat()">❌</button>
+    <button class="close-btn" onclick="closeChat()">❌</button>
   </div>
   <div class="chat-body" id="chatBody">
     <div id="chatMessages"></div>
   </div>
   <div id="chatInputArea" class="chat-input-area"></div>
 </div>
+
+<script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+<script>
+emailjs.init("RYSpcySfYE9jFWhKI"); // Your EmailJS public key
+
+let chatData = {};
+let chatStep = 0;
+let chatOpen = false;
+
+// Predefined Q&A
+const fixedQA = [
+  {q: "📝 Admission", a: "Admissions are open April–June. Visit the office with required documents."},
+  {q: "⏰ Timings", a: "School timings: 8:30 AM - 3:30 PM, Monday to Friday."},
+  {q: "🏫 Facilities", a: "We offer smart classrooms, labs, library, sports ground, and transport."},
+  {q: "💰 Fees", a: "Fee details are available on our admissions page or office."},
+  {q: "Other Queries", a: ""}
+];
+
+function toggleChat(){
+  const chat=document.getElementById("chatBox");
+  if(chatOpen){
+    closeChat();
+  } else {
+    chat.style.display="flex";
+    chatOpen=true;
+    if(chatStep===0 && document.getElementById("chatMessages").innerHTML===""){
+      showFixedQuestions();
+    }
+  }
+}
+
+function closeChat(){
+  document.getElementById("chatBox").style.display="none";
+  chatOpen=false;
+  chatData={}; chatStep=0;
+  document.getElementById("chatMessages").innerHTML="";
+  document.getElementById("chatInputArea").innerHTML="";
+}
+
+function showFixedQuestions(){
+  const chatArea=document.getElementById("chatInputArea");
+  const messages=document.getElementById("chatMessages");
+  messages.innerHTML+=`<div><strong>Assistant:</strong> Please select your query:</div>`;
+  chatArea.innerHTML = fixedQA.map(q=>`<button onclick="selectQuery('${q.q}')">${q.q}</button>`).join('');
+  scrollChat();
+}
+
+function selectQuery(query){
+  const messages=document.getElementById("chatMessages");
+  messages.innerHTML+=`<div><strong>You:</strong> ${query}</div>`;
+  if(query!=="Other Queries"){
+    const ans=fixedQA.find(f=>f.q===query).a;
+    messages.innerHTML+=`<div><strong>Assistant:</strong> ${ans}</div>`;
+    document.getElementById("chatInputArea").innerHTML='';
+  } else {
+    chatData={}; chatStep=1; nextStep();
+  }
+  scrollChat();
+}
+
+function nextStep(){
+  const chatArea=document.getElementById("chatInputArea");
+  const messages=document.getElementById("chatMessages");
+  const steps=[
+    { key:"topic", label:"Please describe your query topic:" },
+    { key:"name", label:"Your full name?" },
+    { key:"email", label:"Email address?" },
+    { key:"mobile", label:"Mobile number?" },
+    { key:"pincode", label:"Pincode?" },
+    { key:"village", label:"Village?" }
+  ];
+  if(chatStep-1 < steps.length){
+    const step=steps[chatStep-1];
+    messages.innerHTML+=`<div><strong>Assistant:</strong> ${step.label}</div>`;
+    chatArea.innerHTML=`<input type="text" id="chatInput" placeholder="${step.label}" />
+                        <button onclick="submitAnswer()">Send</button>`;
+    document.getElementById("chatInput").focus();
+  } else { showSummary(); }
+  scrollChat();
+}
+
+function submitAnswer(){
+  const input=document.getElementById("chatInput");
+  const val=input.value.trim(); if(!val) return;
+  const messages=document.getElementById("chatMessages");
+  messages.innerHTML+=`<div><strong>You:</strong> ${val}</div>`;
+  const stepsKeys=["topic","name","email","mobile","pincode","village"];
+  const key=stepsKeys[chatStep-1];
+  chatData[key]=val;
+
+  if(key==="pincode"){
+    fetch(`https://api.postalpincode.in/pincode/${val}`)
+    .then(res=>res.json())
+    .then(data=>{
+      if(data[0].Status==="Success"){
+        chatData.state=data[0].PostOffice[0].State;
+        chatData.district=data[0].PostOffice[0].District;
+        messages.innerHTML+=`<div><strong>Assistant:</strong> Auto-detected State: ${chatData.state}, District: ${chatData.district}</div>`;
+        chatStep++; nextStep();
+      } else {
+        messages.innerHTML+=`<div><strong>Assistant:</strong> Invalid pincode. Please enter correct pincode.</div>`;
+      }
+      scrollChat();
+    }).catch(()=>{
+      messages.innerHTML+=`<div><strong>Assistant:</strong> Could not fetch state/district. Please enter manually.</div>`;
+      chatStep++; nextStep();
+    });
+  } else { chatStep++; nextStep(); }
+
+  input.value="";
+  scrollChat();
+}
+
+function showSummary(){
+  const messages=document.getElementById("chatMessages");
+  const chatArea=document.getElementById("chatInputArea");
+  messages.innerHTML+=`<div><strong>Assistant:</strong> Please review your details before submission:</div>`;
+  let summaryHTML="<ul>";
+  for(let k in chatData){ summaryHTML+=`<li><strong>${k}:</strong> ${chatData[k]}</li>`; }
+  summaryHTML+="</ul>";
+  chatArea.innerHTML=`<div>${summaryHTML}</div><button onclick="submitEmail()">Submit</button>`;
+  scrollChat();
+}
+
+function submitEmail(){
+  emailjs.send('service_c1uox1o','template_xeol1mo', chatData)
+  .then(()=>alert("✅ Your query has been sent! Our team will reply soon."))
+  .catch(()=>alert("❌ Error sending query."));
+  closeChat();
+}
+
+function scrollChat(){
+  const body=document.getElementById("chatBody");
+  body.scrollTop=body.scrollHeight;
+}
+</script>
 
 <style>
 /* Floating button */
@@ -459,7 +595,7 @@
   font-weight: bold;
 }
 
-/* Chat box (default desktop) */
+/* Chat box */
 .chat-box {
   position: fixed;
   bottom: 70px;
@@ -532,12 +668,8 @@
     max-height: 100%;
     border-radius: 0;
   }
-  .chat-body {
-    flex-grow: 1;
-    padding: 15px;
-  }
 }
 </style>
-
+  
 </body>
 </html>
