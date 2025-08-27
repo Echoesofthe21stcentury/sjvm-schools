@@ -4,68 +4,40 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SJVM School | Contact Us</title>
+  <link rel="icon" href="favicon.png" type="image/png" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet" />
+
   <style>
     * {margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif;}
+    body {background: linear-gradient(to right, #0f2027, #203a43, #2c5364); color: white;}
 
-    body {
-      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
-      color: white;
-      padding: 0;
-    }
-
-    /* 🌟 Navigation Bar */
-    nav {
-      background: rgba(0,0,0,0.8);
-      padding: 1rem 2rem;
+    /* Header */
+    header {
+      background-color: #1b2d3b;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 1000;
+      padding: 1rem 2rem;
+      flex-wrap: wrap;
     }
+    .logo {display: flex; align-items: center; font-size: 1.6rem; font-weight: bold;}
+    .logo img {height: 40px; margin-right: 10px;}
+    .nav-links {list-style: none; display: flex; gap: 1.5rem;}
+    .nav-links li a {color: #eee; text-decoration: none; font-weight: 500;}
+    .nav-links li a:hover {color: #ffd700;}
+    .login-btn {background: #ffd700; color: black; padding: 0.5rem 1rem; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;}
 
-    nav .logo {
-      font-size: 1.5rem;
-      font-weight: bold;
-      color: #ffd700;
+    @media(max-width:768px){
+      .nav-links{display:none; flex-direction:column; width:100%; background:#1b2d3b; padding:1rem 0;}
+      .nav-links.show{display:flex;}
+      .hamburger{display:block;}
     }
+    .hamburger{display:none; font-size:24px; background:none; color:white; border:none; cursor:pointer;}
 
-    nav ul {
-      list-style: none;
-      display: flex;
-      gap: 1.5rem;
-    }
-
-    nav ul li a {
-      text-decoration: none;
-      color: white;
-      font-weight: 500;
-      transition: 0.3s;
-    }
-
-    nav ul li a:hover {
-      color: #ffd700;
-    }
-
-    /* 📞 Contact Section */
-    main {
-      padding: 2rem;
-    }
-
-    h1 {
-      text-align: center;
-      margin-bottom: 1rem;
-      color: #ffd700;
-    }
-
-    p {
-      text-align: center;
-      margin-bottom: 2rem;
-      font-size: 1.1rem;
-    }
-
+    /* Contact Form */
+    main {padding: 2rem;}
+    h1 {text-align:center; margin-bottom:1rem; color:#ffd700;}
+    p {text-align:center; margin-bottom:2rem; font-size:1.1rem;}
     form {
       background: rgba(0,0,0,0.6);
       padding: 2rem;
@@ -74,118 +46,73 @@
       margin: auto;
       box-shadow: 0 4px 12px rgba(0,0,0,0.4);
     }
-
-    label {
-      display: block;
-      margin: 10px 0 5px;
-      font-weight: bold;
-      color: #ffd700;
+    label {display:block; margin:10px 0 5px; font-weight:bold; color:#ffd700;}
+    input, textarea, select {
+      width:100%; padding:12px; border:none; border-radius:8px; margin-bottom:1rem; font-size:1rem;
     }
-
-    input, textarea {
-      width: 100%;
-      padding: 12px;
-      border: none;
-      border-radius: 8px;
-      margin-bottom: 1rem;
-      font-size: 1rem;
-    }
-
-    textarea { min-height: 120px; resize: vertical; }
-
+    textarea {min-height:120px; resize:vertical;}
     button {
-      background: #ffd700;
-      color: black;
-      border: none;
-      padding: 12px 20px;
-      border-radius: 8px;
-      font-weight: bold;
-      cursor: pointer;
-      width: 100%;
-      font-size: 1rem;
-      transition: 0.3s;
+      background:#ffd700; color:black; border:none;
+      padding:12px 20px; border-radius:8px; font-weight:bold; cursor:pointer;
+      width:100%; font-size:1rem; transition:0.3s;
     }
-
-    button:hover { background: #e6c200; }
-
-    #status {
-      margin-top: 1rem;
-      text-align: center;
-      font-weight: bold;
-    }
+    button:hover{background:#e6c200;}
+    #status{text-align:center; margin-top:1rem; font-weight:bold;}
   </style>
 </head>
 <body>
 
-  <!-- 🌟 Navigation -->
-  <nav>
-    <div class="logo">SJVM School</div>
-    <ul>
-      <li><a href="index.html">🏠 Home</a></li>
-      <li><a href="about.html">ℹ️ About</a></li>
-      <li><a href="academics.html">📚 Academics</a></li>
-      <li><a href="admissions.html">📝 Admissions</a></li>
-      <li><a href="contact.html">📞 Contact</a></li>
-    </ul>
-  </nav>
+<!-- 🌟 Header -->
+<header>
+  <div class="logo">
+    <img src="kling_20250827_Image_to_Video__635_0.mp4_1756233350266.gif" alt="SJVM Logo" />
+    SJVM
+  </div>
+  <button class="hamburger" onclick="toggleMenu()">☰</button>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="admissions.html">Admissions</a></li>
+    <li><a href="shop.html">Shop</a></li>
+    <li><a href="gallery.html">Gallery</a></li>
+    <li><a href="branches.html">Branches</a></li>
+    <li><a href="founders.html">Founder</a></li>
+    <li><a href="contact.html" style="color:#ffd700;">Contact</a></li>
+    <li><a href="login.html" class="login-btn">Login</a></li>
+  </ul>
+</header>
 
-  <!-- 📞 Contact Section -->
-  <main>
-    <h1>📞 Contact SJVM School</h1>
-    <p>We’d love to hear from you! Fill out the form and our team will reach out.</p>
+<!-- 📞 Contact Form -->
+<main>
+  <h1>📞 Contact SJVM School</h1>
+  <p>We’d love to hear from you! Fill out the form and our team will reach out.</p>
 
-    <form id="contactForm">
-      <label for="name">Full Name</label>
-      <input type="text" id="name" name="name" placeholder="Your full name" required />
+  <form action="https://getform.io/f/bgdjlqwa" method="POST">
+    <label for="name">Full Name</label>
+    <input type="text" id="name" name="name" placeholder="Your full name" required />
 
-      <label for="email">Email Address</label>
-      <input type="email" id="email" name="email" placeholder="Your email" required />
+    <label for="email">Email Address</label>
+    <input type="email" id="email" name="email" placeholder="Your email" required />
 
-      <label for="message">Message</label>
-      <textarea id="message" name="message" placeholder="Write your message here..." required></textarea>
+    <label for="message">Message</label>
+    <textarea id="message" name="message" placeholder="Write your message here..." required></textarea>
 
-      <button type="submit">Send Message</button>
-      <div id="status"></div>
-    </form>
-  </main>
+    <!-- Honeypot -->
+    <input type="hidden" name="_gotcha" style="display:none !important">
 
-  <!-- ✉️ Script for GitHub API -->
-  <script>
-  document.getElementById("contactForm").addEventListener("submit", async function(e){
-    e.preventDefault();
-    const status = document.getElementById("status");
-    status.innerText = "⏳ Sending...";
+    <button type="submit">Send Message</button>
+  </form>
+</main>
 
-    let data = {
-      name: this.name.value,
-      email: this.email.value,
-      message: this.message.value
-    };
+<!-- ⚙️ Footer -->
+<footer style="text-align:center; padding:1rem; background:#111; color:#bbb;">
+  <p>© 2025 SJVM School. All rights reserved.</p>
+</footer>
 
-    try {
-      let res = await fetch("https://api.github.com/repos/YOUR_USERNAME/YOUR_REPO/issues", {
-        method: "POST",
-        headers: {
-          "Authorization": "Bearer YOUR_GITHUB_TOKEN", // ⚠️ Replace later with safer method
-          "Accept": "application/vnd.github.v3+json"
-        },
-        body: JSON.stringify({
-          title: `New Contact: ${data.name}`,
-          body: `**Name:** ${data.name}\n**Email:** ${data.email}\n\n**Message:**\n${data.message}`
-        })
-      });
-
-      if(res.ok){
-        status.innerText = "✅ Message sent successfully!";
-        this.reset();
-      } else {
-        status.innerText = "❌ Failed to send message.";
-      }
-    } catch (err) {
-      status.innerText = "⚠️ Error connecting to server.";
-    }
-  });
-  </script>
+<script>
+function toggleMenu(){
+  document.getElementById("navLinks").classList.toggle("show");
+}
+</script>
 
 </body>
 </html>
