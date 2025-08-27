@@ -11,6 +11,46 @@
     body {
       background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
       color: white;
+      padding: 0;
+    }
+
+    /* 🌟 Navigation Bar */
+    nav {
+      background: rgba(0,0,0,0.8);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    nav .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #ffd700;
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    nav ul li a {
+      text-decoration: none;
+      color: white;
+      font-weight: 500;
+      transition: 0.3s;
+    }
+
+    nav ul li a:hover {
+      color: #ffd700;
+    }
+
+    /* 📞 Contact Section */
+    main {
       padding: 2rem;
     }
 
@@ -77,23 +117,39 @@
 </head>
 <body>
 
-  <h1>📞 Contact SJVM School</h1>
-  <p>We’d love to hear from you! Fill out the form and our team will reach out.</p>
+  <!-- 🌟 Navigation -->
+  <nav>
+    <div class="logo">SJVM School</div>
+    <ul>
+      <li><a href="index.html">🏠 Home</a></li>
+      <li><a href="about.html">ℹ️ About</a></li>
+      <li><a href="academics.html">📚 Academics</a></li>
+      <li><a href="admissions.html">📝 Admissions</a></li>
+      <li><a href="contact.html">📞 Contact</a></li>
+    </ul>
+  </nav>
 
-  <form id="contactForm">
-    <label for="name">Full Name</label>
-    <input type="text" id="name" name="name" placeholder="Your full name" required />
+  <!-- 📞 Contact Section -->
+  <main>
+    <h1>📞 Contact SJVM School</h1>
+    <p>We’d love to hear from you! Fill out the form and our team will reach out.</p>
 
-    <label for="email">Email Address</label>
-    <input type="email" id="email" name="email" placeholder="Your email" required />
+    <form id="contactForm">
+      <label for="name">Full Name</label>
+      <input type="text" id="name" name="name" placeholder="Your full name" required />
 
-    <label for="message">Message</label>
-    <textarea id="message" name="message" placeholder="Write your message here..." required></textarea>
+      <label for="email">Email Address</label>
+      <input type="email" id="email" name="email" placeholder="Your email" required />
 
-    <button type="submit">Send Message</button>
-    <div id="status"></div>
-  </form>
+      <label for="message">Message</label>
+      <textarea id="message" name="message" placeholder="Write your message here..." required></textarea>
 
+      <button type="submit">Send Message</button>
+      <div id="status"></div>
+    </form>
+  </main>
+
+  <!-- ✉️ Script for GitHub API -->
   <script>
   document.getElementById("contactForm").addEventListener("submit", async function(e){
     e.preventDefault();
@@ -110,7 +166,7 @@
       let res = await fetch("https://api.github.com/repos/YOUR_USERNAME/YOUR_REPO/issues", {
         method: "POST",
         headers: {
-          "Authorization": "Bearer YOUR_GITHUB_TOKEN", // ⚠️ Replace with GitHub Action (safer)
+          "Authorization": "Bearer YOUR_GITHUB_TOKEN", // ⚠️ Replace later with safer method
           "Accept": "application/vnd.github.v3+json"
         },
         body: JSON.stringify({
