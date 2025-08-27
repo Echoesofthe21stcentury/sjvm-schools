@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SJVM School | Dashboard Messages</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    * {margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif;}
+
+    body {
+      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+      color: white;
+    }
+
+    /* 🌟 Navigation Bar */
+    nav {
+      background: rgba(0,0,0,0.8);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    nav .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #ffd700;
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    nav ul li a {
+      text-decoration: none;
+      color: white;
+      font-weight: 500;
+      transition: 0.3s;
+    }
+
+    nav ul li a:hover {
+      color: #ffd700;
+    }
+
+    main {
+      padding: 2rem;
+      max-width: 900px;
+      margin: auto;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 1rem;
+      color: #ffd700;
+    }
+
+    #messages {
+      margin-top: 2rem;
+    }
+
+    .message-card {
+      background: rgba(0,0,0,0.6);
+      padding: 1.2rem;
+      border-radius: 12px;
+      margin-bottom: 1rem;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    }
+
+    .message-card h3 {
+      margin-bottom: .5rem;
+      color: #ffd700;
+    }
+
+    .message-card p {
+      margin: .3rem 0;
+      color: #ddd;
+    }
+
+    .message-card small {
+      color: #aaa;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 🌟 Navigation -->
+  <nav>
+    <div class="logo">SJVM School</div>
+    <ul>
+      <li><a href="index.html">🏠 Home</a></li>
+      <li><a href="dashboard.html">📊 Dashboard</a></li>
+      <li><a href="messages.html">✉️ Messages</a></li>
+      <li><a href="logout.html">🚪 Logout</a></li>
+    </ul>
+  </nav>
+
+  <!-- 📬 Messages Section -->
+  <main>
+    <h1>📬 Contact Form Messages</h1>
+    <div id="messages">⏳ Loading messages...</div>
+  </main>
+
+  <!-- ✉️ Script to fetch messages from GitHub -->
+  <script>
+    const token = "YOUR_GITHUB_TOKEN";   // ⚠️ Replace with a safe backend later
+    const owner = "YOUR_USERNAME";       // e.g. Echoesofthe21stcentury
+    const repo = "sjvm-schools";
+
+    async function loadMessages() {
+      const container = document.getElementById("messages");
+      container.innerHTML = "⏳ Loading...";
+
+      try {
+        const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/issues`, {
+          headers: {
+            Authorization: `token ${token}`
+          }
+        });
+
+        if (!response.ok) {
+          container.innerHTML = "❌ Failed to fetch messages.";
+          return;
+        }
+
+        const issues = await response.json();
+        if (issues.length === 0) {
+          container.innerHTML = "📭 No messages yet.";
+          return;
+        }
+
+        container.innerHTML = "";
+        issues.forEach(issue => {
+          const card = document.createElement("div");
+          card.className = "message-card";
+          card.innerHTML = `
+            <h3>${issue.title}</h3>
+            <p>${issue.body.replace(/\n/g, "<br>")}</p>
+            <small>🕒 Submitted on: ${new Date(issue.created_at).toLocaleString()}</small>
+          `;
+          container.appendChild(card);
+        });
+
+      } catch (err) {
+        console.error(err);
+        container.innerHTML = "⚠️ Error fetching messages.";
+      }
+    }
+
+    loadMessages();
+  </script>
+</body>
+</html>
