@@ -169,60 +169,65 @@
     </div>
   </div>
 
-  <script>
-    async function login() {
-      const role = document.getElementById("role").value;
-      const userId = document.getElementById("userId").value.trim();
-      const password = document.getElementById("password").value.trim();
-      const errorBox = document.getElementById("error");
-      const profileBox = document.getElementById("profile");
+<script>
+  async function login() {
+    const role = document.getElementById("role").value;
+    const userId = document.getElementById("userId").value.trim();
+    const password = document.getElementById("password").value.trim();
+    const errorBox = document.getElementById("error");
 
-      errorBox.textContent = "";
-      profileBox.style.display = "none";
+    errorBox.textContent = "";
 
-      if (!role || !userId || !password) {
-        errorBox.textContent = "⚠️ Please fill all fields.";
-        return;
-      }
-
-      try {
-        const response = await fetch("users.json");
-        const users = await response.json();
-
-        let user = null;
-
-        if (role === "Student") {
-          for (const classKey in users.Student) {
-            if (users.Student[classKey][userId] && users.Student[classKey][userId].password === password) {
-              user = users.Student[classKey][userId];
-              break;
-            }
-          }
-        } else if (users[role]) {
-          for (const groupKey in users[role]) {
-            if (users[role][groupKey][userId] && users[role][groupKey][userId].password === password) {
-              user = users[role][groupKey][userId];
-              break;
-            }
-          }
-        }
-
-        if (user) {
-          profileBox.innerHTML = `
-            <img src="${user.photo}" alt="Profile Photo">
-            <h3>Welcome, ${user.name} 🎉</h3>
-            <p><b>Role:</b> ${role}</p>
-            <p><b>User ID:</b> ${userId}</p>
-          `;
-          profileBox.style.display = "block";
-        } else {
-          errorBox.textContent = "❌ Invalid credentials. Try again.";
-        }
-      } catch (err) {
-        errorBox.textContent = "⚠️ Error loading users.json";
-        console.error(err);
-      }
+    if (!role || !userId || !password) {
+      errorBox.textContent = "⚠️ Please fill all fields.";
+      return;
     }
-  </script>
+
+    try {
+      const response = await fetch("users.json");
+      const users = await response.json();
+
+      let user = null;
+
+      if (role === "Student") {
+        for (const classKey in users.Student) {
+          if (users.Student[classKey][userId] && users.Student[classKey][userId].password === password) {
+            user = users.Student[classKey][userId];
+            break;
+          }
+        }
+      } else if (users[role]) {
+        for (const groupKey in users[role]) {
+          if (users[role][groupKey][userId] && users[role][groupKey][userId].password === password) {
+            user = users[role][groupKey][userId];
+            break;
+          }
+        }
+      }
+
+      if (user) {
+        // ✅ Save user session to localStorage (optional)
+        localStorage.setItem("loggedInUser", JSON.stringify({ role, userId, name: user.name }));
+
+        // ✅ Redirect based on role
+        const redirectPages = {
+          "Student": "student.html",
+          "Teacher": "teacher.html",
+          "Coordinator": "coordinator.html",
+          "Admin": "admin.html",
+          "Principal": "principal.html",
+          "Chairman": "chairman.html"
+        };
+
+        window.location.href = redirectPages[role];
+      } else {
+        errorBox.textContent = "❌ Invalid credentials. Try again.";
+      }
+    } catch (err) {
+      errorBox.textContent = "⚠️ Error loading users.json";
+      console.error(err);
+    }
+  }
+</script>
 </body>
 </html>
