@@ -2,71 +2,227 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Login - SJVM School</title>
-  <link rel="stylesheet" href="style.css"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SJVM School | Login</title>
+  <link rel="icon" href="favicon.png" type="image/png" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet" />
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+    body {
+      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+      color: white;
+      min-height: 100vh;
+      padding-top: 80px; /* ✅ space for fixed header */
+    }
+
+    /* ✅ Fixed Header */
+    header {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      background-color: #1b2d3b;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      z-index: 1000;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      font-size: 1.6rem;
+      font-weight: bold;
+    }
+    .logo img {
+      height: 40px;
+      margin-right: 10px;
+    }
+    .nav-links {
+      list-style: none;
+      display: flex;
+      gap: 1.5rem;
+    }
+    .nav-links li a {
+      color: #eee;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .nav-links li a:hover {
+      color: #ffd700;
+    }
+    .login-btn {
+      background-color: #ffd700;
+      color: black;
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    /* ✅ Login Box */
+    .login-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: calc(100vh - 80px);
+      padding: 2rem;
+    }
+    .login-box {
+      background: #1b2d3b;
+      padding: 30px;
+      border-radius: 15px;
+      width: 380px;
+      text-align: center;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+    }
+    .login-box h2 {
+      margin-bottom: 20px;
+      color: #ffd700;
+    }
+    select, input {
+      width: 90%;
+      padding: 12px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      outline: none;
+    }
+    button.login-submit {
+      width: 95%;
+      padding: 12px;
+      margin-top: 15px;
+      border: none;
+      border-radius: 8px;
+      background: #ffd700;
+      color: black;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button.login-submit:hover {
+      background: #ffea00;
+    }
+    .error {
+      color: #ff4d4d;
+      margin-top: 10px;
+    }
+    .profile {
+      margin-top: 20px;
+      padding: 15px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 10px;
+    }
+    .profile img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      margin-bottom: 10px;
+    }
+  </style>
 </head>
 <body>
 
-  <header class="header">
-    <h1 style="text-align:center; color:#f0f6fc;">SJVM School</h1>
-    <nav class="nav-links" style="text-align:center; margin-top: 10px;">
-      <a href="index.html">Home</a>
-      <a href="about.html">About</a>
-      <a href="shop.html">Shop</a>
-      <a href="login.html" class="active">Login</a>
-    </nav>
+  <!-- ✅ Fixed Navbar -->
+  <header>
+    <div class="logo">
+      <img src="favicon.png" alt="SJVM Logo" />
+      SJVM
+    </div>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="forms.html">Admissions</a></li>
+      <li><a href="shop.html">Shop</a></li>
+      <li><a href="gallery.html">Gallery</a></li>
+      <li><a href="branches.html">Branches</a></li>
+      <li><a href="founders.html">Founder</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li><a href="login.html" class="login-btn">Login</a></li>
+    </ul>
   </header>
 
-  <main>
-    <div class="form-container">
-      <h2>Login to Your Account</h2>
-      <form id="loginForm">
-        <label for="role">Select Role:</label><br/>
-        <select id="role" required class="input">
-          <option value="">-- Choose Role --</option>
-          <option value="Student">Student</option>
-          <option value="Teacher">Teacher</option>
-          <option value="Principal">Principal</option>
-          <option value="Admin">Admin</option>
-        </select><br/>
-
-        <label for="branch">Select Branch:</label><br/>
-        <select id="branch" required class="input">
-          <option value="">-- Choose Branch --</option>
-          <option value="Bandikodigenahalli">Bandikodigenahalli</option>
-          <option value="Atturu Layout">Atturu Layout</option>
-        </select><br/>
-
-        <label for="password">Password:</label><br/>
-        <input type="password" id="password" placeholder="Enter password" required/><br/>
-
-        <button type="submit" class="btn">Login</button>
-      </form>
+  <!-- ✅ Login Section -->
+  <div class="login-container">
+    <div class="login-box">
+      <h2>🔐 Login to SJVM</h2>
+      <select id="role">
+        <option value="">-- Select Role --</option>
+        <option value="Student">Student</option>
+        <option value="Teacher">Teacher</option>
+        <option value="Coordinator">Coordinator</option>
+        <option value="Admin">Admin</option>
+        <option value="Principal">Principal</option>
+        <option value="Chairman">Chairman</option>
+      </select>
+      <input type="text" id="userId" placeholder="Enter User ID" />
+      <input type="password" id="password" placeholder="Enter Password" />
+      <button class="login-submit" onclick="login()">Login</button>
+      <p class="error" id="error"></p>
+      <div id="profile" class="profile" style="display:none;"></div>
     </div>
-  </main>
-
-  <footer style="text-align:center; padding:20px; color:#8b949e;">
-    © 2025 SJVM School. All rights reserved.
-  </footer>
+  </div>
 
   <script>
-    document.getElementById("loginForm").addEventListener("submit", function(e) {
-      e.preventDefault();
+    async function login() {
       const role = document.getElementById("role").value;
-      const branch = document.getElementById("branch").value;
-      const password = document.getElementById("password").value;
+      const userId = document.getElementById("userId").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const errorBox = document.getElementById("error");
+      const profileBox = document.getElementById("profile");
 
-      if (password === "sjvm123") {
-        sessionStorage.setItem("isLoggedIn", "true");
-        sessionStorage.setItem("userRole", role);
-        sessionStorage.setItem("userBranch", branch);
-        window.location.href = "dashboard.html";
-      } else {
-        alert("Incorrect password. Hint: Try 'sjvm123'");
+      errorBox.textContent = "";
+      profileBox.style.display = "none";
+
+      if (!role || !userId || !password) {
+        errorBox.textContent = "⚠️ Please fill all fields.";
+        return;
       }
-    });
-  </script>
 
+      try {
+        const response = await fetch("users.json");
+        const users = await response.json();
+
+        let user = null;
+
+        if (role === "Student") {
+          for (const classKey in users.Student) {
+            if (users.Student[classKey][userId] && users.Student[classKey][userId].password === password) {
+              user = users.Student[classKey][userId];
+              break;
+            }
+          }
+        } else if (users[role]) {
+          for (const groupKey in users[role]) {
+            if (users[role][groupKey][userId] && users[role][groupKey][userId].password === password) {
+              user = users[role][groupKey][userId];
+              break;
+            }
+          }
+        }
+
+        if (user) {
+          profileBox.innerHTML = `
+            <img src="${user.photo}" alt="Profile Photo">
+            <h3>Welcome, ${user.name} 🎉</h3>
+            <p><b>Role:</b> ${role}</p>
+            <p><b>User ID:</b> ${userId}</p>
+          `;
+          profileBox.style.display = "block";
+        } else {
+          errorBox.textContent = "❌ Invalid credentials. Try again.";
+        }
+      } catch (err) {
+        errorBox.textContent = "⚠️ Error loading users.json";
+        console.error(err);
+      }
+    }
+  </script>
 </body>
 </html>
