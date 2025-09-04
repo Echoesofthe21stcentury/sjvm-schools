@@ -68,6 +68,13 @@
   font-weight: bold;
   cursor: pointer;
 }
+.hero-gif {
+  width: 100%;
+  height: auto;
+  max-height: 90vh; /* so it won’t overflow screen */
+  object-fit: cover;
+  display: block;
+}
 
 /* Blast animation */
 @keyframes blastIn {
@@ -365,8 +372,9 @@
 
 <!-- Hero, Live Video -->
 <section>
-  <div><img src="TEACHERS DAY.gif" alt="Animated Background" /></div>
-  <div>
+<div>
+  <img src="TEACHERS DAY.gif" alt="Animated Background" class="hero-gif" />
+</div>
     <h2>🎥ANNUAL SPORTS MEET 2025 is now on Youtube!</h2>
     <p>Watch our events live here!</p>
     <div class="video-wrapper">
@@ -670,6 +678,12 @@ function scrollChat(){
   }
 }
 </style>
-  
+  <script>
+function toggleMenu() {
+  const nav = document.getElementById('navLinks');
+  nav.classList.toggle('show');
+}
+</script>
+
 </body>
 </html>
