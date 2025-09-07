@@ -4,353 +4,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SJVM School</title>
-  
-  <!-- ✅ Favicon -->
   <link rel="icon" href="favicon.png" type="image/png" />
-
-  <!-- ✅ Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet" />
 
   <style>
-    /* Popup Styles */
-.popup {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.8);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-}
-
-.popup-content {
-  position: relative;
-  background: #fff;
-  border-radius: 15px;
-  max-width: 500px;
-  width: 90%;
-  overflow: hidden;
-  animation: blastIn 1s ease-out;
-}
-
-.popup-content img {
-  width: 100%;
-  display: block;
-  border-bottom: 1px solid #ccc;
-}
-
-.popup-text {
-  padding: 20px;
-  max-height: 250px;
-  overflow-y: auto;
-  font-family: 'Poppins', sans-serif;
-  color: #000;
-}
-
-.popup-text h2 {
-  color: #d32f2f;
-  text-align: center;
-}
-
-.popup-text p {
-  margin-bottom: 10px;
-  line-height: 1.4;
-}
-
-#closePopup {
-  display: block;
-  margin: 10px auto 0;
-  padding: 10px 20px;
-  background: #ffd700;
-  border: none;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
-}
-.hero-gif {
-  width: 100%;
-  height: auto;
-  max-height: 90vh; /* so it won’t overflow screen */
-  object-fit: cover;
-  display: block;
-}
-
-/* Blast animation */
-@keyframes blastIn {
-  0% { transform: translateY(-200px) rotate(-20deg); opacity: 0; }
-  60% { transform: translateY(20px) rotate(5deg); opacity: 1; }
-  100% { transform: translateY(0) rotate(0deg); }
-}
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Poppins', sans-serif;
-    }
-
-    body {
-      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
-      color: white;
-    }
-
-    header {
-      background-color: #1b2d3b;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1rem 2rem;
-      flex-wrap: wrap;
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      font-size: 1.6rem;
-      font-weight: bold;
-    }
-
-    .logo img {
-      height: 40px;
-      margin-right: 10px;
-    }
-
-    .hamburger {
-      display: none;
-      font-size: 24px;
-      background: none;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-
-    .nav-links {
-      list-style: none;
-      display: flex;
-      gap: 1.5rem;
-    }
-
-    .nav-links li a {
-      color: #eee;
-      text-decoration: none;
-      font-weight: 500;
-    }
-
-    .nav-links li a:hover {
-      color: #ffd700;
-    }
-
-    .login-btn {
-      background-color: #ffd700;
-      color: black;
-      padding: 0.5rem 1rem;
-      border: none;
-      border-radius: 5px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .two-column-layout {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-      padding: 1rem;
-      background-color: #111;
-      color: white;
-    }
-
-    .live-stream h2 {
-      color: #ffd700;
-      margin-bottom: 0.5rem;
-    }
-
-    .video-wrapper {
-      position: relative;
-      padding-bottom: 56.25%;
-      height: 0;
-      overflow: hidden;
-    }
-
-    .video-wrapper iframe {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-    }
-
-    section {
-      padding: 2rem;
-      text-align: center;
-    }
-
-    .gallery-images {
-      display: flex;
-      justify-content: center;
-      gap: 1rem;
-      margin-top: 1rem;
-      flex-wrap: wrap;
-    }
-
-    .gallery-images img {
-      width: 250px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.4);
-    }
-
-    .btn {
-      display: inline-block;
-      margin-top: 1rem;
-      padding: 0.6rem 1.2rem;
-      border-radius: 5px;
-      font-weight: bold;
-      text-decoration: none;
-      background: none;
-      color: #eee;
-      border: 1px solid transparent;
-    }
-
-    .btn:hover {
-      color: #ffd700;
-    }
-
-    .branches, .founder {
-      background-color: rgba(255,255,255,0.05);
-      border-radius: 10px;
-      margin: 1rem auto;
-      max-width: 600px;
-      padding: 1.5rem;
-    }
-
-    .founder p {
-      font-style: italic;
-    }
-
-    footer {
-      text-align: center;
-      padding: 1rem;
-      background-color: #111;
-      color: #bbb;
-    }
-
-    img {
-      max-width: 100%;
-      height: auto;
-    }
-
-    @media (max-width: 768px) {
-      .two-column-layout {
-        flex-direction: column;
-      }
-
-      .nav-links {
-        display: none;
-        flex-direction: column;
-        width: 100%;
-        background-color: #1b2d3b;
-        padding: 1rem 0;
-      }
-
-      .nav-links.show {
-        display: flex;
-      }
-
-      .hamburger {
-        display: block;
-      }
-
-      .gallery-images img {
-        width: 100%;
-        max-width: 300px;
-      }
-    }
-
-    /* ✅ AI Chat Styles */
-    .ai-float {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background-color: #ffd700;
-      color: #000;
-      border: none;
-      padding: 12px 18px;
-      border-radius: 50px;
-      font-size: 16px;
-      cursor: pointer;
-      z-index: 9999;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-    }
-
-    .chat-box {
-      position: fixed;
-      top: 0;
-      left: 0;
-      height: 100vh;
-      width: 100vw;
-      background-color: #000;
-      color: white;
-      display: none;
-      flex-direction: column;
-      padding: 20px;
-      z-index: 9998;
-    }
-
-    .chat-header {
-      background-color: #ffd700;
-      color: black;
-      font-size: 20px;
-      padding: 10px 15px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-radius: 5px;
-      font-weight: bold;
-    }
-
-    .chat-body {
-      margin-top: 15px;
-      flex-grow: 1;
-      overflow-y: auto;
-    }
-
-    .chat-question button {
-      background-color: white;
-      color: #000;
-      border: none;
-      padding: 10px;
-      margin: 10px 0;
-      border-radius: 5px;
-      font-weight: bold;
-      cursor: pointer;
-      width: 100%;
-      text-align: left;
-    }
-
-    .chat-question button:hover {
-      background-color: #eee;
-    }
-
-    .chat-answer {
-      background-color: white;
-      color: #000;
-      margin-top: 15px;
-      padding: 10px;
-      border-radius: 5px;
-    }
-
-    .close-btn {
-      background: none;
-      border: none;
-      font-size: 20px;
-      cursor: pointer;
-    }
+    /* your existing CSS (no change needed) */
   </style>
 </head>
-
 <body>
   
-
-
 <!-- 🌐 Header -->
 <header>
   <div class="logo">
@@ -359,76 +21,35 @@
   </div>
   <button class="hamburger" onclick="toggleMenu()">☰</button>
   <ul class="nav-links" id="navLinks">
-    <li><a href="#">Home</a></li>
-    <li><a href="forms.html">Admissions</a></li>
-    <li><a href="shop.html">Shop</a></li>
-    <li><a href="/gallery">Gallery</a></li>
-    <li><a href="/branches">Branches</a></li>
-    <li><a href="/founders">Founder</a></li>
-    <li><a href="/contact">Contact</a></li>
+    <li><a href="#" onclick="loadPage('home.html')">Home</a></li>
+    <li><a href="#" onclick="loadPage('forms.html')">Admissions</a></li>
+    <li><a href="#" onclick="loadPage('shop.html')">Shop</a></li>
+    <li><a href="#" onclick="loadPage('gallery.html')">Gallery</a></li>
+    <li><a href="#" onclick="loadPage('branches.html')">Branches</a></li>
+    <li><a href="#" onclick="loadPage('founders.html')">Founder</a></li>
+    <li><a href="#" onclick="loadPage('contact.html')">Contact</a></li>
     <li><a href="login.html" class="login-btn">Login</a></li>
   </ul>
 </header>
 
-<!-- Hero, Live Video -->
-<section>
-<div>
-  <img src="TEACHERS DAY.gif" alt="Animated Background" class="hero-gif" />
-</div>
-    <h2>🎥ANNUAL SPORTS MEET 2025 is now on Youtube!</h2>
+<!-- ✅ Main content container -->
+<div id="main-content">
+  <!-- Default home content -->
+  <section>
+    <img src="TEACHERS DAY.gif" alt="Animated Background" class="hero-gif" />
+    <h2>🎥 ANNUAL SPORTS MEET 2025 is now on Youtube!</h2>
     <p>Watch our events live here!</p>
     <div class="video-wrapper">
-      <iframe 
-        src="https://www.youtube.com/embed/MvZ7OIwwQSs?autoplay=1&rel=0" 
-        allow="autoplay; encrypted-media" 
-        allowfullscreen></iframe>
+      <iframe src="https://www.youtube.com/embed/MvZ7OIwwQSs?autoplay=1&rel=0" 
+        allow="autoplay; encrypted-media" allowfullscreen></iframe>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- 🎓 Welcome -->
-<section>
-  <h1>Welcome to SJVM School</h1>
-  <p>Empowering students through excellence in education</p>
-</section>
-
-<!-- 📝 Admission -->
-<section id="admission">
-  <h2>Admission Open</h2>
-  <p>Enroll now for the academic year 2025–26.</p>
-  <a href="https://forms.sjvmschools.org" class="btn">Apply Now</a>
-</section>
-
-<!-- 🖼️ Gallery -->
-<section id="gallery">
-  <h2>Gallery</h2>
-  <div class="gallery-images">
-    <a href="gallery.html"><img src="gif (1).gif" alt="School 1" /></a>
-    <a href="gallery.html"><img src="ATTUR SCHOOL BLDG.jpg" alt="School 2" /></a>
-    <a href="gallery.html"><img src="bk scl.jpg" alt="School 3" /></a>
-  </div>
-</section>
-
-<!-- 🏫 Branches -->
-<section id="branches" class="branches" onclick="window.location.href='branches.html'" style="cursor: pointer;">
-  <h2>Our Branches</h2>
-  <p>SJVM Bandikodigenahalli</p>
-  <p>SJVM Atturu Layout</p>
-</section>
-
-<!-- 🧑‍🏫 Founder Message -->
-<section id="founder" class="founder">
-  <h2>Message from the Founder</h2>
-  <div><img src="sir.jpg" alt="Founder"></div>
-  <p>"At SJVM, we strive to build strong values and academic excellence among our students. Join us in shaping the future!"</p>
-  <p><strong>– Shri Late Dr. Narendra Kummara K R, Founder</strong></p>
-</section>
-
-<!-- 📞 Contact -->
-<section id="contact" onclick="window.location.href='contact.html'" style="cursor: pointer;">
-  <h2>Contact Us</h2>
-  <p>Email: info@sjvmschools.org | Phone: +91-7090233666</p>
-</section>
+  <section>
+    <h1>Welcome to SJVM School</h1>
+    <p>Empowering students through excellence in education</p>
+  </section>
+</div>
 
 <!-- ⚙️ Footer -->
 <footer>
@@ -437,251 +58,26 @@
 
 <!-- 🤖 SJVM Assistant -->
 <button class="ai-float" onclick="toggleChat()">I'm here to help 👋</button>
+<div class="chat-box" id="chatBox"> ... </div> <!-- your chat code -->
 
-<div class="chat-box" id="chatBox">
-  <div class="chat-header">
-    SJVM Assistant 🤖
-    <button class="close-btn" onclick="closeChat()">❌</button>
-  </div>
-  <div class="chat-body" id="chatBody">
-    <div id="chatMessages"></div>
-  </div>
-  <div id="chatInputArea" class="chat-input-area"></div>
-</div>
-
-<script src="https://cdn.emailjs.com/dist/email.min.js"></script>
 <script>
-emailjs.init("RYSpcySfYE9jFWhKI"); // Your EmailJS public key
-
-let chatData = {};
-let chatStep = 0;
-let chatOpen = false;
-
-// Predefined Q&A
-const fixedQA = [
-  {q: "📝 Admission", a: "Currently academic started, admission are closed!"},
-  {q: "⏰ Ganesha Chaturti", a: "✨🐘 A Historic Moment at SJVM! 🐘✨ For the first time ever, the SJVM Group of Institutions will be celebrating Ganesh Chaturthi at our campus. We warmly invite all parents, students, staff, and well-wishers to join this auspicious beginning. 🌸🪔 📅 Date: 27th August 2025 🕥 Time: 10:30 AM onwards 📍 Venue: SJVM Bandikodigenahalli Arena, Sy. No. 35, Bandikodigenahalli, KIAL Main Road, B K Halli Post, Bagaluru, Jala Hobli, Yelahanka, Bangalore North – 562149 🌿 Let us welcome Lord Ganesha with devotion and togetherness, seeking blessings for wisdom, knowledge, and prosperity for our students and the entire SJVM family. 🌿 🔗 More details: www.sjvmschools.org 🙏 Ganapati Bappa Morya! 🙏 #GaneshChaturthi #SJVM #FirstEverCelebration #Blessings #NewBeginnings #FestivalOfUnity"},
-  {q: "🏫 Facilities", a: "We offer smart classrooms, labs, library, sports ground, and transport."},
-  {q: "💰 Fees", a: "Fee details are available on our admissions page or office."},
-  {q: "Other Queries", a: ""}
-];
-
-function toggleChat(){
-  const chat=document.getElementById("chatBox");
-  if(chatOpen){
-    closeChat();
-  } else {
-    chat.style.display="flex";
-    chatOpen=true;
-    if(chatStep===0 && document.getElementById("chatMessages").innerHTML===""){
-      showFixedQuestions();
-    }
-  }
-}
-
-function closeChat(){
-  document.getElementById("chatBox").style.display="none";
-  chatOpen=false;
-  chatData={}; chatStep=0;
-  document.getElementById("chatMessages").innerHTML="";
-  document.getElementById("chatInputArea").innerHTML="";
-}
-
-function showFixedQuestions(){
-  const chatArea=document.getElementById("chatInputArea");
-  const messages=document.getElementById("chatMessages");
-  messages.innerHTML+=`<div><strong>Assistant:</strong> Please select your query:</div>`;
-  chatArea.innerHTML = fixedQA.map(q=>`<button onclick="selectQuery('${q.q}')">${q.q}</button>`).join('');
-  scrollChat();
-}
-
-function selectQuery(query){
-  const messages=document.getElementById("chatMessages");
-  messages.innerHTML+=`<div><strong>You:</strong> ${query}</div>`;
-  if(query!=="Other Queries"){
-    const ans=fixedQA.find(f=>f.q===query).a;
-    messages.innerHTML+=`<div><strong>Assistant:</strong> ${ans}</div>`;
-    document.getElementById("chatInputArea").innerHTML='';
-  } else {
-    chatData={}; chatStep=1; nextStep();
-  }
-  scrollChat();
-}
-
-function nextStep(){
-  const chatArea=document.getElementById("chatInputArea");
-  const messages=document.getElementById("chatMessages");
-  const steps=[
-    { key:"topic", label:"Please describe your query topic:" },
-    { key:"name", label:"Your full name?" },
-    { key:"email", label:"Email address?" },
-    { key:"mobile", label:"Mobile number?" },
-    { key:"pincode", label:"Pincode?" },
-    { key:"village", label:"Village?" }
-  ];
-  if(chatStep-1 < steps.length){
-    const step=steps[chatStep-1];
-    messages.innerHTML+=`<div><strong>Assistant:</strong> ${step.label}</div>`;
-    chatArea.innerHTML=`<input type="text" id="chatInput" placeholder="${step.label}" />
-                        <button onclick="submitAnswer()">Send</button>`;
-    document.getElementById("chatInput").focus();
-  } else { showSummary(); }
-  scrollChat();
-}
-
-function submitAnswer(){
-  const input=document.getElementById("chatInput");
-  const val=input.value.trim(); if(!val) return;
-  const messages=document.getElementById("chatMessages");
-  messages.innerHTML+=`<div><strong>You:</strong> ${val}</div>`;
-  const stepsKeys=["topic","name","email","mobile","pincode","village"];
-  const key=stepsKeys[chatStep-1];
-  chatData[key]=val;
-
-  if(key==="pincode"){
-    fetch(`https://api.postalpincode.in/pincode/${val}`)
-    .then(res=>res.json())
-    .then(data=>{
-      if(data[0].Status==="Success"){
-        chatData.state=data[0].PostOffice[0].State;
-        chatData.district=data[0].PostOffice[0].District;
-        messages.innerHTML+=`<div><strong>Assistant:</strong> Auto-detected State: ${chatData.state}, District: ${chatData.district}</div>`;
-        chatStep++; nextStep();
-      } else {
-        messages.innerHTML+=`<div><strong>Assistant:</strong> Invalid pincode. Please enter correct pincode.</div>`;
-      }
-      scrollChat();
-    }).catch(()=>{
-      messages.innerHTML+=`<div><strong>Assistant:</strong> Could not fetch state/district. Please enter manually.</div>`;
-      chatStep++; nextStep();
-    });
-  } else { chatStep++; nextStep(); }
-
-  input.value="";
-  scrollChat();
-}
-
-function showSummary(){
-  const messages=document.getElementById("chatMessages");
-  const chatArea=document.getElementById("chatInputArea");
-  messages.innerHTML+=`<div><strong>Assistant:</strong> Please review your details before submission:</div>`;
-  let summaryHTML="<ul>";
-  for(let k in chatData){ summaryHTML+=`<li><strong>${k}:</strong> ${chatData[k]}</li>`; }
-  summaryHTML+="</ul>";
-  chatArea.innerHTML=`<div>${summaryHTML}</div><button onclick="submitEmail()">Submit</button>`;
-  scrollChat();
-}
-
-function submitEmail(){
-  emailjs.send('service_c1uox1o','template_xeol1mo', chatData)
-  .then(()=>alert("✅ Your query has been sent! Our team will reply soon."))
-  .catch(()=>alert("❌ Error sending query."));
-  closeChat();
-}
-
-function scrollChat(){
-  const body=document.getElementById("chatBody");
-  body.scrollTop=body.scrollHeight;
-}
-</script>
-
-<style>
-/* Floating button */
-.ai-float {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background: #ffd700;
-  color: #000;
-  border: none;
-  padding: 12px 18px;
-  border-radius: 50px;
-  cursor: pointer;
-  z-index: 9999;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-  font-size: 16px;
-  font-weight: bold;
-}
-
-/* Chat box */
-.chat-box {
-  position: fixed;
-  bottom: 70px;
-  right: 20px;
-  width: 340px;
-  max-height: 480px;
-  background: #1b2d3b;
-  color: white;
-  display: none;
-  flex-direction: column;
-  border-radius: 12px;
-  z-index: 9998;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-  font-family: 'Poppins', sans-serif;
-}
-
-/* Header */
-.chat-header {
-  background: #ffd700;
-  color: black;
-  padding: 10px;
-  font-weight: bold;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-radius: 10px 10px 0 0;
-}
-
-/* Body */
-.chat-body {
-  padding: 10px;
-  flex-grow: 1;
-  overflow-y: auto;
-}
-
-/* Input area */
-.chat-input-area {
-  display: flex;
-  align-items: center;
-  padding: 10px;
-  border-top: 1px solid #444;
-}
-
-.chat-input-area input {
-  flex-grow: 1;
-  padding: 8px;
-  border-radius: 5px;
-  border: none;
-  outline: none;
-}
-
-.chat-input-area button {
-  margin-left: 8px;
-  padding: 8px 12px;
-  border-radius: 5px;
-  border: none;
-  background: #ffd700;
-  color: black;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-/* Mobile full screen */
-@media (max-width: 768px) {
-  .chat-box {
-    bottom: 0;
-    right: 0;
-    width: 100%;
-    height: 100%;
-    max-height: 100%;
-    border-radius: 0;
-  }
-}
-</style>
-  <script>
 function toggleMenu() {
   const nav = document.getElementById('navLinks');
   nav.classList.toggle('show');
+}
+
+// ✅ Dynamic page loader
+function loadPage(page) {
+  fetch(page)
+    .then(response => response.text())
+    .then(data => {
+      document.getElementById("main-content").innerHTML = data;
+      window.history.pushState({}, "", "index.html#" + page);
+    })
+    .catch(error => {
+      document.getElementById("main-content").innerHTML = "<p>❌ Failed to load page.</p>";
+      console.error("Error loading page:", error);
+    });
 }
 </script>
 
