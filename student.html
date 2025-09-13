@@ -1,200 +1,194 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <title>Student Dashboard | SJVM</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SJVM School | Student Dashboard</title>
+  <link rel="icon" href="favicon.png" type="image/png" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet" />
+
   <style>
-    body { font-family:Arial; background:#f4f8fc; margin:0; }
-    header { background:#003366; color:white; padding:20px; text-align:center; }
-    nav { background:#0059b3; display:flex; justify-content:center; flex-wrap:wrap; }
-    nav a { color:white; padding:14px 20px; text-decoration:none; font-weight:bold; }
-    nav a:hover { background:#003366; }
-    .container { max-width:900px; margin:30px auto; background:white; padding:30px; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.1); }
-    table { width:100%; border-collapse:collapse; margin-top:20px; }
-    th,td { padding:10px; border:1px solid #ccc; text-align:center; }
-    th { background:#e0ebff; }
-    button { padding:10px 15px; margin:10px 5px; background:#006600; color:white; border:none; border-radius:5px; cursor:pointer; }
-    button:hover { background:#004d00; }
-    .logout { text-align:center; margin:30px; }
-    .logout button { padding:10px 20px; background:#b30000; color:white; border:none; border-radius:6px; }
-    .logout button:hover { background:#800000; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+    body {
+      background: #f4f6f9;
+      color: #333;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ✅ Header */
+    header {
+      background-color: #2c5364;
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 {
+      font-size: 1.5rem;
+    }
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 1.2rem;
+    }
+    nav ul li a {
+      color: #ffd700;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    nav ul li a:hover {
+      text-decoration: underline;
+    }
+
+    /* ✅ Dashboard */
+    .container {
+      flex: 1;
+      padding: 2rem;
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 2rem;
+    }
+
+    /* Profile card */
+    .profile-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 15px;
+      text-align: center;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .profile-card img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      margin-bottom: 1rem;
+      border: 3px solid #2c5364;
+    }
+    .profile-card h2 {
+      color: #2c5364;
+      margin-bottom: 0.5rem;
+    }
+    .profile-card p {
+      margin: 5px 0;
+      font-size: 0.95rem;
+    }
+
+    /* Dashboard content */
+    .dashboard {
+      display: grid;
+      gap: 1.5rem;
+    }
+    .card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .card h3 {
+      margin-bottom: 1rem;
+      color: #2c5364;
+    }
+    .logout-btn {
+      background: #ff4d4d;
+      color: white;
+      padding: 0.6rem 1.2rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 1rem;
+    }
+    .logout-btn:hover {
+      background: #e60000;
+    }
   </style>
 </head>
 <body>
-<header><h1>🎓 SJVM Student Dashboard</h1></header>
-<nav>
-  <a href="#" onclick="showProfile()">👤 Profile</a>
-  <a href="#" onclick="showAttendance()">📝 Attendance</a>
-  <a href="#" onclick="showHomework()">📚 Homework</a>
-  <a href="#" onclick="viewResults()">📊 Results</a>
-  <a href="#" onclick="viewFees()">💰 Fees</a>
-</nav>
-<div class="container" id="dashboardContent"><p>Welcome to your dashboard!</p></div>
-<div class="logout"><button onclick="logout()">Logout</button></div>
+  <!-- ✅ Header -->
+  <header>
+    <h1>SJVM Student Dashboard</h1>
+    <nav>
+      <ul>
+        <li><a href="#">Assignments</a></li>
+        <li><a href="#">Attendance</a></li>
+        <li><a href="#">Results</a></li>
+        <li><a href="#" onclick="logout()">Logout</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- ✅ Main Container -->
+  <div class="container">
+    <!-- Profile Section -->
+    <div class="profile-card" id="profile">
+      <img src="favicon.png" alt="Profile Photo" />
+      <h2>Loading...</h2>
+      <p>Please wait...</p>
+    </div>
+
+    <!-- Dashboard Section -->
+    <div class="dashboard">
+      <div class="card">
+        <h3>📚 Assignments</h3>
+        <p>No new assignments.</p>
+      </div>
+      <div class="card">
+        <h3>📊 Attendance</h3>
+        <p>Attendance record will appear here.</p>
+      </div>
+      <div class="card">
+        <h3>🏆 Results</h3>
+        <p>Your exam results will appear here.</p>
+      </div>
+    </div>
+  </div>
 
 <script>
-  const usersURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/users.json";
-  const attendanceURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/attendance.json";
-  const homeworkURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/homework.json";
-  const resultsBase = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/results/";
-  const feesURL = "https://raw.githubusercontent.com/Echoesofthe21stcentury/sjvm-schools/main/fees.json";
+  // ✅ Load student from localStorage
+  const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
 
-  const userid = localStorage.getItem("userid");
-  const studentClass = localStorage.getItem("studentClass");
-  const branch = localStorage.getItem("branch");
+  if (!loggedInUser || loggedInUser.role !== "Student") {
+    // Block access if not logged in as Student
+    alert("⚠️ Unauthorized access. Please login as Student.");
+    window.location.href = "login.html";
+  } else {
+    fetch("users.json")
+      .then(res => res.json())
+      .then(data => {
+        let student = null;
+        for (const classKey in data.Student) {
+          if (data.Student[classKey][loggedInUser.userId]) {
+            student = data.Student[classKey][loggedInUser.userId];
+            break;
+          }
+        }
 
-  if (!userid || !studentClass || !branch) {
-    document.getElementById("dashboardContent").innerHTML = "<p style='color:red'>❌ Access Denied.</p>";
+        if (student) {
+          const profile = document.getElementById("profile");
+          profile.innerHTML = `
+            <img src="${student.photo}" alt="Profile Photo" />
+            <h2>${student.name}</h2>
+            <p><b>ID:</b> ${loggedInUser.userId}</p>
+            <p><b>Class:</b> ${student.class}</p>
+            <p><b>Branch:</b> ${student.branch}</p>
+            <p><b>Email:</b> ${student.email}</p>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+          `;
+        }
+      })
+      .catch(err => console.error("Error loading student:", err));
   }
 
   function logout() {
-    localStorage.clear();
-    window.location.href = "userlogin.html";
-  }
-
-  async function showProfile(){
-    const data = await (await fetch(usersURL)).json();
-    const stu = data.Student?.[studentClass]?.[userid] || {};
-    document.getElementById("dashboardContent").innerHTML = `
-      <h3>👤 Profile</h3>
-      <p><strong>User ID:</strong> ${userid}</p>
-      <p><strong>Name:</strong> ${stu.name || '—'}</p>
-      <p><strong>Class:</strong> ${studentClass}</p>
-      <p><strong>Branch:</strong> ${branch}</p>
-      <p><strong>Father:</strong> ${stu.father || '—'}</p>
-      <p><strong>Mother:</strong> ${stu.mother || '—'}</p>
-      <p><strong>Mobile:</strong> ${stu.mobile || '—'}</p>
-      <p><strong>Email:</strong> ${stu.email || '—'}</p>
-      <p><strong>DOB:</strong> ${stu.dob || '—'}</p>`;
-  }
-
-  async function showAttendance(){
-    const data = await (await fetch(attendanceURL)).json();
-    let rows = '';
-    for (const date in data) {
-      const r = data[date]?.[studentClass]?.[branch]?.[userid];
-      if (r) rows += `<tr><td>${date}</td><td>${r}</td></tr>`;
-    }
-    document.getElementById("dashboardContent").innerHTML = rows
-      ? `<h3>📝 Attendance</h3><table><tr><th>Date</th><th>Status</th></tr>${rows}</table>`
-      : "<p>No attendance records found.</p>";
-  }
-
-  async function showHomework(){
-    const hw = await (await fetch(homeworkURL)).json();
-    const list = (hw[studentClass] || []).map(h=>`<li><strong>${h.subject}</strong>: ${h.task} (Due: ${h.dueDate})</li>`).join("");
-    document.getElementById("dashboardContent").innerHTML = list
-      ? `<h3>📚 Homework</h3><ul>${list}</ul>`
-      : "<p>No homework assigned.</p>";
-  }
-
-  function viewResults(){
-    document.getElementById("dashboardContent").innerHTML = `
-      <h3>📊 View Results</h3>
-      <select id="exam"><option>--Select--</option>
-        ${["FA1","FA2","SA1","FA3","FA4","SA2"].map(ex=>`<option>${ex}</option>`).join('')}
-      </select>
-      <button onclick="fetchResult()">🔍 View</button>
-      <div id="resultOutput"></div>`;
-  }
-
-  async function fetchResult(){
-    const ex = document.getElementById("exam").value;
-    const out = document.getElementById("resultOutput");
-    if (!ex) return out.innerHTML = "<p style='color:red'>Please select exam.</p>";
-
-    try {
-      const res = await fetch(`${resultsBase}${ex}_${userid}.json`);
-      if (!res.ok) throw 0;
-      const data = await res.json();
-      const s = data.Status;
-      const bg = s=='Fail'?'#ffcccc':'#ccffcc';
-      const subs = Object.keys(data.marks);
-      const rows = subs.map(sub=>`
-        <tr>
-          <td>${sub}</td>
-          <td>${data.marks[sub].Marks}</td>
-          <td>${data.marks[sub].Max}</td>
-          <td>${data.marks[sub].Internal}</td>
-          <td>${data.marks[sub].Total}</td>
-          <td>${data.marks[sub].Grade}</td>
-        </tr>`).join("");
-      out.innerHTML = `
-        <div id="resultSection" style="background:${bg};padding:20px;border-radius:10px;">
-          <table>
-            <thead><tr><th>Subject</th><th>Obtained</th><th>Max</th><th>Internal</th><th>Total</th><th>Grade</th></tr></thead>
-            <tbody>${rows}</tbody>
-            <tfoot>
-              <tr><td colspan="4"><b>Total Obtained</b></td><td colspan="2">${data.Total}/${data.Max}</td></tr>
-              <tr><td colspan="4"><b>Percentage</b></td><td colspan="2">${data.Percentage}%</td></tr>
-              <tr><td colspan="4"><b>Status</b></td><td colspan="2">${s}</td></tr>
-            </tfoot>
-          </table>
-          <br><button onclick="printResult()">🖨 Print</button><button onclick="downloadPDF()">⬇️ PDF</button>
-        </div>`;
-    } catch {
-      out.innerHTML = `<p style="color:red">Result not published yet.</p>`;
-    }
-  }
-
-  function printResult(){
-    const win = window.open("", "", "height=700,width=900");
-    win.document.write(`<html><head><title>Print Result</title>
-      <style>body{font-family:Arial;padding:20px;}table{width:100%;border-collapse:collapse;}
-             th,td{border:1px solid #333;padding:10px;text-align:center;}</style></head><body>`);
-    win.document.write(document.getElementById("resultSection").innerHTML);
-    win.document.write("</body></html>");
-    win.print(); win.close();
-  }
-
-  function downloadPDF(){
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    doc.html(document.getElementById("resultSection"), {
-      callback: () => doc.save("Result.pdf"),
-      x: 10, y: 10
-    });
-  }
-
-  async function viewFees(){
-    const data = await (await fetch(feesURL)).json();
-    const fee = data?.[studentClass]?.[branch]?.[userid];
-    if (!fee) {
-      document.getElementById("dashboardContent").innerHTML = "<p>💰 No fee assigned yet.</p>";
-      return;
-    }
-
-    if (fee.status === "Paid") {
-      document.getElementById("dashboardContent").innerHTML = `
-        <h3>💰 Fee Status</h3>
-        <p><strong>Status:</strong> ✅ Paid</p>
-        <p><strong>Amount:</strong> ₹${fee.amount}</p>
-        <p><strong>Payment Mode:</strong> ${fee.mode}</p>
-        <p><strong>Paid Date:</strong> ${fee.date}</p>`;
-    } else {
-      document.getElementById("dashboardContent").innerHTML = `
-        <h3>💰 Fee Due</h3>
-        <p><strong>Status:</strong> ❌ Pending</p>
-        <p><strong>Amount Due:</strong> ₹${fee.amount}</p>
-        <button onclick="payNow(${fee.amount})">Pay Now</button>`;
-    }
-  }
-
-  function payNow(amount) {
-    const method = prompt("Select Payment Mode (Cash / UPI / Card):");
-    const paidAmount = parseInt(prompt("Enter amount to pay (min ₹2000):"));
-    if (paidAmount < 2000 || paidAmount > amount) return alert("Invalid amount.");
-    alert(`✅ Payment of ₹${paidAmount} successful via ${method}. PDF generated.`);
-
-    // You can add pdf generation logic here
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    doc.text(`SJVM Schools\nPayment Receipt\n\nUser: ${userid}\nAmount: ₹${paidAmount}\nMode: ${method}\nStatus: Paid`, 10, 10);
-    doc.save(`SJVM_Fee_Receipt_${userid}.pdf`);
-
-    document.getElementById("dashboardContent").innerHTML = `<p>✅ Fee payment complete. Please wait while admin updates your status.</p>`;
+    localStorage.removeItem("loggedInUser");
+    window.location.href = "login.html";
   }
 </script>
 </body>
