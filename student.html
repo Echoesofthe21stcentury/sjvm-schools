@@ -1,195 +1,131 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SJVM School | Student Dashboard</title>
-  <link rel="icon" href="favicon.png" type="image/png" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SJVM School | Student Dashboard</title>
+<link rel="icon" href="favicon.png" type="image/png" />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+body { background: #f4f6f9; color: #333; min-height: 100vh; display: flex; flex-direction: column; }
 
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Poppins', sans-serif;
-    }
-    body {
-      background: #f4f6f9;
-      color: #333;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
+header { background-color: #2c5364; color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+header h1 { font-size: 1.5rem; }
+nav ul { list-style: none; display: flex; gap: 1rem; flex-wrap: wrap; }
+nav ul li a { color: #ffd700; text-decoration: none; font-weight: 500; }
+nav ul li a:hover { text-decoration: underline; }
 
-    /* ✅ Header */
-    header {
-      background-color: #2c5364;
-      color: white;
-      padding: 1rem 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    header h1 {
-      font-size: 1.5rem;
-    }
-    nav ul {
-      list-style: none;
-      display: flex;
-      gap: 1.2rem;
-    }
-    nav ul li a {
-      color: #ffd700;
-      text-decoration: none;
-      font-weight: 500;
-    }
-    nav ul li a:hover {
-      text-decoration: underline;
-    }
+.container { flex: 1; padding: 1rem; display: grid; grid-template-columns: 300px 1fr; gap: 1rem; }
+@media (max-width: 768px) { .container { grid-template-columns: 1fr; } }
 
-    /* ✅ Dashboard */
-    .container {
-      flex: 1;
-      padding: 2rem;
-      display: grid;
-      grid-template-columns: 300px 1fr;
-      gap: 2rem;
-    }
-
-    /* Profile card */
-    .profile-card {
-      background: white;
-      padding: 1.5rem;
-      border-radius: 15px;
-      text-align: center;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    }
-    .profile-card img {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      margin-bottom: 1rem;
-      border: 3px solid #2c5364;
-    }
-    .profile-card h2 {
-      color: #2c5364;
-      margin-bottom: 0.5rem;
-    }
-    .profile-card p {
-      margin: 5px 0;
-      font-size: 0.95rem;
-    }
-
-    /* Dashboard content */
-    .dashboard {
-      display: grid;
-      gap: 1.5rem;
-    }
-    .card {
-      background: white;
-      padding: 1.5rem;
-      border-radius: 15px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    }
-    .card h3 {
-      margin-bottom: 1rem;
-      color: #2c5364;
-    }
-    .logout-btn {
-      background: #ff4d4d;
-      color: white;
-      padding: 0.6rem 1.2rem;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      margin-top: 1rem;
-    }
-    .logout-btn:hover {
-      background: #e60000;
-    }
-  </style>
+.profile-card { background: white; padding: 1rem; border-radius: 15px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.1); cursor: pointer; }
+.profile-card img { width: 120px; height: 120px; border-radius: 50%; margin-bottom: 0.5rem; border: 3px solid #2c5364; }
+.profile-card h2 { color: #2c5364; margin-bottom: 0.5rem; }
+.profile-card p { margin: 3px 0; font-size: 0.95rem; }
+.card { background: white; padding: 1rem; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+.card h3 { margin-bottom: 0.5rem; color: #2c5364; }
+.logout-btn { background: #ff4d4d; color: white; padding: 0.5rem 1rem; border: none; border-radius: 8px; cursor: pointer; margin-top: 0.5rem; }
+.logout-btn:hover { background: #e60000; }
+</style>
 </head>
 <body>
-  <!-- ✅ Header -->
-  <header>
-    <h1>SJVM Student Dashboard</h1>
-    <nav>
-      <ul>
-        <li><a href="#">Assignments</a></li>
-        <li><a href="#">Attendance</a></li>
-        <li><a href="#">Results</a></li>
-        <li><a href="#" onclick="logout()">Logout</a></li>
-      </ul>
-    </nav>
-  </header>
 
-  <!-- ✅ Main Container -->
-  <div class="container">
-    <!-- Profile Section -->
-    <div class="profile-card" id="profile">
-      <img src="favicon.png" alt="Profile Photo" />
-      <h2>Loading...</h2>
-      <p>Please wait...</p>
-    </div>
+<header>
+<h1>SJVM Student Dashboard</h1>
+<nav>
+<ul>
+<li><a href="#">Assignments</a></li>
+<li><a href="#">Attendance</a></li>
+<li><a href="#">Results</a></li>
+<li><a href="#" onclick="logout()">Logout</a></li>
+</ul>
+</nav>
+</header>
 
-    <!-- Dashboard Section -->
-    <div class="dashboard">
-      <div class="card">
-        <h3>📚 Assignments</h3>
-        <p>No new assignments.</p>
-      </div>
-      <div class="card">
-        <h3>📊 Attendance</h3>
-        <p>Attendance record will appear here.</p>
-      </div>
-      <div class="card">
-        <h3>🏆 Results</h3>
-        <p>Your exam results will appear here.</p>
-      </div>
-    </div>
-  </div>
+<div class="container">
+<div class="profile-card" id="profile">
+<img src="favicon.png" alt="Profile Photo" />
+<h2>Loading...</h2>
+<p>Please wait...</p>
+</div>
+
+<div class="dashboard">
+<div class="card" id="assignments-card">
+<h3>📚 Assignments</h3>
+<p>No new assignments.</p>
+</div>
+<div class="card" id="attendance-card">
+<h3>📊 Attendance</h3>
+<p>Attendance record will appear here.</p>
+</div>
+<div class="card" id="results-card">
+<h3>🏆 Results</h3>
+<p>Your exam results will appear here.</p>
+</div>
+</div>
+</div>
 
 <script>
-  // ✅ Load student from localStorage
-  const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
+// Load logged in student
+const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
+if(!loggedInUser || loggedInUser.role !== "Student") {
+alert("⚠️ Unauthorized access. Please login as Student.");
+window.location.href = "login.html";
+}
 
-  if (!loggedInUser || loggedInUser.role !== "Student") {
-    // Block access if not logged in as Student
-    alert("⚠️ Unauthorized access. Please login as Student.");
-    window.location.href = "login.html";
-  } else {
-    fetch("users.json")
+const githubURL = "https://raw.githubusercontent.com/infosjvm-prog/update-sjvmschools/main/users.json";
+
+fetch(githubURL)
+.then(res => res.json())
+.then(data => {
+  let student = null;
+  for(const classKey in data.Student) {
+    if(data.Student[classKey][loggedInUser.userId]) {
+      student = data.Student[classKey][loggedInUser.userId];
+      break;
+    }
+  }
+  if(student){
+    const profile = document.getElementById("profile");
+    profile.innerHTML = `
+      <img src="${student.photo}" alt="Profile Photo" />
+      <h2>${student.name}</h2>
+      <p><b>ID:</b> ${loggedInUser.userId}</p>
+      <p><b>Class:</b> ${student.class}</p>
+      <p><b>Branch:</b> ${student.branch}</p>
+      <p><b>Email:</b> ${student.email}</p>
+      <p><b>Mobile:</b> ${student.mobile}</p>
+      <p><b>Password:</b> <span id="pass-star">********</span> <button onclick="togglePassword()">👁️</button></p>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+      <button class="logout-btn" onclick="window.location.href='https://update.sjvmschools.org'">Update Details</button>
+    `;
+  }
+})
+.catch(err => console.error("Error loading student:", err));
+
+function togglePassword(){
+  const passSpan = document.getElementById("pass-star");
+  if(passSpan.textContent === "********"){
+    fetch(githubURL)
       .then(res => res.json())
       .then(data => {
         let student = null;
-        for (const classKey in data.Student) {
-          if (data.Student[classKey][loggedInUser.userId]) {
+        for(const classKey in data.Student) {
+          if(data.Student[classKey][loggedInUser.userId]) {
             student = data.Student[classKey][loggedInUser.userId];
             break;
           }
         }
+        if(student) passSpan.textContent = student.password;
+      });
+  } else { passSpan.textContent = "********"; }
+}
 
-        if (student) {
-          const profile = document.getElementById("profile");
-          profile.innerHTML = `
-            <img src="${student.photo}" alt="Profile Photo" />
-            <h2>${student.name}</h2>
-            <p><b>ID:</b> ${loggedInUser.userId}</p>
-            <p><b>Class:</b> ${student.class}</p>
-            <p><b>Branch:</b> ${student.branch}</p>
-            <p><b>Email:</b> ${student.email}</p>
-            <button class="logout-btn" onclick="logout()">Logout</button>
-          `;
-        }
-      })
-      .catch(err => console.error("Error loading student:", err));
-  }
-
-  function logout() {
-    localStorage.removeItem("loggedInUser");
-    window.location.href = "login.html";
-  }
+function logout(){
+  localStorage.removeItem("loggedInUser");
+  window.location.href="login.html";
+}
 </script>
 </body>
 </html>
