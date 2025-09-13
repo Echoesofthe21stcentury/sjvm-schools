@@ -154,12 +154,13 @@
   "Branch": {
     "Atturu layout": {
        "atturu2011": {
-           "name": "Atturu Layout"
-           "password": "Branch@2011"
+           "name": "Atturu Layout",
+           "password": "Branch@2011",
            "branch": "Atturu Layout"
        }
     }
   },
   "Chairman": {}
 }
+
 
