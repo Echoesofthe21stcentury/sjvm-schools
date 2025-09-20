@@ -351,7 +351,7 @@
   <!-- 🎉 Popup -->
 <div id="popup" class="popup">
   <div class="popup-content">
-    <img src="photo-collage.png.png" alt="Teachers">
+    <img src="photo-collage.png" alt="Teachers">
     <div class="popup-text">
       <h2>Congratulations!</h2>
       <p>📢 Congratulations on Receiving the Best Teacher Awards 📢</p>
@@ -366,7 +366,7 @@
     <img src="SJVM logo empowering mankind without background.png" alt="SJVM Logo" />
     SJVM
   </div>
-  <button class="hamburger" onclick="toggleMenu()">☰</button>
+  <button class="hamburger">☰</button>
   <ul class="nav-links" id="navLinks">
     <li><a href="#" onclick="loadPage('home.html')">Home</a></li>
     <li><a href="#" onclick="loadPage('forms.html')">Admissions</a></li>
@@ -589,11 +589,10 @@ function submitEmail(){
 }
 
 function scrollChat(){
-  const body=document.getElementById("chatBody");
-  body.scrollTop=body.scrollHeight;
+  const body = document.getElementById("chatMessages");
+  body.scrollTop = body.scrollHeight;
 }
 </script>
-
 
 <style>
 /* Floating Help Button */
@@ -601,22 +600,20 @@ function scrollChat(){
   position: fixed;
   bottom: 20px;
   right: 20px;
-  background: #004aad;
-  color: #fff;
+  background: #ffd700;
+  color: #000;
   padding: 12px 18px;
-  border-radius: 30px;
+  border-radius: 50px;
   cursor: pointer;
   border: none;
-  box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
+  box-shadow: 0px 4px 8px rgba(0,0,0,0.3);
   transition: 0.3s;
 }
-.ai-float:hover {
-  background: #002f6c;
-}
+.ai-float:hover { background: #e6c200; }
 
 /* Chat Popup */
 .chat-popup {
-  display: none; /* Hidden by default */
+  display: none;
   position: fixed;
   bottom: 80px;
   right: 20px;
@@ -635,10 +632,11 @@ function scrollChat(){
 }
 
 .chat-header {
-  background: #004aad;
-  color: white;
-  padding: 10px;
+  background: #ffd700;
+  color: #000;
+  font-size: 16px;
   font-weight: bold;
+  padding: 10px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -659,6 +657,7 @@ function scrollChat(){
   padding: 10px;
   font-size: 14px;
 }
+
 .close-btn {
   background: none;
   border: none;
@@ -666,17 +665,21 @@ function scrollChat(){
   font-size: 16px;
   cursor: pointer;
 }
-
 </style>
 
 <script>
-function toggleMenu() {
-  const nav = document.getElementById('navLinks');
-  nav.classList.toggle('show');
-}
-
-// 🎉 Popup close button
 document.addEventListener("DOMContentLoaded", function() {
+  // Mobile menu toggle
+  const hamburger = document.querySelector(".hamburger");
+  const navLinks = document.getElementById("navLinks");
+
+  function toggleMenu() {
+    navLinks.classList.toggle("show");
+  }
+
+  hamburger.addEventListener("click", toggleMenu);
+
+  // Popup close
   const popup = document.getElementById("popup");
   const closeBtn = document.getElementById("closePopup");
 
@@ -684,19 +687,24 @@ document.addEventListener("DOMContentLoaded", function() {
     popup.style.display = "none";
   });
 });
+</script>
+
 <script>
 function openChatPopup() {
-  document.getElementById("chatPopup").style.display = "block";
+  const chat = document.getElementById("chatPopup");
+  chat.style.display = "block";
   if (document.getElementById("chatMessages").innerHTML === "") {
-    showFixedQuestions(); // show predefined options first
+    showFixedQuestions(); // Show predefined queries first
   }
 }
 
 function closeChatPopup() {
-  document.getElementById("chatPopup").style.display = "none";
+  const chat = document.getElementById("chatPopup");
+  chat.style.display = "none";
   document.getElementById("chatMessages").innerHTML = "";
   document.getElementById("chatInputArea").innerHTML = "";
 }
 </script>
+
 </body>
 </html>
