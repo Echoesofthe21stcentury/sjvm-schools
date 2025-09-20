@@ -361,25 +361,24 @@
   </div>
 </div>
   <!-- 🌐 Header -->
-<header>
-  <div class="logo">
-    <img src="SJVM logo empowering mankind without background.png" alt="SJVM Logo" />
-    SJVM
-  </div>
-  <button class="hamburger">☰</button>
-  <ul class="nav-links" id="navLinks">
-    <li><a href="#" onclick="loadPage('home.html')">Home</a></li>
-    <li><a href="#" onclick="loadPage('forms.html')">Admissions</a></li>
-    <li><a href="#" onclick="loadPage('shop.html')">Shop</a></li>
-    <li><a href="#" onclick="loadPage('https://careers.sjvmschools.org')">Career Opportunities</a></li>
-    <li><a href="#" onclick="loadPage('gallery.html')">Gallery</a></li>
-    <li><a href="#" onclick="loadPage('branches.html')">Branches</a></li>
-    <li><a href="#" onclick="loadPage('founders.html')">Founder</a></li>
-    <li><a href="#" onclick="loadPage('contact.html')">Contact</a></li>
-    <li><a href="login.html" class="login-btn">Login</a></li>
-  </ul>
-</header>
-
+  <header>
+    <div class="logo">
+      <img src="SJVM logo empowering mankind without background.png" alt="SJVM Logo" />
+      SJVM
+    </div>
+    <button class="hamburger">☰</button>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#" onclick="loadPage('home.html')">Home</a></li>
+      <li><a href="#" onclick="loadPage('forms.html')">Admissions</a></li>
+      <li><a href="#" onclick="loadPage('shop.html')">Shop</a></li>
+      <li><a href="https://careers.sjvmschools.org" target="_blank">Career Opportunities</a></li>
+      <li><a href="#" onclick="loadPage('gallery.html')">Gallery</a></li>
+      <li><a href="#" onclick="loadPage('branches.html')">Branches</a></li>
+      <li><a href="#" onclick="loadPage('founders.html')">Founder</a></li>
+      <li><a href="#" onclick="loadPage('contact.html')">Contact</a></li>
+      <li><a href="login.html" class="login-btn">Login</a></li>
+    </ul>
+  </header>
 <!-- Hero, Live Video -->
 <section>
 <div>
@@ -591,6 +590,24 @@ function submitEmail(){
 function scrollChat(){
   const body = document.getElementById("chatMessages");
   body.scrollTop = body.scrollHeight;
+}
+</script>
+<script>
+function loadPage(page) {
+  fetch(page)
+    .then(response => {
+      if (!response.ok) throw new Error('Page not found: ' + page);
+      return response.text();
+    })
+    .then(html => {
+      document.getElementById('mainContent').innerHTML = html;
+    })
+    .catch(err => {
+      document.getElementById('mainContent').innerHTML = `
+        <h2>Error</h2>
+        <p>${err.message}</p>
+      `;
+    });
 }
 </script>
 
