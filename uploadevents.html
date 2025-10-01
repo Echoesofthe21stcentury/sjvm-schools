@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Upload Events - SJVM</title>
+<style>
+body { font-family: Arial, sans-serif; padding: 2rem; background:#203a43; color:white; }
+input, select, button { margin:0.5rem 0; padding:0.5rem; }
+#uploadSection { display:none; margin-top:2rem; }
+</style>
+</head>
+<body>
+
+<h1>Upload Event Images</h1>
+
+<div id="pinSection">
+  <label>Enter Security PIN: </label>
+  <input type="password" id="pinInput" placeholder="PIN">
+  <button onclick="checkPIN()">Submit</button>
+  <p id="pinMsg" style="color:red;"></p>
+</div>
+
+<div id="uploadSection">
+  <label>Select School Branch:</label>
+  <select id="branchSelect"></select><br>
+
+  <label>Select Event:</label>
+  <select id="eventSelect"></select><br>
+
+  <label>Upload Images:</label>
+  <input type="file" id="imageInput" multiple accept="image/*"><br>
+
+  <button onclick="uploadEvent()">Upload Event</button>
+  <p id="uploadMsg"></p>
+</div>
+
+<script>
+// ---------- Security PIN ----------
+let pinTimer = setTimeout(()=>{ window.location.href="index.html"; }, 20000);
+function checkPIN(){
+  const pin = document.getElementById("pinInput").value;
+  if(pin==="091118"){
+    clearTimeout(pinTimer);
+    document.getElementById("pinSection").style.display="none";
+    document.getElementById("uploadSection").style.display="block";
+    loadBranches();
+  } else {
+    document.getElementById("pinMsg").textContent = "Incorrect PIN!";
+  }
+}
+
+// ---------- Load Branches & Events ----------
+let eventsData = [];
+async function loadBranches(){
+  const res = await fetch('events.json');
+  eventsData = await res.json();
+  const branchSet = new Set(eventsData.map(e=>e.school));
+  const branchSelect = document.getElementById("branchSelect");
+  branchSet.forEach(b=>{
+    const opt = document.createElement("option"); opt.value=b; opt.textContent=b;
+    branchSelect.appendChild(opt);
+  });
+  branchSelect.addEventListener("change", updateEvents);
+  updateEvents();
+}
+
+function updateEvents(){
+  const selectedBranch = document.getElementById("branchSelect").value;
+  const eventSelect = document.getElementById("eventSelect");
+  eventSelect.innerHTML="";
+  eventsData.filter(e=>e.school===selectedBranch).forEach(ev=>{
+    const opt = document.createElement("option"); opt.value=ev.id; opt.textContent=ev.title;
+    eventSelect.appendChild(opt);
+  });
+}
+
+// ---------- GitHub API Upload ----------
+async function uploadEvent(){
+  const selectedEventId = parseInt(document.getElementById("eventSelect").value);
+  const selectedEvent = eventsData.find(e=>e.id===selectedEventId);
+  const files = document.getElementById("imageInput").files;
+  if(files.length===0){ alert("Select at least one image."); return; }
+
+  const username = "YOUR_GITHUB_USERNAME";
+  const repo = "YOUR_REPO_NAME";
+  const branch = "main";
+  const token = "YOUR_PERSONAL_ACCESS_TOKEN";
+  const imagesFolder = "images/";
+
+  const newImagePaths = [];
+
+  for(const file of files){
+    const b64 = await toBase64(file);
+    const path = `${imagesFolder}${file.name}`;
+    newImagePaths.push(path);
+
+    // Get SHA if file exists
+    let sha = null;
+    const getFile = await fetch(`https://api.github.com/repos/${username}/${repo}/contents/${path}?ref=${branch}`, {
+      headers:{Authorization:`token ${token}`}
+    });
+    if(getFile.ok){
+      const fileData = await getFile.json();
+      sha = fileData.sha;
+    }
+
+    // Upload image
+    await fetch(`https://api.github.com/repos/${username}/${repo}/contents/${path}`, {
+      method:"PUT",
+      headers:{Authorization:`token ${token}`},
+      body: JSON.stringify({
+        message: `Add ${file.name}`,
+        content: b64,
+        branch: branch,
+        sha: sha
+      })
+    });
+  }
+
+  // Update events.json with new image paths
+  selectedEvent.images.push(...newImagePaths);
+
+  // Get current SHA of events.json
+  const getEventsFile = await fetch(`https://api.github.com/repos/${username}/${repo}/contents/events.json?ref=${branch}`, {
+    headers:{Authorization:`token ${token}`}
+  });
+  const eventsFileData = await getEventsFile.json();
+  const eventsSHA = eventsFileData.sha;
+
+  // Upload updated events.json
+  const updateRes = await fetch(`https://api.github.com/repos/${username}/${repo}/contents/events.json`, {
+    method:"PUT",
+    headers:{Authorization:`token ${token}`},
+    body: JSON.stringify({
+      message: `Update images for ${selectedEvent.title}`,
+      content: btoa(JSON.stringify(eventsData, null, 2)),
+      branch: branch,
+      sha: eventsSHA
+    })
+  });
+
+  if(updateRes.ok){
+    document.getElementById("uploadMsg").textContent = "Event images uploaded and events.json updated!";
+  } else {
+    document.getElementById("uploadMsg").textContent = "Error updating events.json.";
+    console.error(await updateRes.json());
+  }
+}
+
+// Convert file to base64
+function toBase64(file){ 
+  return new Promise((resolve, reject)=>{
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = ()=> resolve(reader.result.split(",")[1]);
+    reader.onerror = err=> reject(err);
+  });
+}
+</script>
+
+</body>
+</html>
