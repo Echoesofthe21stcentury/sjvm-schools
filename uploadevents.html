@@ -14,10 +14,11 @@
   label { display:block; margin:0.5rem 0 0.2rem 0; }
   input, select, button { padding:0.5rem; margin-bottom:1rem; border-radius:5px; border:none; width:100%; max-width:400px; }
   button { background:#ffd700; color:#000; font-weight:bold; cursor:pointer; }
-  #uploadSection, #tokenSection { display:none; margin-top:2rem; text-align:center; }
+  #uploadSection { display:none; margin-top:2rem; }
+  #pinSection, #tokenSection { text-align:center; }
+  #uploadMsg { margin-top:1rem; font-weight:bold; text-align:center; }
   #previewContainer { display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:1rem; justify-content:center; }
   .previewImage { width:120px; height:120px; object-fit:cover; border-radius:8px; border:2px solid #ffd700; }
-  #pinSection { text-align:center; }
 </style>
 </head>
 <body>
@@ -25,7 +26,7 @@
 <main>
 <h1>Upload Event Images</h1>
 
-<!-- PIN Section -->
+<!-- Security PIN -->
 <div id="pinSection">
   <label>Enter Security PIN:</label>
   <input type="password" id="pinInput" placeholder="PIN">
@@ -33,10 +34,10 @@
   <p id="pinMsg" style="color:red;"></p>
 </div>
 
-<!-- GitHub Token Section -->
-<div id="tokenSection">
+<!-- GitHub Token -->
+<div id="tokenSection" style="display:none;">
   <label>Enter GitHub Access Token:</label>
-  <input type="password" id="githubTokenInput" placeholder="PAT">
+  <input type="password" id="tokenInput" placeholder="GitHub PAT">
   <button onclick="submitToken()">Submit Token</button>
   <p id="tokenMsg" style="color:red;"></p>
 </div>
@@ -60,10 +61,8 @@
 </main>
 
 <script>
+// ---------- Security PIN ----------
 let pinTimer = setTimeout(()=>{ window.location.href="index.html"; }, 20000);
-let githubToken = "";
-
-// -------- Security PIN --------
 function checkPIN(){
   const pin = document.getElementById("pinInput").value;
   if(pin==="091118"){
@@ -75,30 +74,30 @@ function checkPIN(){
   }
 }
 
-// -------- GitHub Token --------
+// ---------- GitHub Token ----------
+let githubToken = "";
 function submitToken(){
-  const tokenInput = document.getElementById("githubTokenInput").value.trim();
-  if(tokenInput.length===0){
-    document.getElementById("tokenMsg").textContent = "Enter a valid token!";
-    return;
-  }
-  githubToken = tokenInput;
+  const token = document.getElementById("tokenInput").value.trim();
+  if(token.length===0){ document.getElementById("tokenMsg").textContent="Token required!"; return; }
+  githubToken = token;
   document.getElementById("tokenSection").style.display="none";
   document.getElementById("uploadSection").style.display="block";
   loadBranches();
 }
 
-// -------- Load Branches & Events --------
+// ---------- Load Branches & Events ----------
 let eventsData = [];
+const username = "Echoesofthe21stcentury"; // GitHub username
+const repo = "sjvm-schools";              // GitHub repo
+const branch = "main";
+
 async function loadBranches(){
   const res = await fetch('events.json');
   eventsData = await res.json();
   const branchSet = new Set(eventsData.map(e=>e.school));
   const branchSelect = document.getElementById("branchSelect");
   branchSet.forEach(b=>{
-    const opt = document.createElement("option");
-    opt.value=b;
-    opt.textContent=b;
+    const opt = document.createElement("option"); opt.value=b; opt.textContent=b;
     branchSelect.appendChild(opt);
   });
   branchSelect.addEventListener("change", updateEvents);
@@ -110,14 +109,12 @@ function updateEvents(){
   const eventSelect = document.getElementById("eventSelect");
   eventSelect.innerHTML="";
   eventsData.filter(e=>e.school===selectedBranch).forEach(ev=>{
-    const opt = document.createElement("option");
-    opt.value=ev.id;
-    opt.textContent=ev.title;
+    const opt = document.createElement("option"); opt.value=ev.id; opt.textContent=ev.title;
     eventSelect.appendChild(opt);
   });
 }
 
-// -------- Preview Images --------
+// ---------- Preview Images ----------
 function showPreview(){
   const files = document.getElementById("imageInput").files;
   const container = document.getElementById("previewContainer");
@@ -130,18 +127,14 @@ function showPreview(){
   });
 }
 
-// -------- Upload Event --------
+// ---------- GitHub Upload ----------
 async function uploadEvent(){
   const selectedEventId = parseInt(document.getElementById("eventSelect").value);
   const selectedEvent = eventsData.find(e=>e.id===selectedEventId);
   const files = document.getElementById("imageInput").files;
   if(files.length===0){ alert("Select at least one image."); return; }
-  if(githubToken===""){ alert("Enter GitHub token first!"); return; }
 
-  const username = "Echoesofthe21stcentury";
-  const repo = "sjvm-schools";
-  const branch = "main";
-  const imagesFolder = "images/";
+  const imagesFolder = `images/${selectedEvent.school}/${selectedEvent.title.replace(/\s+/g,"_")}/`;
   const newImagePaths = [];
 
   for(const file of files){
@@ -170,6 +163,7 @@ async function uploadEvent(){
     });
   }
 
+  // Update events.json
   selectedEvent.images.push(...newImagePaths);
 
   const getEventsFile = await fetch(`https://api.github.com/repos/${username}/${repo}/contents/events.json?ref=${branch}`, {
@@ -178,30 +172,28 @@ async function uploadEvent(){
   const eventsFileData = await getEventsFile.json();
   const eventsSHA = eventsFileData.sha;
 
-  function utf8_to_b64(str){ return window.btoa(unescape(encodeURIComponent(str))); }
-
   const updateRes = await fetch(`https://api.github.com/repos/${username}/${repo}/contents/events.json`, {
     method:"PUT",
     headers:{Authorization:`token ${githubToken}`},
     body: JSON.stringify({
       message: `Update images for ${selectedEvent.title}`,
-      content: utf8_to_b64(JSON.stringify(eventsData, null, 2)),
+      content: btoa(JSON.stringify(eventsData, null, 2)),
       branch: branch,
       sha: eventsSHA
     })
   });
 
   if(updateRes.ok){
-    document.getElementById("uploadMsg").textContent = "Event images uploaded and events.json updated!";
-    document.getElementById("previewContainer").innerHTML = "";
-    document.getElementById("imageInput").value = "";
+    document.getElementById("uploadMsg").textContent = "Event images uploaded successfully!";
+    document.getElementById("previewContainer").innerHTML="";
+    document.getElementById("imageInput").value="";
   } else {
     document.getElementById("uploadMsg").textContent = "Error updating events.json.";
     console.error(await updateRes.json());
   }
 }
 
-// Convert file to base64
+// ---------- Convert file to base64 ----------
 function toBase64(file){ 
   return new Promise((resolve, reject)=>{
     const reader = new FileReader();
