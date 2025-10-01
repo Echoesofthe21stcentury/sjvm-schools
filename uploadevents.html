@@ -3,94 +3,172 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SJVM Event Gallery</title>
+<title>Upload Events - SJVM</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
 <style>
-  *{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
-  body{background:linear-gradient(to right,#0f2027,#203a43,#2c5364);color:white;min-height:100vh;}
-  header{padding:1rem;text-align:center;background:#203a43;box-shadow:0 2px 5px rgba(0,0,0,0.3);}
-  header h1{color:#ffd700;font-size:1.8rem;}
-  main{padding:1rem;}
-  select{padding:0.5rem;border-radius:5px;border:none;margin-bottom:1rem;width:100%;max-width:400px;}
-  .gallery-container{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;}
-  .event-section{margin-bottom:2rem;}
-  .event-title{font-size:1.2rem;font-weight:bold;margin-bottom:0.5rem;color:#ffd700;text-align:center;}
-  .gallery-container img{width:100%;height:150px;object-fit:cover;border-radius:8px;border:2px solid #ffd700;transition:transform 0.2s;}
-  .gallery-container img:hover{transform:scale(1.05);}
-  @media (max-width:600px){
-    .gallery-container img{height:120px;}
-    header h1{font-size:1.5rem;}
-  }
+  * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins',sans-serif; }
+  html, body { height:100%; }
+  body { display:flex; flex-direction:column; min-height:100vh; background:linear-gradient(to right,#0f2027,#203a43,#2c5364); color:white; }
+  main { flex:1; padding:2rem; }
+  h1 { color:#ffd700; margin-bottom:1rem; text-align:center; }
+  label { display:block; margin:0.5rem 0 0.2rem 0; }
+  input, select, button { padding:0.5rem; margin-bottom:1rem; border-radius:5px; border:none; }
+  button { background:#ffd700; color:#000; font-weight:bold; cursor:pointer; }
+  #uploadSection { display:none; margin-top:2rem; }
+  #pinSection { text-align:center; }
+  select, input { width:100%; max-width:400px; }
+  #uploadMsg { margin-top:1rem; font-weight:bold; }
 </style>
 </head>
 <body>
-<header>
-  <h1>SJVM Event Gallery</h1>
-</header>
+
 <main>
+<h1>Upload Event Images</h1>
+
+<div id="pinSection">
+  <label>Enter Security PIN:</label>
+  <input type="password" id="pinInput" placeholder="PIN">
+  <button onclick="checkPIN()">Submit</button>
+  <p id="pinMsg" style="color:red;"></p>
+</div>
+
+<div id="uploadSection">
   <label>Select School Branch:</label>
   <select id="branchSelect"></select>
-  
-  <div id="eventsContainer"></div>
+
+  <label>Select Event:</label>
+  <select id="eventSelect"></select>
+
+  <label>Upload Images:</label>
+  <input type="file" id="imageInput" multiple accept="image/*">
+
+  <button onclick="uploadEvent()">Upload Event</button>
+  <p id="uploadMsg"></p>
+</div>
 </main>
 
 <script>
-// ---------- Load events.json ----------
-let eventsData = [];
-async function loadEvents(){
-  try{
-    const res = await fetch('events.json'); // Make sure events.json is in same folder
-    eventsData = await res.json();
+// ---------- Security PIN ----------
+let pinTimer = setTimeout(()=>{ window.location.href="index.html"; }, 20000);
+function checkPIN(){
+  const pin = document.getElementById("pinInput").value;
+  if(pin==="091118"){
+    clearTimeout(pinTimer);
+    document.getElementById("pinSection").style.display="none";
+    document.getElementById("uploadSection").style.display="block";
     loadBranches();
-  }catch(e){
-    alert("Failed to load events.json. Use Live Server or XAMPP.");
-    console.error(e);
+  } else {
+    document.getElementById("pinMsg").textContent = "Incorrect PIN!";
   }
 }
 
-// ---------- Load Branches ----------
-function loadBranches(){
+// ---------- Load Branches & Events ----------
+let eventsData = [];
+async function loadBranches(){
+  const res = await fetch('events.json');
+  eventsData = await res.json();
   const branchSet = new Set(eventsData.map(e=>e.school));
   const branchSelect = document.getElementById("branchSelect");
-  branchSelect.innerHTML="";
   branchSet.forEach(b=>{
     const opt = document.createElement("option"); opt.value=b; opt.textContent=b;
     branchSelect.appendChild(opt);
   });
-  branchSelect.addEventListener("change", displayEvents);
-  displayEvents();
+  branchSelect.addEventListener("change", updateEvents);
+  updateEvents();
 }
 
-// ---------- Display Events & Images ----------
-function displayEvents(){
+function updateEvents(){
   const selectedBranch = document.getElementById("branchSelect").value;
-  const container = document.getElementById("eventsContainer");
-  container.innerHTML="";
-
+  const eventSelect = document.getElementById("eventSelect");
+  eventSelect.innerHTML="";
   eventsData.filter(e=>e.school===selectedBranch).forEach(ev=>{
-    const section = document.createElement("div");
-    section.className="event-section";
-
-    const title = document.createElement("div");
-    title.className="event-title";
-    title.textContent = ev.title;
-    section.appendChild(title);
-
-    const gallery = document.createElement("div");
-    gallery.className="gallery-container";
-    ev.images.forEach(imgPath=>{
-      const img = document.createElement("img");
-      img.src = imgPath;
-      gallery.appendChild(img);
-    });
-    section.appendChild(gallery);
-
-    container.appendChild(section);
+    const opt = document.createElement("option"); opt.value=ev.id; opt.textContent=ev.title;
+    eventSelect.appendChild(opt);
   });
 }
 
-// ---------- Initialize ----------
-loadEvents();
+// ---------- GitHub Upload ----------
+async function uploadEvent(){
+  const selectedEventId = parseInt(document.getElementById("eventSelect").value);
+  const selectedEvent = eventsData.find(e=>e.id===selectedEventId);
+  const files = document.getElementById("imageInput").files;
+  if(files.length===0){ alert("Select at least one image."); return; }
+
+  const username = "Echoesofthe21stcentury"; // Your GitHub username
+  const repo = "sjvm-schools";              // Your repo
+  const branch = "main";
+  const token = "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"; // Your PAT
+  const imagesFolder = "images/";
+
+  const newImagePaths = [];
+
+  for(const file of files){
+    const b64 = await toBase64(file);
+    const path = `${imagesFolder}${file.name}`;
+    newImagePaths.push(path);
+
+    // Get SHA if file exists
+    let sha = null;
+    const getFile = await fetch(`https://api.github.com/repos/${username}/${repo}/contents/${path}?ref=${branch}`, {
+      headers:{Authorization:`token ${token}`}
+    });
+    if(getFile.ok){
+      const fileData = await getFile.json();
+      sha = fileData.sha;
+    }
+
+    // Upload image
+    await fetch(`https://api.github.com/repos/${username}/${repo}/contents/${path}`, {
+      method:"PUT",
+      headers:{Authorization:`token ${token}`},
+      body: JSON.stringify({
+        message: `Add ${file.name}`,
+        content: b64,
+        branch: branch,
+        sha: sha
+      })
+    });
+  }
+
+  // Update events.json with new image paths
+  selectedEvent.images.push(...newImagePaths);
+
+  // Get current SHA of events.json
+  const getEventsFile = await fetch(`https://api.github.com/repos/${username}/${repo}/contents/events.json?ref=${branch}`, {
+    headers:{Authorization:`token ${token}`}
+  });
+  const eventsFileData = await getEventsFile.json();
+  const eventsSHA = eventsFileData.sha;
+
+  // Upload updated events.json
+  const updateRes = await fetch(`https://api.github.com/repos/${username}/${repo}/contents/events.json`, {
+    method:"PUT",
+    headers:{Authorization:`token ${token}`},
+    body: JSON.stringify({
+      message: `Update images for ${selectedEvent.title}`,
+      content: btoa(JSON.stringify(eventsData, null, 2)),
+      branch: branch,
+      sha: eventsSHA
+    })
+  });
+
+  if(updateRes.ok){
+    document.getElementById("uploadMsg").textContent = "Event images uploaded and events.json updated!";
+  } else {
+    document.getElementById("uploadMsg").textContent = "Error updating events.json.";
+    console.error(await updateRes.json());
+  }
+}
+
+// Convert file to base64
+function toBase64(file){ 
+  return new Promise((resolve, reject)=>{
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = ()=> resolve(reader.result.split(",")[1]);
+    reader.onerror = err=> reject(err);
+  });
+}
 </script>
 </body>
 </html>
