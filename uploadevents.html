@@ -57,25 +57,34 @@ function checkPIN(){
     clearTimeout(pinTimer);
     document.getElementById("pinSection").style.display="none";
     document.getElementById("uploadSection").style.display="block";
-    loadBranches();
+    loadEventsJSON();
   } else {
     document.getElementById("pinMsg").textContent = "Incorrect PIN!";
   }
 }
 
-// ---------- Load Branches & Events ----------
-const eventsData = [
-  {id:1, school:"Bandikodigenahalli", title:"Annual Sports Meet 2025"},
-  {id:2, school:"Bandikodigenahalli", title:"Cultural Fest 2025"},
-  {id:3, school:"Atturu", title:"Science Exhibition 2025"},
-  {id:4, school:"Atturu", title:"Annual Day Celebration 2025"}
-];
+// ---------- Fetch events.json ----------
+let eventsData = [];
+async function loadEventsJSON(){
+  try{
+    const res = await fetch('events.json');
+    eventsData = await res.json();
+    loadBranches();
+  } catch(e){
+    document.getElementById("uploadMsg").textContent = "Error loading events.json";
+    console.error(e);
+  }
+}
 
+// ---------- Load Branches & Events ----------
 function loadBranches(){
   const branchSet = new Set(eventsData.map(e=>e.school));
   const branchSelect = document.getElementById("branchSelect");
+  branchSelect.innerHTML = "";
   branchSet.forEach(b=>{
-    const opt = document.createElement("option"); opt.value=b; opt.textContent=b;
+    const opt = document.createElement("option");
+    opt.value = b;
+    opt.textContent = b;
     branchSelect.appendChild(opt);
   });
   branchSelect.addEventListener("change", updateEvents);
@@ -87,7 +96,9 @@ function updateEvents(){
   const eventSelect = document.getElementById("eventSelect");
   eventSelect.innerHTML="";
   eventsData.filter(e=>e.school===selectedBranch).forEach(ev=>{
-    const opt = document.createElement("option"); opt.value=ev.id; opt.textContent=ev.title;
+    const opt = document.createElement("option");
+    opt.value = ev.id;
+    opt.textContent = ev.title;
     eventSelect.appendChild(opt);
   });
 }
