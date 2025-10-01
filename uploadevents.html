@@ -3,25 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Upload Events - SJVM</title>
+<title>Upload Event Images - SJVM</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
 <style>
-  * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins',sans-serif; }
-  html, body { height:100%; }
-  body { display:flex; flex-direction:column; min-height:100vh; background:linear-gradient(to right,#0f2027,#203a43,#2c5364); color:white; }
-  main { flex:1; padding:2rem; }
-  h1 { color:#ffd700; margin-bottom:1rem; text-align:center; }
-  label { display:block; margin:0.5rem 0 0.2rem 0; }
-  input, select, button { padding:0.5rem; margin-bottom:1rem; border-radius:5px; border:none; }
-  button { background:#ffd700; color:#000; font-weight:bold; cursor:pointer; }
-  #uploadSection { display:none; margin-top:2rem; }
-  #pinSection { text-align:center; }
-  select, input { width:100%; max-width:400px; }
-  #uploadMsg { margin-top:1rem; font-weight:bold; }
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
+body{background:linear-gradient(to right,#0f2027,#203a43,#2c5364);color:white;min-height:100vh;display:flex;flex-direction:column;}
+main{flex:1;padding:2rem;}
+h1{color:#ffd700;text-align:center;margin-bottom:1rem;}
+label{display:block;margin:0.5rem 0 0.2rem 0;}
+input, select, button{padding:0.5rem;margin-bottom:1rem;border-radius:5px;border:none;width:100%;max-width:400px;}
+button{background:#ffd700;color:#000;font-weight:bold;cursor:pointer;}
+#uploadSection{display:none;margin-top:2rem;}
+#pinSection{text-align:center;}
+#previewContainer{display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:1rem;justify-content:center;}
+.previewImage{width:120px;height:120px;object-fit:cover;border-radius:8px;border:2px solid #ffd700;}
+#uploadMsg{margin-top:1rem;font-weight:bold;text-align:center;}
 </style>
 </head>
 <body>
-
 <main>
 <h1>Upload Event Images</h1>
 
@@ -40,9 +39,11 @@
   <select id="eventSelect"></select>
 
   <label>Upload Images:</label>
-  <input type="file" id="imageInput" multiple accept="image/*">
+  <input type="file" id="imageInput" multiple accept="image/*" onchange="showPreview()">
 
-  <button onclick="uploadEvent()">Upload Event</button>
+  <div id="previewContainer"></div>
+
+  <button onclick="uploadEvent()">Upload Images</button>
   <p id="uploadMsg"></p>
 </div>
 </main>
@@ -56,19 +57,29 @@ function checkPIN(){
     clearTimeout(pinTimer);
     document.getElementById("pinSection").style.display="none";
     document.getElementById("uploadSection").style.display="block";
-    loadBranches();
+    loadEventsJSON();
   } else {
     document.getElementById("pinMsg").textContent = "Incorrect PIN!";
   }
 }
 
-// ---------- Load Branches & Events ----------
+// ---------- Load Events from events.json ----------
 let eventsData = [];
-async function loadBranches(){
-  const res = await fetch('events.json');
-  eventsData = await res.json();
+async function loadEventsJSON(){
+  try{
+    const res = await fetch('events.json'); // Make sure events.json is in the same folder
+    eventsData = await res.json();
+    loadBranches();
+  }catch(e){
+    alert("Failed to load events.json. Run via server (Live Server/XAMPP).");
+    console.error(e);
+  }
+}
+
+function loadBranches(){
   const branchSet = new Set(eventsData.map(e=>e.school));
   const branchSelect = document.getElementById("branchSelect");
+  branchSelect.innerHTML="";
   branchSet.forEach(b=>{
     const opt = document.createElement("option"); opt.value=b; opt.textContent=b;
     branchSelect.appendChild(opt);
@@ -82,87 +93,89 @@ function updateEvents(){
   const eventSelect = document.getElementById("eventSelect");
   eventSelect.innerHTML="";
   eventsData.filter(e=>e.school===selectedBranch).forEach(ev=>{
-    const opt = document.createElement("option"); opt.value=ev.id; opt.textContent=ev.title;
+    const opt = document.createElement("option");
+    opt.value = ev.id;
+    opt.textContent = ev.title;
     eventSelect.appendChild(opt);
   });
 }
 
-// ---------- GitHub Upload ----------
+// ---------- Preview Images ----------
+function showPreview(){
+  const files = document.getElementById("imageInput").files;
+  const container = document.getElementById("previewContainer");
+  container.innerHTML="";
+  Array.from(files).forEach(file=>{
+    const img = document.createElement("img");
+    img.className="previewImage";
+    img.src = URL.createObjectURL(file);
+    container.appendChild(img);
+  });
+}
+
+// ---------- Upload to GitHub ----------
 async function uploadEvent(){
   const selectedEventId = parseInt(document.getElementById("eventSelect").value);
   const selectedEvent = eventsData.find(e=>e.id===selectedEventId);
   const files = document.getElementById("imageInput").files;
-  if(files.length===0){ alert("Select at least one image."); return; }
+  if(files.length===0){ alert("Select images!"); return; }
 
-  const username = "Echoesofthe21stcentury"; // Your GitHub username
-  const repo = "sjvm-schools";              // Your repo
+  const token = prompt("Enter GitHub Access Token:");
+  if(!token){ alert("Token required!"); return; }
+
+  const username = "Echoesofthe21stcentury";
+  const repo = "sjvm-schools";
   const branch = "main";
-  const token = "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"; // Your PAT
-  const imagesFolder = "images/";
+  const folder = `images/${selectedEvent.school}/${selectedEvent.title.replace(/\s+/g,"_")}/`;
 
-  const newImagePaths = [];
+  document.getElementById("uploadMsg").textContent = "Uploading images...";
 
   for(const file of files){
-    const b64 = await toBase64(file);
-    const path = `${imagesFolder}${file.name}`;
-    newImagePaths.push(path);
+    try{
+      const b64 = await toBase64(file);
+      const path = folder + file.name;
 
-    // Get SHA if file exists
-    let sha = null;
-    const getFile = await fetch(`https://api.github.com/repos/${username}/${repo}/contents/${path}?ref=${branch}`, {
-      headers:{Authorization:`token ${token}`}
-    });
-    if(getFile.ok){
-      const fileData = await getFile.json();
-      sha = fileData.sha;
+      let sha = null;
+      const getFile = await fetch(`https://api.github.com/repos/${username}/${repo}/contents/${path}?ref=${branch}`, {
+        headers:{Authorization:`token ${token}`}
+      });
+      if(getFile.ok){
+        const fileData = await getFile.json();
+        sha = fileData.sha;
+      }
+
+      const uploadRes = await fetch(`https://api.github.com/repos/${username}/${repo}/contents/${path}`,{
+        method:"PUT",
+        headers:{Authorization:`token ${token}`},
+        body: JSON.stringify({
+          message: `Add ${file.name}`,
+          content: b64,
+          branch: branch,
+          sha: sha
+        })
+      });
+
+      if(!uploadRes.ok){
+        const err = await uploadRes.json();
+        document.getElementById("uploadMsg").textContent = `Error uploading ${file.name}: ${err.message}`;
+        return;
+      }
+
+    } catch(e){
+      document.getElementById("uploadMsg").textContent = `Error: ${e.message}`;
+      console.error(e);
+      return;
     }
-
-    // Upload image
-    await fetch(`https://api.github.com/repos/${username}/${repo}/contents/${path}`, {
-      method:"PUT",
-      headers:{Authorization:`token ${token}`},
-      body: JSON.stringify({
-        message: `Add ${file.name}`,
-        content: b64,
-        branch: branch,
-        sha: sha
-      })
-    });
   }
 
-  // Update events.json with new image paths
-  selectedEvent.images.push(...newImagePaths);
-
-  // Get current SHA of events.json
-  const getEventsFile = await fetch(`https://api.github.com/repos/${username}/${repo}/contents/events.json?ref=${branch}`, {
-    headers:{Authorization:`token ${token}`}
-  });
-  const eventsFileData = await getEventsFile.json();
-  const eventsSHA = eventsFileData.sha;
-
-  // Upload updated events.json
-  const updateRes = await fetch(`https://api.github.com/repos/${username}/${repo}/contents/events.json`, {
-    method:"PUT",
-    headers:{Authorization:`token ${token}`},
-    body: JSON.stringify({
-      message: `Update images for ${selectedEvent.title}`,
-      content: btoa(JSON.stringify(eventsData, null, 2)),
-      branch: branch,
-      sha: eventsSHA
-    })
-  });
-
-  if(updateRes.ok){
-    document.getElementById("uploadMsg").textContent = "Event images uploaded and events.json updated!";
-  } else {
-    document.getElementById("uploadMsg").textContent = "Error updating events.json.";
-    console.error(await updateRes.json());
-  }
+  document.getElementById("uploadMsg").textContent = "Images uploaded successfully!";
+  document.getElementById("previewContainer").innerHTML="";
+  document.getElementById("imageInput").value="";
 }
 
-// Convert file to base64
+// Convert to base64
 function toBase64(file){ 
-  return new Promise((resolve, reject)=>{
+  return new Promise((resolve,reject)=>{
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onload = ()=> resolve(reader.result.split(",")[1]);
