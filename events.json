@@ -2,7 +2,7 @@
   {
     "id": 1,
     "school": "Bandikodigenahalli",
-    "title": "Annual Sports Meet 2025",
+    "title": "First Day of School",
     "description": "A fun-filled sports day with competitions, races, and prizes.",
     "images": [
       "images/bk_sports1.jpg",
@@ -14,7 +14,7 @@
   {
     "id": 2,
     "school": "Bandikodigenahalli",
-    "title": "Cultural Fest 2025",
+    "title": "Aksharabhyasa & Padapooja",
     "description": "Dance, music, and drama performances by students.",
     "images": [
       "images/bk_cultural1.jpg",
@@ -25,7 +25,7 @@
   {
     "id": 3,
     "school": "Atturu",
-    "title": "Science Exhibition 2025",
+    "title": "First Day of School",
     "description": "Showcasing creative science projects by our students.",
     "images": [
       "images/atturu_science1.jpg",
@@ -36,7 +36,139 @@
   {
     "id": 4,
     "school": "Atturu",
-    "title": "Annual Day Celebration 2025",
+    "title": "Aksharabhyasa & PadaPooja",
+    "description": "A day filled with performances, awards, and celebrations.",
+    "images": [
+      "images/atturu_annual1.jpg",
+      "images/atturu_annual2.jpg"
+    ],
+    "pdf": "pdfs/atturu_annual2025.pdf"
+  }
+  {
+    "id": 5,
+    "school": "Atturu",
+    "title": "Annual Day Celebration 2024",
+    "description": "A day filled with performances, awards, and celebrations.",
+    "images": [
+      "images/atturu_annual1.jpg",
+      "images/atturu_annual2.jpg"
+    ],
+    "pdf": "pdfs/atturu_annual2025.pdf"
+  }
+  {
+    "id": 6,
+    "school": "Bandikodigenahalli",
+    "title": "Annual Day Celebration 2023",
+    "description": "A day filled with performances, awards, and celebrations.",
+    "images": [
+      "images/atturu_annual1.jpg",
+      "images/atturu_annual2.jpg"
+    ],
+    "pdf": "pdfs/atturu_annual2025.pdf"
+  }
+  {
+    "id": 7,
+    "school": "Bandikodigenahalli",
+    "title": "Environmental Day",
+    "description": "A day filled with performances, awards, and celebrations.",
+    "images": [
+      "images/atturu_annual1.jpg",
+      "images/atturu_annual2.jpg"
+    ],
+    "pdf": "pdfs/atturu_annual2025.pdf"
+  }
+  {
+    "id": 8,
+    "school": "Atturu",
+    "title": "Environmental Day",
+    "description": "A day filled with performances, awards, and celebrations.",
+    "images": [
+      "images/atturu_annual1.jpg",
+      "images/atturu_annual2.jpg"
+    ],
+    "pdf": "pdfs/atturu_annual2025.pdf"
+  }
+  {
+    "id": 9,
+    "school": "Atturu",
+    "title": "Navaratri Celebration 1to9 days",
+    "description": "A day filled with performances, awards, and celebrations.",
+    "images": [
+      "images/atturu_annual1.jpg",
+      "images/atturu_annual2.jpg"
+    ],
+    "pdf": "pdfs/atturu_annual2025.pdf"
+  }
+  {
+    "id": 10,
+    "school": "Bandikodigenahalli",
+    "title": "Navaratri Celebration 1to9 days",
+    "description": "A day filled with performances, awards, and celebrations.",
+    "images": [
+      "images/atturu_annual1.jpg",
+      "images/atturu_annual2.jpg"
+    ],
+    "pdf": "pdfs/atturu_annual2025.pdf"
+  }
+  {
+    "id": 11,
+    "school": "Atturu",
+    "title": "Dasara & Ayudhapooja Celebration",
+    "description": "A day filled with performances, awards, and celebrations.",
+    "images": [
+      "images/atturu_annual1.jpg",
+      "images/atturu_annual2.jpg"
+    ],
+    "pdf": "pdfs/atturu_annual2025.pdf"
+  }
+  {
+    "id": 12,
+    "school": "Bandikodigenahalli",
+    "title": "Dasara & Ayudhapooja Celebration",
+    "description": "A day filled with performances, awards, and celebrations.",
+    "images": [
+      "images/atturu_annual1.jpg",
+      "images/atturu_annual2.jpg"
+    ],
+    "pdf": "pdfs/atturu_annual2025.pdf"
+  }
+  {
+    "id": 13,
+    "school": "Atturu",
+    "title": "Independence day",
+    "description": "A day filled with performances, awards, and celebrations.",
+    "images": [
+      "images/atturu_annual1.jpg",
+      "images/atturu_annual2.jpg"
+    ],
+    "pdf": "pdfs/atturu_annual2025.pdf"
+  }
+  {
+    "id": 14,
+    "school": "Bandikodigenahalli",
+    "title": "Independence Day",
+    "description": "A day filled with performances, awards, and celebrations.",
+    "images": [
+      "images/atturu_annual1.jpg",
+      "images/atturu_annual2.jpg"
+    ],
+    "pdf": "pdfs/atturu_annual2025.pdf"
+  }
+  {
+    "id": 15,
+    "school": "Atturu",
+    "title": "Kannada Rajyothsava",
+    "description": "A day filled with performances, awards, and celebrations.",
+    "images": [
+      "images/atturu_annual1.jpg",
+      "images/atturu_annual2.jpg"
+    ],
+    "pdf": "pdfs/atturu_annual2025.pdf"
+  }
+  {
+    "id": 16,
+    "school": "Bandikodigenahalli",
+    "title": "Kannada Rajyothsava",
     "description": "A day filled with performances, awards, and celebrations.",
     "images": [
       "images/atturu_annual1.jpg",
