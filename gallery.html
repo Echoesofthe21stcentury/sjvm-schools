@@ -9,7 +9,23 @@
 
   <style>
     * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins',sans-serif; }
-    body { background: linear-gradient(to right,#0f2027,#203a43,#2c5364); color:white; }
+    html, body { 
+  height: 100%; 
+  margin: 0; 
+  padding: 0; 
+}
+
+body { 
+  display: flex; 
+  flex-direction: column; 
+  min-height: 100vh; 
+  background: linear-gradient(to right,#0f2027,#203a43,#2c5364); 
+  color:white; 
+}
+
+main { 
+  flex: 1; 
+}
 
     header { background-color:#1b2d3b; display:flex; justify-content:space-between; align-items:center; padding:1rem 2rem; flex-wrap:wrap; }
     .logo { display:flex; align-items:center; font-size:1.6rem; font-weight:bold; }
@@ -61,14 +77,17 @@
     <ul class="nav-links" id="navLinks">
       <li><a href="index.html">Home</a></li>
       <li><a href="forms.html">Admissions</a></li>
-      <li><a href="shop.html">Shop</a></li>
+      <li><a href="index.html">Shop</a></li>
+      <li><a href="https://careers.sjvmschools.org" target="_blank">Career Opportunities</a></li>
       <li><a href="gallery.html" class="active">Gallery</a></li>
       <li><a href="branches.html">Branches</a></li>
+      <li><a href="founders.html">Founder & Staff</a></li>
       <li><a href="contact.html">Contact</a></li>
       <li><a href="login.html" class="login-btn">Login</a></li>
     </ul>
   </header>
 
+<main>
   <!-- Gallery Section -->
   <section>
     <h1>Bandikodigenahalli Events</h1>
@@ -77,6 +96,8 @@
     <h1>Atturu Events</h1>
     <div class="gallery-container" id="atturuGallery"></div>
   </section>
+</main>
+
 
   <!-- Event Modal -->
   <div id="eventModal">
