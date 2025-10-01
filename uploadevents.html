@@ -18,6 +18,8 @@
   #pinSection { text-align:center; }
   select, input { width:100%; max-width:400px; }
   #uploadMsg { margin-top:1rem; font-weight:bold; }
+  #previewContainer { display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:1rem; justify-content:center; }
+  .previewImage { width:120px; height:120px; object-fit:cover; border-radius:8px; border:2px solid #ffd700; }
 </style>
 </head>
 <body>
@@ -40,7 +42,9 @@
   <select id="eventSelect"></select>
 
   <label>Upload Images:</label>
-  <input type="file" id="imageInput" multiple accept="image/*">
+  <input type="file" id="imageInput" multiple accept="image/*" onchange="showPreview()">
+
+  <div id="previewContainer"></div>
 
   <button onclick="uploadEvent()">Upload Event</button>
   <p id="uploadMsg"></p>
@@ -87,6 +91,19 @@ function updateEvents(){
   });
 }
 
+// ---------- Preview Images ----------
+function showPreview(){
+  const files = document.getElementById("imageInput").files;
+  const container = document.getElementById("previewContainer");
+  container.innerHTML="";
+  Array.from(files).forEach(file=>{
+    const img = document.createElement("img");
+    img.className="previewImage";
+    img.src = URL.createObjectURL(file);
+    container.appendChild(img);
+  });
+}
+
 // ---------- GitHub Upload ----------
 async function uploadEvent(){
   const selectedEventId = parseInt(document.getElementById("eventSelect").value);
@@ -107,7 +124,6 @@ async function uploadEvent(){
     const path = `${imagesFolder}${file.name}`;
     newImagePaths.push(path);
 
-    // Get SHA if file exists
     let sha = null;
     const getFile = await fetch(`https://api.github.com/repos/${username}/${repo}/contents/${path}?ref=${branch}`, {
       headers:{Authorization:`token ${token}`}
@@ -117,7 +133,6 @@ async function uploadEvent(){
       sha = fileData.sha;
     }
 
-    // Upload image
     await fetch(`https://api.github.com/repos/${username}/${repo}/contents/${path}`, {
       method:"PUT",
       headers:{Authorization:`token ${token}`},
@@ -130,17 +145,14 @@ async function uploadEvent(){
     });
   }
 
-  // Update events.json with new image paths
   selectedEvent.images.push(...newImagePaths);
 
-  // Get current SHA of events.json
   const getEventsFile = await fetch(`https://api.github.com/repos/${username}/${repo}/contents/events.json?ref=${branch}`, {
     headers:{Authorization:`token ${token}`}
   });
   const eventsFileData = await getEventsFile.json();
   const eventsSHA = eventsFileData.sha;
 
-  // Upload updated events.json
   const updateRes = await fetch(`https://api.github.com/repos/${username}/${repo}/contents/events.json`, {
     method:"PUT",
     headers:{Authorization:`token ${token}`},
@@ -154,6 +166,8 @@ async function uploadEvent(){
 
   if(updateRes.ok){
     document.getElementById("uploadMsg").textContent = "Event images uploaded and events.json updated!";
+    document.getElementById("previewContainer").innerHTML = "";
+    document.getElementById("imageInput").value = "";
   } else {
     document.getElementById("uploadMsg").textContent = "Error updating events.json.";
     console.error(await updateRes.json());
