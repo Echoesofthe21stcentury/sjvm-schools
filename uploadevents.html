@@ -67,7 +67,7 @@ function checkPIN(){
 let eventsData = [];
 async function loadEventsJSON(){
   try{
-    const res = await fetch('events.json');
+    const res = await fetch('./events.json');
     eventsData = await res.json();
     loadBranches();
   } catch(e){
