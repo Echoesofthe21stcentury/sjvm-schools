@@ -12,14 +12,12 @@
   main { flex:1; padding:2rem; }
   h1 { color:#ffd700; margin-bottom:1rem; text-align:center; }
   label { display:block; margin:0.5rem 0 0.2rem 0; }
-  input, select, button { padding:0.5rem; margin-bottom:1rem; border-radius:5px; border:none; }
+  input, select, button { padding:0.5rem; margin-bottom:1rem; border-radius:5px; border:none; width:100%; max-width:400px; }
   button { background:#ffd700; color:#000; font-weight:bold; cursor:pointer; }
-  #uploadSection { display:none; margin-top:2rem; }
-  #pinSection { text-align:center; }
-  select, input { width:100%; max-width:400px; }
-  #uploadMsg { margin-top:1rem; font-weight:bold; }
+  #uploadSection, #tokenSection { display:none; margin-top:2rem; text-align:center; }
   #previewContainer { display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:1rem; justify-content:center; }
   .previewImage { width:120px; height:120px; object-fit:cover; border-radius:8px; border:2px solid #ffd700; }
+  #pinSection { text-align:center; }
 </style>
 </head>
 <body>
@@ -27,6 +25,7 @@
 <main>
 <h1>Upload Event Images</h1>
 
+<!-- PIN Section -->
 <div id="pinSection">
   <label>Enter Security PIN:</label>
   <input type="password" id="pinInput" placeholder="PIN">
@@ -34,6 +33,15 @@
   <p id="pinMsg" style="color:red;"></p>
 </div>
 
+<!-- GitHub Token Section -->
+<div id="tokenSection">
+  <label>Enter GitHub Access Token:</label>
+  <input type="password" id="githubTokenInput" placeholder="PAT">
+  <button onclick="submitToken()">Submit Token</button>
+  <p id="tokenMsg" style="color:red;"></p>
+</div>
+
+<!-- Upload Section -->
 <div id="uploadSection">
   <label>Select School Branch:</label>
   <select id="branchSelect"></select>
@@ -52,21 +60,35 @@
 </main>
 
 <script>
-// ---------- Security PIN ----------
 let pinTimer = setTimeout(()=>{ window.location.href="index.html"; }, 20000);
+let githubToken = "";
+
+// -------- Security PIN --------
 function checkPIN(){
   const pin = document.getElementById("pinInput").value;
   if(pin==="091118"){
     clearTimeout(pinTimer);
     document.getElementById("pinSection").style.display="none";
-    document.getElementById("uploadSection").style.display="block";
-    loadBranches();
+    document.getElementById("tokenSection").style.display="block";
   } else {
     document.getElementById("pinMsg").textContent = "Incorrect PIN!";
   }
 }
 
-// ---------- Load Branches & Events ----------
+// -------- GitHub Token --------
+function submitToken(){
+  const tokenInput = document.getElementById("githubTokenInput").value.trim();
+  if(tokenInput.length===0){
+    document.getElementById("tokenMsg").textContent = "Enter a valid token!";
+    return;
+  }
+  githubToken = tokenInput;
+  document.getElementById("tokenSection").style.display="none";
+  document.getElementById("uploadSection").style.display="block";
+  loadBranches();
+}
+
+// -------- Load Branches & Events --------
 let eventsData = [];
 async function loadBranches(){
   const res = await fetch('events.json');
@@ -74,7 +96,9 @@ async function loadBranches(){
   const branchSet = new Set(eventsData.map(e=>e.school));
   const branchSelect = document.getElementById("branchSelect");
   branchSet.forEach(b=>{
-    const opt = document.createElement("option"); opt.value=b; opt.textContent=b;
+    const opt = document.createElement("option");
+    opt.value=b;
+    opt.textContent=b;
     branchSelect.appendChild(opt);
   });
   branchSelect.addEventListener("change", updateEvents);
@@ -86,12 +110,14 @@ function updateEvents(){
   const eventSelect = document.getElementById("eventSelect");
   eventSelect.innerHTML="";
   eventsData.filter(e=>e.school===selectedBranch).forEach(ev=>{
-    const opt = document.createElement("option"); opt.value=ev.id; opt.textContent=ev.title;
+    const opt = document.createElement("option");
+    opt.value=ev.id;
+    opt.textContent=ev.title;
     eventSelect.appendChild(opt);
   });
 }
 
-// ---------- Preview Images ----------
+// -------- Preview Images --------
 function showPreview(){
   const files = document.getElementById("imageInput").files;
   const container = document.getElementById("previewContainer");
@@ -104,19 +130,18 @@ function showPreview(){
   });
 }
 
-// ---------- GitHub Upload ----------
+// -------- Upload Event --------
 async function uploadEvent(){
   const selectedEventId = parseInt(document.getElementById("eventSelect").value);
   const selectedEvent = eventsData.find(e=>e.id===selectedEventId);
   const files = document.getElementById("imageInput").files;
   if(files.length===0){ alert("Select at least one image."); return; }
+  if(githubToken===""){ alert("Enter GitHub token first!"); return; }
 
-  const username = "Echoesofthe21stcentury"; // Your GitHub username
-  const repo = "sjvm-schools";              // Your repo
+  const username = "Echoesofthe21stcentury";
+  const repo = "sjvm-schools";
   const branch = "main";
-  const token = "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"; // Your PAT
   const imagesFolder = "images/";
-
   const newImagePaths = [];
 
   for(const file of files){
@@ -126,7 +151,7 @@ async function uploadEvent(){
 
     let sha = null;
     const getFile = await fetch(`https://api.github.com/repos/${username}/${repo}/contents/${path}?ref=${branch}`, {
-      headers:{Authorization:`token ${token}`}
+      headers:{Authorization:`token ${githubToken}`}
     });
     if(getFile.ok){
       const fileData = await getFile.json();
@@ -135,7 +160,7 @@ async function uploadEvent(){
 
     await fetch(`https://api.github.com/repos/${username}/${repo}/contents/${path}`, {
       method:"PUT",
-      headers:{Authorization:`token ${token}`},
+      headers:{Authorization:`token ${githubToken}`},
       body: JSON.stringify({
         message: `Add ${file.name}`,
         content: b64,
@@ -148,17 +173,19 @@ async function uploadEvent(){
   selectedEvent.images.push(...newImagePaths);
 
   const getEventsFile = await fetch(`https://api.github.com/repos/${username}/${repo}/contents/events.json?ref=${branch}`, {
-    headers:{Authorization:`token ${token}`}
+    headers:{Authorization:`token ${githubToken}`}
   });
   const eventsFileData = await getEventsFile.json();
   const eventsSHA = eventsFileData.sha;
 
+  function utf8_to_b64(str){ return window.btoa(unescape(encodeURIComponent(str))); }
+
   const updateRes = await fetch(`https://api.github.com/repos/${username}/${repo}/contents/events.json`, {
     method:"PUT",
-    headers:{Authorization:`token ${token}`},
+    headers:{Authorization:`token ${githubToken}`},
     body: JSON.stringify({
       message: `Update images for ${selectedEvent.title}`,
-      content: btoa(JSON.stringify(eventsData, null, 2)),
+      content: utf8_to_b64(JSON.stringify(eventsData, null, 2)),
       branch: branch,
       sha: eventsSHA
     })
