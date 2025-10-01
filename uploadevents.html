@@ -3,188 +3,94 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Upload Event Images - SJVM</title>
+<title>SJVM Event Gallery</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
 <style>
   *{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
-  body{background:linear-gradient(to right,#0f2027,#203a43,#2c5364);color:white;min-height:100vh;display:flex;flex-direction:column;}
-  main{flex:1;padding:2rem;}
-  h1{color:#ffd700;text-align:center;margin-bottom:1rem;}
-  label{display:block;margin:0.5rem 0 0.2rem 0;}
-  input, select, button{padding:0.5rem;margin-bottom:1rem;border-radius:5px;border:none;width:100%;max-width:400px;}
-  button{background:#ffd700;color:#000;font-weight:bold;cursor:pointer;}
-  #uploadSection{display:none;margin-top:2rem;}
-  #pinSection{text-align:center;}
-  #previewContainer{display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:1rem;justify-content:center;}
-  .previewImage{width:120px;height:120px;object-fit:cover;border-radius:8px;border:2px solid #ffd700;}
-  #uploadMsg{margin-top:1rem;font-weight:bold;text-align:center;}
+  body{background:linear-gradient(to right,#0f2027,#203a43,#2c5364);color:white;min-height:100vh;}
+  header{padding:1rem;text-align:center;background:#203a43;box-shadow:0 2px 5px rgba(0,0,0,0.3);}
+  header h1{color:#ffd700;font-size:1.8rem;}
+  main{padding:1rem;}
+  select{padding:0.5rem;border-radius:5px;border:none;margin-bottom:1rem;width:100%;max-width:400px;}
+  .gallery-container{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;}
+  .event-section{margin-bottom:2rem;}
+  .event-title{font-size:1.2rem;font-weight:bold;margin-bottom:0.5rem;color:#ffd700;text-align:center;}
+  .gallery-container img{width:100%;height:150px;object-fit:cover;border-radius:8px;border:2px solid #ffd700;transition:transform 0.2s;}
+  .gallery-container img:hover{transform:scale(1.05);}
+  @media (max-width:600px){
+    .gallery-container img{height:120px;}
+    header h1{font-size:1.5rem;}
+  }
 </style>
 </head>
 <body>
+<header>
+  <h1>SJVM Event Gallery</h1>
+</header>
 <main>
-<h1>Upload Event Images</h1>
-
-<div id="pinSection">
-  <label>Enter Security PIN:</label>
-  <input type="password" id="pinInput" placeholder="PIN">
-  <button onclick="checkPIN()">Submit</button>
-  <p id="pinMsg" style="color:red;"></p>
-</div>
-
-<div id="uploadSection">
   <label>Select School Branch:</label>
   <select id="branchSelect"></select>
-
-  <label>Select Event:</label>
-  <select id="eventSelect"></select>
-
-  <label>Upload Images:</label>
-  <input type="file" id="imageInput" multiple accept="image/*" onchange="showPreview()">
-
-  <div id="previewContainer"></div>
-
-  <button onclick="uploadEvent()">Upload Images</button>
-  <p id="uploadMsg"></p>
-</div>
+  
+  <div id="eventsContainer"></div>
 </main>
 
 <script>
-// ---------- Security PIN ----------
-let pinTimer = setTimeout(()=>{ window.location.href="index.html"; }, 20000);
-function checkPIN(){
-  const pin = document.getElementById("pinInput").value;
-  if(pin==="091118"){
-    clearTimeout(pinTimer);
-    document.getElementById("pinSection").style.display="none";
-    document.getElementById("uploadSection").style.display="block";
-    loadEventsJSON();
-  } else {
-    document.getElementById("pinMsg").textContent = "Incorrect PIN!";
-  }
-}
-
-// ---------- Fetch events.json ----------
+// ---------- Load events.json ----------
 let eventsData = [];
-async function loadEventsJSON(){
+async function loadEvents(){
   try{
-    const res = await fetch('events.json');
+    const res = await fetch('events.json'); // Make sure events.json is in same folder
     eventsData = await res.json();
     loadBranches();
-  } catch(e){
-    document.getElementById("uploadMsg").textContent = "Error loading events.json";
+  }catch(e){
+    alert("Failed to load events.json. Use Live Server or XAMPP.");
     console.error(e);
   }
 }
 
-// ---------- Load Branches & Events ----------
+// ---------- Load Branches ----------
 function loadBranches(){
   const branchSet = new Set(eventsData.map(e=>e.school));
   const branchSelect = document.getElementById("branchSelect");
-  branchSelect.innerHTML = "";
+  branchSelect.innerHTML="";
   branchSet.forEach(b=>{
-    const opt = document.createElement("option");
-    opt.value = b;
-    opt.textContent = b;
+    const opt = document.createElement("option"); opt.value=b; opt.textContent=b;
     branchSelect.appendChild(opt);
   });
-  branchSelect.addEventListener("change", updateEvents);
-  updateEvents();
+  branchSelect.addEventListener("change", displayEvents);
+  displayEvents();
 }
 
-function updateEvents(){
+// ---------- Display Events & Images ----------
+function displayEvents(){
   const selectedBranch = document.getElementById("branchSelect").value;
-  const eventSelect = document.getElementById("eventSelect");
-  eventSelect.innerHTML="";
-  eventsData.filter(e=>e.school===selectedBranch).forEach(ev=>{
-    const opt = document.createElement("option");
-    opt.value = ev.id;
-    opt.textContent = ev.title;
-    eventSelect.appendChild(opt);
-  });
-}
-
-// ---------- Preview Images ----------
-function showPreview(){
-  const files = document.getElementById("imageInput").files;
-  const container = document.getElementById("previewContainer");
+  const container = document.getElementById("eventsContainer");
   container.innerHTML="";
-  Array.from(files).forEach(file=>{
-    const img = document.createElement("img");
-    img.className="previewImage";
-    img.src = URL.createObjectURL(file);
-    container.appendChild(img);
+
+  eventsData.filter(e=>e.school===selectedBranch).forEach(ev=>{
+    const section = document.createElement("div");
+    section.className="event-section";
+
+    const title = document.createElement("div");
+    title.className="event-title";
+    title.textContent = ev.title;
+    section.appendChild(title);
+
+    const gallery = document.createElement("div");
+    gallery.className="gallery-container";
+    ev.images.forEach(imgPath=>{
+      const img = document.createElement("img");
+      img.src = imgPath;
+      gallery.appendChild(img);
+    });
+    section.appendChild(gallery);
+
+    container.appendChild(section);
   });
 }
 
-// ---------- Upload to GitHub ----------
-async function uploadEvent(){
-  const selectedEventId = parseInt(document.getElementById("eventSelect").value);
-  const selectedEvent = eventsData.find(e=>e.id===selectedEventId);
-  const files = document.getElementById("imageInput").files;
-  if(files.length===0){ alert("Select images!"); return; }
-
-  const token = prompt("Enter GitHub Access Token:");
-  if(!token){ alert("Token required!"); return; }
-
-  const username = "Echoesofthe21stcentury";
-  const repo = "sjvm-schools";
-  const branch = "main";
-  const folder = `images/${selectedEvent.school}/${selectedEvent.title.replace(/\s+/g,"_")}/`;
-
-  document.getElementById("uploadMsg").textContent = "Uploading images...";
-
-  for(const file of files){
-    try{
-      const b64 = await toBase64(file);
-      const path = folder + file.name;
-
-      let sha = null;
-      const getFile = await fetch(`https://api.github.com/repos/${username}/${repo}/contents/${path}?ref=${branch}`, {
-        headers:{Authorization:`token ${token}`}
-      });
-      if(getFile.ok){
-        const fileData = await getFile.json();
-        sha = fileData.sha;
-      }
-
-      const uploadRes = await fetch(`https://api.github.com/repos/${username}/${repo}/contents/${path}`,{
-        method:"PUT",
-        headers:{Authorization:`token ${token}`},
-        body: JSON.stringify({
-          message: `Add ${file.name}`,
-          content: b64,
-          branch: branch,
-          sha: sha
-        })
-      });
-
-      if(!uploadRes.ok){
-        const err = await uploadRes.json();
-        document.getElementById("uploadMsg").textContent = `Error uploading ${file.name}: ${err.message}`;
-        return;
-      }
-
-    } catch(e){
-      document.getElementById("uploadMsg").textContent = `Error: ${e.message}`;
-      console.error(e);
-      return;
-    }
-  }
-
-  document.getElementById("uploadMsg").textContent = "Images uploaded successfully!";
-  document.getElementById("previewContainer").innerHTML="";
-  document.getElementById("imageInput").value="";
-}
-
-// Convert to base64
-function toBase64(file){ 
-  return new Promise((resolve,reject)=>{
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = ()=> resolve(reader.result.split(",")[1]);
-    reader.onerror = err=> reject(err);
-  });
-}
+// ---------- Initialize ----------
+loadEvents();
 </script>
 </body>
 </html>
