@@ -25,7 +25,7 @@
 <h1>Upload Event Images</h1>
 
 <div id="pinSection">
-  <label>Enter Security PIN:</label>
+  <label>Enter Security Key:</label>
   <input type="password" id="pinInput" placeholder="PIN">
   <button onclick="checkPIN()">Submit</button>
   <p id="pinMsg" style="color:red;"></p>
@@ -123,7 +123,7 @@ async function uploadEvent(){
   const files = document.getElementById("imageInput").files;
   if(files.length===0){ alert("Select images!"); return; }
 
-  const token = prompt("Enter GitHub Access Token:");
+  const token = prompt("Enter Submission Code");
   if(!token){ alert("Token required!"); return; }
 
   const username = "Echoesofthe21stcentury";
