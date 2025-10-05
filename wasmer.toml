@@ -1,0 +1,13 @@
+[package]
+name = "sjvm-schools"
+version = "1.0.0"
+
+[[module]]
+name = "backend"
+source = "."
+runtime = "php"
+command = "index.php"
+
+[build]
+# This line tells Wasmer not to use Composer
+command = "echo 'No composer required'"
