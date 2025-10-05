@@ -9,5 +9,4 @@ runtime = "php"
 command = "index.php"
 
 [build]
-# This line tells Wasmer not to use Composer
 command = "echo 'No composer required'"
